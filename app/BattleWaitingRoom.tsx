@@ -11,14 +11,14 @@ import {
 } from 'react-native';
 import { MotiView, MotiText } from 'moti';
 import { Flame, Zap, Trophy, Users, Clock, Swords, Sparkles } from 'lucide-react-native';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { AnimatedAvatar } from '@/components/battle/AnimatedAvatar';
+import { AnimatedAvatar } from '../components/battle/AnimatedAvatar';
 import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface BattleParticipant {
   id: string;
