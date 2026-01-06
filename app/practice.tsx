@@ -143,7 +143,10 @@ export default function PracticeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.subjectsContainer}
-              style={styles.subjectsScroll}
+              style={[
+                styles.subjectsScroll,
+                isMobile && { marginBottom: 8 }
+              ]}
             >
               {subjects.map((subj) => (
                 <SubjectFilterBubble
@@ -160,7 +163,10 @@ export default function PracticeScreen() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.chaptersContainer}
-                style={styles.chaptersScroll}
+                style={[
+                  styles.chaptersScroll,
+                  isMobile && { marginBottom: 8 }
+                ]}
               >
                 {currentChapters.map((chapter) => (
                   <ChapterFilterBubble
