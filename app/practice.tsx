@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { Eye, EyeOff, Bookmark, XCircle, ArrowUp, ArrowDown, Filter } from "lucide-react-native";
 import { SubjectFilterBubble } from "@/components/SubjectFilterBubble";
+import { ChapterFilterBubble } from "@/components/ChapterFilterBubble";
 import { PracticeCard } from "@/components/PracticeCard";
 import { usePracticeData } from "@/hooks/usePracticeData";
 import MainLayout from "@/components/MainLayout";
@@ -24,6 +25,14 @@ export default function PracticeScreen() {
 
   const [containersVisible, setContainersVisible] = useState(true);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState("General Medicine");
+  const [selectedCategory, setSelectedCategory] =
+    useState<"unviewed" | "viewed" | "bookmarked" | "wrong">("unviewed");
+  const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [showScrollControls, setShowScrollControls] = useState(false);
+   // ✅ FIX 1 — declare ref BEFORE scroll effect
+  const listRef = React.useRef<FlatList>(null);
 
   const subjects = [
     "General Medicine",
@@ -47,13 +56,46 @@ export default function PracticeScreen() {
     "Radiology",
   ];
 
-  const [selectedSubject, setSelectedSubject] = useState("General Medicine");
-  const [selectedCategory, setSelectedCategory] =
-    useState<"unviewed" | "viewed" | "bookmarked" | "wrong">("unviewed");
-  const [userId, setUserId] = useState<string | null>(null);
-  const [showScrollControls, setShowScrollControls] = useState(false);
-   // ✅ FIX 1 — declare ref BEFORE scroll effect
-  const listRef = React.useRef<FlatList>(null);
+  const chaptersBySubject: Record<string, string[]> = {
+    "General Medicine": [
+      "Cardiology",
+      "Respiratory",
+      "Gastroenterology",
+      "Neurology",
+      "Nephrology",
+      "Endocrinology",
+    ],
+    "Anatomy": [
+      "Upper Limb",
+      "Lower Limb",
+      "Thorax",
+      "Abdomen",
+      "Head & Neck",
+    ],
+    "General Surgery": [
+      "GI Surgery",
+      "Vascular Surgery",
+      "Breast Surgery",
+      "Endocrine Surgery",
+    ],
+    "Obstetrics and Gynaecology": [
+      "Obstetrics",
+      "Gynaecology",
+      "Reproductive Medicine",
+    ],
+  };
+
+  const currentChapters = chaptersBySubject[selectedSubject] || [];
+
+  const handleSubjectChange = (subj: string) => {
+    setSelectedSubject(subj);
+    const chapters = chaptersBySubject[subj];
+    if (chapters && chapters.length > 0) {
+      setSelectedChapter(chapters[0]);
+    } else {
+      setSelectedChapter(null);
+    }
+  };
  
   
   useEffect(() => {
@@ -62,6 +104,13 @@ export default function PracticeScreen() {
       setUserId(session?.user?.id ?? null);
     };
     loadUser();
+  }, []);
+
+  useEffect(() => {
+    const chapters = chaptersBySubject[selectedSubject];
+    if (chapters && chapters.length > 0 && !selectedChapter) {
+      setSelectedChapter(chapters[0]);
+    }
   }, []);
 
   const practiceData = usePracticeData(selectedSubject, userId, selectedCategory);
@@ -101,10 +150,28 @@ export default function PracticeScreen() {
                   key={subj}
                   subject={subj}
                   selected={selectedSubject === subj}
-                  onPress={() => setSelectedSubject(subj)}
+                  onPress={() => handleSubjectChange(subj)}
                 />
               ))}
             </ScrollView>
+
+            {currentChapters.length > 0 && (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.chaptersContainer}
+                style={styles.chaptersScroll}
+              >
+                {currentChapters.map((chapter) => (
+                  <ChapterFilterBubble
+                    key={chapter}
+                    chapter={chapter}
+                    selected={selectedChapter === chapter}
+                    onPress={() => setSelectedChapter(chapter)}
+                  />
+                ))}
+              </ScrollView>
+            )}
 
             <View style={styles.categoryContainer}>
               <TouchableOpacity
@@ -258,6 +325,14 @@ const styles = StyleSheet.create({
   subjectsScroll: { marginBottom: 16 },
 
   subjectsContainer: {
+    paddingHorizontal: 16,
+    gap: 8,
+    flexWrap: "wrap",
+  },
+
+  chaptersScroll: { marginBottom: 16 },
+
+  chaptersContainer: {
     paddingHorizontal: 16,
     gap: 8,
     flexWrap: "wrap",
