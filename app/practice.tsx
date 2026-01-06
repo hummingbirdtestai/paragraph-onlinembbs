@@ -67,7 +67,7 @@ const subjects = [
 
 
 const chaptersBySubject: Record<string, string[]> = {
-  Anatomy: [
+  "Anatomy": [
     "General Anatomy",
     "Neuroanatomy",
     "Upper Limb",
@@ -80,7 +80,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Embryology & Genetics"
   ],
 
-  Physiology: [
+  "Physiology": [
     "General Physiology",
     "Systemic Physiology",
     "Basic Sciences Applied to Physiology",
@@ -88,7 +88,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Physiology – Core Concepts"
   ],
 
-  Biochemistry: [
+  "Biochemistry": [
     "General Biochemistry",
     "Enzymology",
     "Carbohydrate Metabolism",
@@ -101,9 +101,9 @@ const chaptersBySubject: Record<string, string[]> = {
     "Integrated / Clinical Correlation"
   ],
 
-  Microbiology: [],
+  "Microbiology": [],
 
-  Pharmacology: [
+  "Pharmacology": [
     "Clinical Pharmacology",
     "Experimental Pharmacology",
     "Basic Sciences Applied to Pharmacology",
@@ -111,7 +111,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Pharmacology – Core Concepts"
   ],
 
-  Pathology: [
+  "Pathology": [
     "General Pathology",
     "Pathology – Core Concepts",
     "Clinical Pathology",
@@ -121,7 +121,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Applied & Integrated Pathology"
   ],
 
-  PSM: [
+  "PSM": [
     "Introduction to Community Medicine",
     "Environmental Health",
     "Health Promotion & Health Education",
@@ -137,7 +137,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Integrated / Applied Community Medicine"
   ],
 
-  Forensic: [
+  "Forensic": [
     "Introduction & General Principles of Forensic Medicine",
     "Forensic Pathology",
     "Clinical Forensic Medicine",
@@ -153,14 +153,14 @@ const chaptersBySubject: Record<string, string[]> = {
     "Applied & Integrated Forensic Medicine"
   ],
 
-  ENT: [
+  "ENT": [
     "Basic Sciences of ENT",
     "ENT Clinical Examination & Procedures",
     "Diseases of Ear, Nose & Throat",
     "Applied & Integrated ENT"
   ],
 
-  Ophthalmology: [
+  "Ophthalmology": [
     "Clinical Examination of the Eye",
     "Lids, Adnexa & Orbit",
     "Conjunctiva",
@@ -171,7 +171,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Systemic Diseases & Miscellaneous Ophthalmology"
   ],
 
-  General Medicine: [
+  "General Medicine": [
     "Cardiology",
     "Respiratory Medicine",
     "Infectious Diseases",
@@ -191,7 +191,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Allied Clinical Specialties"
   ],
 
-  General Surgery: [
+  "General Surgery": [
     "Head & Neck and Oral Surgery",
     "Principles of Surgery",
     "Blood Transfusion & Hemostasis",
@@ -209,7 +209,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Allied Clinical Disciplines"
   ],
 
-  Obstetrics: [
+  "Obstetrics": [
     "Community Obstetrics & Public Health",
     "Basics of Reproduction & Preconception Care",
     "Medical Disorders Complicating Pregnancy",
@@ -227,7 +227,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Clinical Observation & Case Based Learning"
   ],
 
-  Gynecology: [
+  "Gynecology": [
     "Applied & Integrated Gynecology",
     "Anatomy & Development of Female Reproductive System",
     "Gynecological Oncology & Pathology",
@@ -242,7 +242,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Gynecological Oncology – Adjuvant Therapy"
   ],
 
-  Pediatrics: [
+  "Pediatrics": [
     "Growth, Development & Adolescence",
     "Pediatrics – Core Concepts",
     "Pediatric Nutrition",
@@ -255,7 +255,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Applied & Integrated Pediatrics"
   ],
 
-  Orthopaedics: [
+  "Orthopaedics": [
     "Traumatology & Fractures",
     "Amputation & Rehabilitation",
     "Neurological Conditions with Orthopaedic Relevance",
@@ -270,7 +270,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Basic Sciences in Orthopaedics"
   ],
 
-  Dermatology: [
+  "Dermatology": [
     "Acne and Related Disorders",
     "Pigmentary Disorders",
     "Papulosquamous Disorders",
@@ -288,7 +288,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Basic Sciences in Dermatology"
   ],
 
-  Psychiatry: [
+  "Psychiatry": [
     "Psychiatry – Core Concepts",
     "Introduction & Mental Health",
     "Major Psychiatric Disorders",
@@ -299,7 +299,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Applied Psychiatry"
   ],
 
-  Anaesthesiology: [
+  "Anaesthesiology": [
     "Introduction & Patient Safety",
     "Resuscitation & Emergency Anaesthesia",
     "Preoperative Assessment & Preparation",
@@ -312,12 +312,12 @@ const chaptersBySubject: Record<string, string[]> = {
     "Applied & Integrated Anaesthesiology"
   ],
 
-  Radiodiagnosis: [
+  "Radiodiagnosis": [
     "Radiation Physics & Safety",
     "System-wise Radiology"
   ],
 
-  Radiotherapy: [
+  "Radiotherapy": [
     "Principles of Radiotherapy",
     "Radiation Safety",
     "Radiotherapy Techniques",
@@ -325,6 +325,7 @@ const chaptersBySubject: Record<string, string[]> = {
     "Applied Radiotherapy"
   ]
 };
+
 
   const currentChapters = chaptersBySubject[selectedSubject] || [];
 
