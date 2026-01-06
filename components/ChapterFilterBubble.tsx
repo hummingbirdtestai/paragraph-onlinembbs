@@ -24,19 +24,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a2329',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#25D366',
+    borderColor: 'rgba(37, 211, 102, 0.4)',
   },
   chipSelected: {
-    backgroundColor: '#25D366',
+    backgroundColor: 'rgba(37, 211, 102, 0.15)',
+    borderColor: '#25D366',
   },
   chipText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#25D366',
+    fontSize: 13,
+    fontWeight: '400',
+    color: 'rgba(37, 211, 102, 0.9)',
   },
   chipTextSelected: {
-    color: '#0b141a',
+    color: '#25D366',
+    fontWeight: '500',
   },
 });
