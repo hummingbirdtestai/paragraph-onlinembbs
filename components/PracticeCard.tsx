@@ -2,7 +2,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { useWindowDimensions } from "react-native";
-import ConceptChatScreen from "@/components/types/Conceptscreen";
+import HighYieldFactSheetScreen from "@/components/types/HighYieldFactSheetScreen";
 import MCQChatScreen from "@/components/types/MCQScreen";
 import { TouchableOpacity } from "react-native";
 import { Bookmark } from "lucide-react-native";
@@ -21,6 +21,8 @@ export function PracticeCard({ phase }) {
   const router = useRouter();
   // Local bookmark state (like FlashcardCard)
 const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
+  const subjectName = phase.subject ?? phase.textbook_chapter;
+
 
 
   // 🔵 DEBUG: Log concept/mcq IDs when card loads
@@ -43,8 +45,8 @@ const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
   return (
     <View style={[styles.card, isConcept && styles.cardConcept]}>
       {/* SUBJECT NAME */}
-     <Text style={[styles.subject, isConcept && styles.subjectConcept]}>
-  {phase.textbook_chapter}
+<Text style={[styles.subject, isConcept && styles.subjectConcept]}>
+  {subjectName}
 </Text>
       {/* 🔖 Inline bookmark icon (same as flashcards) */}
 <View style={[styles.bookmarkRow, isConcept && styles.bookmarkRowConcept]}>
@@ -52,19 +54,20 @@ const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
     onPress={async () => {
       if (!user?.id) return;
 
-      console.log("🔖 Toggle practice bookmark", {
-        practicecard_id: phase.id,
-        subject: phase.subject,
-      });
+console.log("🔖 Toggle practice bookmark", {
+  practicecard_id: phase.id,
+  subject: subjectName,
+});
 
-      const { data, error } = await supabase.rpc(
-        "toggle_practice_bookmark_v1",
-        {
-          p_student_id: user.id,
-          p_practicecard_id: phase.id,
-         p_subject: phase.textbook_chapter,
-        }
-      );
+
+     const { data, error } = await supabase.rpc(
+  "toggle_practice_bookmark_v1",
+  {
+    p_student_id: user.id,
+    p_practicecard_id: phase.id,
+    p_subject: subjectName,
+  }
+);
 
       if (error) {
         console.log("❌ Bookmark toggle error:", error);
@@ -93,16 +96,12 @@ const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
       </View>
 
       {/* FULL VIEW RENDER */}
-      {isConcept && (
-        <ConceptChatScreen
-          item={phase.phase_json}
-          studentId={"practice-view"}
-          isBookmarked={false}
-          reviewMode={true}
-          hideInternalNext={true}
-          phaseUniqueId={phase.id}
-        />
-      )}
+{isConcept && (
+  <HighYieldFactSheetScreen
+    data={phase.phase_json?.concept ?? ""}
+  />
+)}
+
 
 {isMCQ && (
   <View style={isWeb ? styles.webConstrained : undefined}>
@@ -113,7 +112,7 @@ const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
   correctAnswer={phase.phase_json?.correct_answer}
   reactOrderFinal={phase.react_order_final}
   phaseUniqueId={phase.id}
-  subject={phase.textbook_chapter}
+  subject={subjectName}
   isBookmarked={isBookmarked}
   reviewMode={false}
   mode="practice"
@@ -123,10 +122,11 @@ const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
 <AskParagraphButton
   studentId={user?.id}
   mcqId={phase.id}
-  subjectName={phase.textbook_chapter}
+  subjectName={subjectName}
   phaseJson={phase.phase_json}
   reactOrder={phase.react_order_final}
 />
+
 
   </View>
 )}

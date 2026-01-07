@@ -290,9 +290,10 @@ const chaptersBySubject: Record<string, string[]> = {
   ]
 };
   
-  const [selectedChapter, setSelectedChapter] = useState<string | null>(
-  chaptersBySubject["General Medicine"]?.[0] ?? null
-);
+const initialChapter =
+  chaptersBySubject["General Medicine"]?.[0] ?? "";
+const [selectedChapter, setSelectedChapter] = useState(initialChapter);
+
   const [userId, setUserId] = useState<string | null>(null);
   const [showScrollControls, setShowScrollControls] = useState(false);
    // ✅ FIX 1 — declare ref BEFORE scroll effect
@@ -333,7 +334,6 @@ const subjects = [
   const currentChapters = chaptersBySubject[selectedSubject] || [];
 
  
-  
   useEffect(() => {
     const loadUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -344,17 +344,14 @@ const subjects = [
 
   
 const handleSubjectChange = (subj: string) => {
-  console.log("🧠 Subject changed →", subj);
-
   setSelectedSubject(subj);
 
   const chapters = chaptersBySubject[subj];
-  const nextChapter = chapters?.[0] ?? null;
+  const nextChapter = chapters?.[0] ?? "";
 
-  console.log("📘 Auto-selecting first chapter →", nextChapter);
-
-  setSelectedChapter(nextChapter);
+  setSelectedChapter(nextChapter);   // NEVER null
 };
+
 
 
  const practiceData = usePracticeData(selectedChapter, userId, selectedCategory);
@@ -369,11 +366,12 @@ const handleSubjectChange = (subj: string) => {
 } = practiceData;
   const PAGE_LIMIT = 20;
  // Scroll to top ONLY when subject or category changes
-  useEffect(() => {
-    if (listRef.current) {
-      listRef.current.scrollToOffset({ offset: 0, animated: true });
-    }
-  }, [selectedCategory, selectedSubject]);
+useEffect(() => {
+  if (listRef.current) {
+    listRef.current.scrollToOffset({ offset: 0, animated: true });
+  }
+}, [selectedCategory, selectedChapter]);
+
 
 
 
@@ -663,4 +661,3 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
 });
-

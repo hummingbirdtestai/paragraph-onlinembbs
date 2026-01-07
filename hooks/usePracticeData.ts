@@ -4,8 +4,8 @@ import { supabase } from "@/lib/supabaseClient";
 // 🔴 ADD THIS EXACT LINE
 console.log("🚨 usePracticeData.ts FILE LOADED 🚨");
 export function usePracticeData(
-  textbookChapter = null,
-  userId = null,
+  textbookChapter: string,
+  userId: string | null,
   category = "unviewed"
 ) {
   const [phases, setPhases] = useState([]);
@@ -21,7 +21,7 @@ export function usePracticeData(
   const LIMIT = 20;
 
   const fetchPhases = async (currentOffset = 0) => {
-    if (!textbookChapter || !userId) {
+    if (!userId) {
       setPhases([]);
       setLoading(false);
       return;
@@ -39,9 +39,11 @@ export function usePracticeData(
     );
 
     if (error) {
-      console.log("RPC Error", error);
-      return;
-    }
+    console.log("RPC Error", error);
+    setIsLoadingMore(false);
+    setLoading(false);
+    return;
+  }
 
     // ⭐ If NO new records → no more pagination
     if (!data || data.length === 0) {
@@ -103,4 +105,3 @@ export function usePracticeData(
     hasMoreData,       // Optional, if UI needs to show “No more items”
   };
 }
-
