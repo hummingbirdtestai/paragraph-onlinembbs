@@ -1,7 +1,8 @@
 //usePracticeData.ts
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-
+// 🔴 ADD THIS EXACT LINE
+console.log("🚨 usePracticeData.ts FILE LOADED 🚨");
 export function usePracticeData(
   textbookChapter = null,
   userId = null,

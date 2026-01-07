@@ -1,7 +1,6 @@
 // contexts/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-
 interface AuthContextType {
   user: any | null;
   session: any | null;

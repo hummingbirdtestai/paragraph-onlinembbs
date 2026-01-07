@@ -18,7 +18,8 @@ import { usePracticeData } from "@/hooks/usePracticeData";
 import MainLayout from "@/components/MainLayout";
 import { supabase } from "@/lib/supabaseClient";
 import { FlatList } from "react-native";
-
+// 🔴 ADD THIS EXACT LINE
+console.log("🚨 practice.tsx FILE LOADED 🚨");
 export default function PracticeScreen() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
@@ -28,43 +29,6 @@ export default function PracticeScreen() {
   const [selectedSubject, setSelectedSubject] = useState("General Medicine");
   const [selectedCategory, setSelectedCategory] =
     useState<"unviewed" | "viewed" | "bookmarked" | "wrong">("unviewed");
-  const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [showScrollControls, setShowScrollControls] = useState(false);
-   // ✅ FIX 1 — declare ref BEFORE scroll effect
-  const listRef = React.useRef<FlatList>(null);
-
-const subjects = [
-  // 1st MBBS
-  "Anatomy",
-  "Physiology",
-  "Biochemistry",
-
-  // 2nd MBBS
-  "Microbiology",
-  "Pharmacology",
-  "Pathology",
-  "PSM",
-  "Forensic",
-
-  // 3rd MBBS – Part 1
-  "ENT",
-  "Ophthalmology",
-
-  // 3rd MBBS – Part 2 / Final
-  "General Medicine",
-  "General Surgery",
-  "Obstetrics",
-  "Gynecology",
-  "Pediatrics",
-  "Orthopaedics",
-  "Dermatology",
-  "Psychiatry",
-  "Anaesthesiology",
-  "Radiodiagnosis",
-  "Radiotherapy"
-];
-
 
 const chaptersBySubject: Record<string, string[]> = {
   "Anatomy": [
@@ -325,6 +289,45 @@ const chaptersBySubject: Record<string, string[]> = {
     "Applied Radiotherapy"
   ]
 };
+  
+  const [selectedChapter, setSelectedChapter] = useState<string | null>(
+  chaptersBySubject["General Medicine"]?.[0] ?? null
+);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [showScrollControls, setShowScrollControls] = useState(false);
+   // ✅ FIX 1 — declare ref BEFORE scroll effect
+  const listRef = React.useRef<FlatList>(null);
+
+const subjects = [
+  // 1st MBBS
+  "Anatomy",
+  "Physiology",
+  "Biochemistry",
+
+  // 2nd MBBS
+  "Microbiology",
+  "Pharmacology",
+  "Pathology",
+  "PSM",
+  "Forensic",
+
+  // 3rd MBBS – Part 1
+  "ENT",
+  "Ophthalmology",
+
+  // 3rd MBBS – Part 2 / Final
+  "General Medicine",
+  "General Surgery",
+  "Obstetrics",
+  "Gynecology",
+  "Pediatrics",
+  "Orthopaedics",
+  "Dermatology",
+  "Psychiatry",
+  "Anaesthesiology",
+  "Radiodiagnosis",
+  "Radiotherapy"
+];
 
 
   const currentChapters = chaptersBySubject[selectedSubject] || [];
@@ -351,10 +354,10 @@ const chaptersBySubject: Record<string, string[]> = {
   
   useEffect(() => {
     const chapters = chaptersBySubject[selectedSubject];
-    if (chapters && chapters.length > 0 && !selectedChapter) {
+    if (chapters && chapters.length > 0) {
       setSelectedChapter(chapters[0]);
     }
-  }, []);
+  }, [selectedSubject]);
 
  const practiceData = usePracticeData(selectedChapter, userId, selectedCategory);
  const {
@@ -416,7 +419,14 @@ const chaptersBySubject: Record<string, string[]> = {
                     key={chapter}
                     chapter={chapter}
                     selected={selectedChapter === chapter}
-                    onPress={() => setSelectedChapter(chapter)}
+                    onPress={() => {
+                      console.log("🟢 [UI CLICK] Chapter clicked", {
+                        subject: selectedSubject,
+                        textbook_chapter: chapter,
+                        length: chapter?.length,
+                      });
+                      setSelectedChapter(chapter);
+                    }}
                   />
                 ))}
               </ScrollView>
