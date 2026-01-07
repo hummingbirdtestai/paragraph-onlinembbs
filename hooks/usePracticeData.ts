@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export function usePracticeData(
-  subject = null,
+  textbookChapter = null,
   userId = null,
   category = "unviewed"
 ) {
@@ -20,7 +20,7 @@ export function usePracticeData(
   const LIMIT = 20;
 
   const fetchPhases = async (currentOffset = 0) => {
-    if (!subject || !userId) {
+    if (!textbookChapter || !userId) {
       setPhases([]);
       setLoading(false);
       return;
@@ -29,7 +29,7 @@ export function usePracticeData(
     const { data, error } = await supabase.rpc(
       "get_concept_practice_feed_v14",
       {
-        p_subject: subject,
+        p_textbook_chapter: textbookChapter,
         p_student_id: userId,
         p_filter: category,
         p_limit: LIMIT,
@@ -62,10 +62,11 @@ export function usePracticeData(
 
   useEffect(() => {
     setOffset(0);
-    setHasMoreData(true);   // ⭐ RESET WHEN SUBJECT/CATEGORY CHANGE
+    setHasMoreData(true);
     setLoading(true);
     fetchPhases(0);
-  }, [subject, userId, category]);
+  }, [textbookChapter, userId, category]);
+
 
   const refresh = async () => {
     setRefreshing(true);

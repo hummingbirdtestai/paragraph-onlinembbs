@@ -348,6 +348,7 @@ const chaptersBySubject: Record<string, string[]> = {
     loadUser();
   }, []);
 
+  
   useEffect(() => {
     const chapters = chaptersBySubject[selectedSubject];
     if (chapters && chapters.length > 0 && !selectedChapter) {
@@ -355,7 +356,7 @@ const chaptersBySubject: Record<string, string[]> = {
     }
   }, []);
 
-  const practiceData = usePracticeData(selectedSubject, userId, selectedCategory);
+ const practiceData = usePracticeData(selectedChapter, userId, selectedCategory);
  const {
   phases,
   loading,

@@ -43,7 +43,9 @@ const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
   return (
     <View style={[styles.card, isConcept && styles.cardConcept]}>
       {/* SUBJECT NAME */}
-      <Text style={[styles.subject, isConcept && styles.subjectConcept]}>{phase.subject}</Text>
+     <Text style={[styles.subject, isConcept && styles.subjectConcept]}>
+  {phase.textbook_chapter}
+</Text>
       {/* 🔖 Inline bookmark icon (same as flashcards) */}
 <View style={[styles.bookmarkRow, isConcept && styles.bookmarkRowConcept]}>
   <TouchableOpacity
@@ -60,7 +62,7 @@ const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
         {
           p_student_id: user.id,
           p_practicecard_id: phase.id,
-          p_subject: phase.subject,
+         p_subject: phase.textbook_chapter,
         }
       );
 
@@ -104,26 +106,28 @@ const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
 
 {isMCQ && (
   <View style={isWeb ? styles.webConstrained : undefined}>
-    <MCQChatScreen
-      item={phase.phase_json}
-      studentId={user?.id}
-      mcqId={phase.id}
-      correctAnswer={phase.phase_json?.correct_answer}
-      reactOrderFinal={phase.react_order_final}
-      phaseUniqueId={phase.id}
-      subject={phase.subject}
-      isBookmarked={isBookmarked}
-      reviewMode={false}
-      mode="practice"
-    />
+<MCQChatScreen
+  item={phase.phase_json}
+  studentId={user?.id}
+  mcqId={phase.id}
+  correctAnswer={phase.phase_json?.correct_answer}
+  reactOrderFinal={phase.react_order_final}
+  phaseUniqueId={phase.id}
+  subject={phase.textbook_chapter}
+  isBookmarked={isBookmarked}
+  reviewMode={false}
+  mode="practice"
+/>
 
-    <AskParagraphButton
-      studentId={user?.id}
-      mcqId={phase.id}
-      subjectName={phase.subject}
-      phaseJson={phase.phase_json}
-      reactOrder={phase.react_order_final}
-    />
+
+<AskParagraphButton
+  studentId={user?.id}
+  mcqId={phase.id}
+  subjectName={phase.textbook_chapter}
+  phaseJson={phase.phase_json}
+  reactOrder={phase.react_order_final}
+/>
+
   </View>
 )}
 
