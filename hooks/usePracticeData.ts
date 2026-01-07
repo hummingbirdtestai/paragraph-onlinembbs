@@ -62,6 +62,11 @@ export function usePracticeData(
   };
 
   useEffect(() => {
+      console.log("📡 usePracticeData TRIGGERED", {
+    textbookChapter,
+    userId,
+    category,
+  });
     setOffset(0);
     setHasMoreData(true);
     setLoading(true);

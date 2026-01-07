@@ -332,15 +332,6 @@ const subjects = [
 
   const currentChapters = chaptersBySubject[selectedSubject] || [];
 
-  const handleSubjectChange = (subj: string) => {
-    setSelectedSubject(subj);
-    const chapters = chaptersBySubject[subj];
-    if (chapters && chapters.length > 0) {
-      setSelectedChapter(chapters[0]);
-    } else {
-      setSelectedChapter(null);
-    }
-  };
  
   
   useEffect(() => {
@@ -352,12 +343,19 @@ const subjects = [
   }, []);
 
   
-  useEffect(() => {
-    const chapters = chaptersBySubject[selectedSubject];
-    if (chapters && chapters.length > 0) {
-      setSelectedChapter(chapters[0]);
-    }
-  }, [selectedSubject]);
+const handleSubjectChange = (subj: string) => {
+  console.log("🧠 Subject changed →", subj);
+
+  setSelectedSubject(subj);
+
+  const chapters = chaptersBySubject[subj];
+  const nextChapter = chapters?.[0] ?? null;
+
+  console.log("📘 Auto-selecting first chapter →", nextChapter);
+
+  setSelectedChapter(nextChapter);
+};
+
 
  const practiceData = usePracticeData(selectedChapter, userId, selectedCategory);
  const {
@@ -486,6 +484,7 @@ const subjects = [
           </View>
         ) : (
    <FlatList
+  key={selectedChapter}   // 🔥 REQUIRED
   ref={listRef}
   data={phases}
   keyExtractor={(item) => item.id}
