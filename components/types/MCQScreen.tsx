@@ -22,6 +22,7 @@ interface MCQData {
   correct_answer: string;
 }
 
+
 export default function MCQChatScreen({
   item,
   onNext,
