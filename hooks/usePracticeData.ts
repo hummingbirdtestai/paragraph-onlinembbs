@@ -6,7 +6,7 @@ console.log("🚨 usePracticeData.ts FILE LOADED 🚨");
 export function usePracticeData(
   textbookChapter: string,
   userId: string | null,
-  category = "unviewed"
+   category: "all" | "bookmarked" | "wrong" = "all"
 ) {
   const [phases, setPhases] = useState([]);
   const [loading, setLoading] = useState(true);

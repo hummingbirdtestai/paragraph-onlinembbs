@@ -28,7 +28,7 @@ export default function PracticeScreen() {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState("General Medicine");
   const [selectedCategory, setSelectedCategory] =
-    useState<"unviewed" | "viewed" | "bookmarked" | "wrong">("unviewed");
+    useState<"all" | "bookmarked" | "wrong">("all");
 
 const chaptersBySubject: Record<string, string[]> = {
   "Anatomy": [
@@ -393,101 +393,78 @@ useEffect(() => {
     <MainLayout isHeaderHidden={isMobile && !containersVisible}>
       <View style={styles.container}>
 
-        {(containersVisible || !isMobile) && (
-          <View style={styles.headerBlock}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.subjectsContainer}
-              style={[
-                styles.subjectsScroll,
-                isMobile && { marginBottom: 8 }
-              ]}
-            >
-              {subjects.map((subj) => (
-                <SubjectFilterBubble
-                  key={subj}
-                  subject={subj}
-                  selected={selectedSubject === subj}
-                  onPress={() => handleSubjectChange(subj)}
-                />
-              ))}
-            </ScrollView>
+  {(containersVisible || !isMobile) && (
+    <View style={styles.headerBlock}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.subjectsContainer}
+        style={[
+          styles.subjectsScroll,
+          isMobile && { marginBottom: 8 }
+        ]}
+      >
+        {subjects.map((subj) => (
+          <SubjectFilterBubble
+            key={subj}
+            subject={subj}
+            selected={selectedSubject === subj}
+            onPress={() => handleSubjectChange(subj)}
+          />
+        ))}
+      </ScrollView>
 
-            {currentChapters.length > 0 && (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.chaptersContainer}
-                style={[
-                  styles.chaptersScroll,
-                  isMobile && { marginBottom: 8 }
-                ]}
-              >
-                {currentChapters.map((chapter) => (
-                  <ChapterFilterBubble
-                    key={chapter}
-                    chapter={chapter}
-                    selected={selectedChapter === chapter}
-                    onPress={() => {
-                      console.log("🟢 [UI CLICK] Chapter clicked", {
-                        subject: selectedSubject,
-                        textbook_chapter: chapter,
-                        length: chapter?.length,
-                      });
-                      setSelectedChapter(chapter);
-                    }}
-                  />
-                ))}
-              </ScrollView>
-            )}
+      {currentChapters.length > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chaptersContainer}
+          style={[
+            styles.chaptersScroll,
+            isMobile && { marginBottom: 8 }
+          ]}
+        >
+          {currentChapters.map((chapter) => (
+            <ChapterFilterBubble
+              key={chapter}
+              chapter={chapter}
+              selected={selectedChapter === chapter}
+              onPress={() => setSelectedChapter(chapter)}
+            />
+          ))}
+        </ScrollView>
+      )}
 
-            <View style={styles.categoryContainer}>
-              <TouchableOpacity
-                style={[styles.categoryIcon, selectedCategory === "unviewed" && styles.categoryIconSelected]}
-                onPress={() => setSelectedCategory("unviewed")}
-              >
-                <EyeOff
-                  size={20}
-                  color={selectedCategory === "unviewed" ? "#fff" : "#10b981"}
-                />
-              </TouchableOpacity>
+      <View style={styles.categoryContainer}>
+        <TouchableOpacity
+          style={[styles.categoryIcon, selectedCategory === "all" && styles.categoryIconSelected]}
+          onPress={() => setSelectedCategory("all")}
+        >
+          <Filter size={20} color={selectedCategory === "all" ? "#fff" : "#10b981"} />
+        </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.categoryIcon, selectedCategory === "viewed" && styles.categoryIconSelected]}
-                onPress={() => setSelectedCategory("viewed")}
-              >
-                <Eye
-                  size={20}
-                  color={selectedCategory === "viewed" ? "#fff" : "#10b981"}
-                />
-              </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.categoryIcon, selectedCategory === "bookmarked" && styles.categoryIconSelected]}
+          onPress={() => setSelectedCategory("bookmarked")}
+        >
+          <Bookmark
+            size={20}
+            color={selectedCategory === "bookmarked" ? "#fff" : "#10b981"}
+            fill={selectedCategory === "bookmarked" ? "#fff" : "transparent"}
+          />
+        </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.categoryIcon, selectedCategory === "bookmarked" && styles.categoryIconSelected]}
-                onPress={() => setSelectedCategory("bookmarked")}
-              >
-                <Bookmark
-                  size={20}
-                  color={selectedCategory === "bookmarked" ? "#fff" : "#10b981"}
-                  fill={selectedCategory === "bookmarked" ? "#fff" : "transparent"}
-                />
-              </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.categoryIcon, selectedCategory === "wrong" && styles.categoryIconSelected]}
+          onPress={() => setSelectedCategory("wrong")}
+        >
+          <XCircle size={20} color={selectedCategory === "wrong" ? "#fff" : "#10b981"} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  )}
 
-              <TouchableOpacity
-                style={[styles.categoryIcon, selectedCategory === "wrong" && styles.categoryIconSelected]}
-                onPress={() => setSelectedCategory("wrong")}
-              >
-                <XCircle
-                  size={20}
-                  color={selectedCategory === "wrong" ? "#fff" : "#10b981"}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-
-        {/* CONTENT */}
+  {/* CONTENT */}
         {!userId ? (
           <View style={{ padding: 40 }}>
             <Text style={{ color: "#bbb", fontSize: 16, textAlign: "center" }}>
