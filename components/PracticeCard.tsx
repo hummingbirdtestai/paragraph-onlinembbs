@@ -99,6 +99,12 @@ console.log("🔖 Toggle practice bookmark", {
 {isConcept && (
   <HighYieldFactSheetScreen
     data={phase.phase_json?.concept ?? ""}
+    cbmeMeta={{
+      chapter: phase.chapter,
+      topic: phase.topic,
+      chapter_order: phase.chapter_order,
+      topic_order: phase.topic_order,
+    }}
   />
 )}
 

@@ -12,8 +12,15 @@ import {
 
 export default function HighYieldFactSheetScreen({
   data,
+  cbmeMeta,
 }: {
   data: string;
+  cbmeMeta?: {
+    chapter?: string | null;
+    topic?: string | null;
+    chapter_order?: number | null;
+    topic_order?: number | null;
+  };
 }) {
   return (
     <View style={styles.container}>
@@ -22,13 +29,24 @@ export default function HighYieldFactSheetScreen({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-       <MentorFactSheetBubble message={data} />
+     <MentorFactSheetBubble message={data} cbmeMeta={cbmeMeta} />
       </ScrollView>
     </View>
   );
 }
 
-function MentorFactSheetBubble({ message }: { message: string }) {
+function MentorFactSheetBubble({
+  message,
+  cbmeMeta,
+}: {
+  message: string;
+  cbmeMeta?: {
+    chapter?: string | null;
+    topic?: string | null;
+    chapter_order?: number | null;
+    topic_order?: number | null;
+  };
+}) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const { width: screenWidth } = useWindowDimensions();
 
@@ -44,6 +62,45 @@ function MentorFactSheetBubble({ message }: { message: string }) {
 
   return (
     <Animated.View style={[styles.mentorBubble, { opacity: fadeAnim }]}>
+      return (
+  <Animated.View style={[styles.mentorBubble, { opacity: fadeAnim }]}>
+
+    {/* 🔹 CBME HEADER BLOCK — INSERTED HERE */}
+    {cbmeMeta?.chapter && (
+      <View style={styles.cbmeBlock}>
+        <Text style={styles.cbmeLine}>
+          <Text style={styles.cbmeLabel}>CBME Topic : </Text>
+          {cbmeMeta.chapter_order !== null &&
+          cbmeMeta.chapter_order !== undefined
+            ? `${cbmeMeta.chapter_order} . `
+            : ""}
+          {cbmeMeta.chapter}
+        </Text>
+
+        {cbmeMeta.topic && (
+          <Text style={styles.cbmeLine}>
+            <Text style={styles.cbmeLabel}>Competency : </Text>
+            {cbmeMeta.topic_order !== null &&
+            cbmeMeta.topic_order !== undefined
+              ? `${cbmeMeta.topic_order + 1} . `
+              : ""}
+            {cbmeMeta.topic}
+          </Text>
+        )}
+      </View>
+    )}
+
+    {/* 🔹 EXISTING CONTENT — DO NOT TOUCH */}
+    {sections.map((section, index) => (
+      <SectionBlock
+        key={index}
+        section={section}
+        isLast={index === sections.length - 1}
+        screenWidth={screenWidth}
+      />
+    ))}
+  </Animated.View>
+);
       {sections.map((section, index) => (
         <SectionBlock
           key={index}
