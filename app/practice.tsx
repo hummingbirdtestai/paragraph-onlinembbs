@@ -65,7 +65,21 @@ const chaptersBySubject: Record<string, string[]> = {
     "Integrated / Clinical Correlation"
   ],
 
-  "Microbiology": [],
+  "Microbiology": [
+  "General Microbiology & Immunology",
+  "Central Nervous System Infections",
+  "Respiratory Tract Infections",
+  "Gastrointestinal & Hepatobiliary Infections",
+  "Genitourinary & Sexually Transmitted Infections",
+  "Cardiovascular & Bloodstream Infections",
+  "Skin, Soft Tissue & Musculoskeletal Infections",
+  "Dermatology, Leprosy & Venereology",
+  "Zoonotic & Emerging Infections",
+  "Hospital-Acquired & Surgical Infections",
+  "Dental & Oral Microbiology",
+  "Applied & Integrated Microbiology"
+],
+
 
   "Pharmacology": [
     "Clinical Pharmacology",

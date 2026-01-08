@@ -9,6 +9,7 @@ import { Bookmark } from "lucide-react-native";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
+import CBMERenderer from "@/components/types/CBMERenderer";
 
 
 
@@ -97,16 +98,22 @@ console.log("🔖 Toggle practice bookmark", {
 
       {/* FULL VIEW RENDER */}
 {isConcept && (
-  <HighYieldFactSheetScreen
-    data={phase.phase_json?.concept ?? ""}
-    cbmeMeta={{
-      chapter: phase.chapter,
-      topic: phase.topic,
-      chapter_order: phase.chapter_order,
-      topic_order: phase.topic_order,
-    }}
-  />
+  <>
+    <CBMERenderer
+      cbmeMeta={{
+        chapter: phase.chapter,
+        topic: phase.topic,
+        chapter_order: phase.chapter_order,
+        topic_order: phase.topic_order,
+      }}
+    />
+
+    <HighYieldFactSheetScreen
+      data={phase.phase_json?.concept ?? ""}
+    />
+  </>
 )}
+
 
 
 {isMCQ && (

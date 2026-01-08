@@ -59,38 +59,8 @@ function MentorFactSheetBubble({
   }, []);
 
   const sections = parseContentIntoSections(message?.trim() ?? "");
-
   return (
-    <Animated.View style={[styles.mentorBubble, { opacity: fadeAnim }]}>
-      return (
   <Animated.View style={[styles.mentorBubble, { opacity: fadeAnim }]}>
-
-    {/* 🔹 CBME HEADER BLOCK — INSERTED HERE */}
-    {cbmeMeta?.chapter && (
-      <View style={styles.cbmeBlock}>
-        <Text style={styles.cbmeLine}>
-          <Text style={styles.cbmeLabel}>CBME Topic : </Text>
-          {cbmeMeta.chapter_order !== null &&
-          cbmeMeta.chapter_order !== undefined
-            ? `${cbmeMeta.chapter_order} . `
-            : ""}
-          {cbmeMeta.chapter}
-        </Text>
-
-        {cbmeMeta.topic && (
-          <Text style={styles.cbmeLine}>
-            <Text style={styles.cbmeLabel}>Competency : </Text>
-            {cbmeMeta.topic_order !== null &&
-            cbmeMeta.topic_order !== undefined
-              ? `${cbmeMeta.topic_order + 1} . `
-              : ""}
-            {cbmeMeta.topic}
-          </Text>
-        )}
-      </View>
-    )}
-
-    {/* 🔹 EXISTING CONTENT — DO NOT TOUCH */}
     {sections.map((section, index) => (
       <SectionBlock
         key={index}
@@ -101,18 +71,9 @@ function MentorFactSheetBubble({
     ))}
   </Animated.View>
 );
-      {sections.map((section, index) => (
-        <SectionBlock
-          key={index}
-          section={section}
-          isLast={index === sections.length - 1}
-          screenWidth={screenWidth}
-        />
-      ))}
-    </Animated.View>
-  );
 }
 
+    
 type SectionType =
   | 'major_header'
   | 'clinical_case'
