@@ -116,6 +116,11 @@ interface FlashcardCardProps {
     Answer: string;
     react_order_final?: number;
     maximum_value?: number;
+      // ✅ ADD
+  chapter?: string;
+  chapter_order?: number;
+  topic?: string;
+  topic_order?: number;
   };
   index: number;
   subject: string;
@@ -320,6 +325,19 @@ const FlashcardCard: React.FC<FlashcardCardProps> = ({
                     style={styles.textBorder}
                   >
                     <View style={styles.textContent}>
+                      {/* 🔵 CBME Chapter */}
+{item.chapter && (
+  <View style={{ marginBottom: 12 }}>
+    <Text style={{ fontSize: 11, color: "#9ca3af", fontWeight: "700" }}>
+      CBME Chapter
+    </Text>
+    <Text style={{ fontSize: 13, color: "#e5e7eb" }}>
+      {item.chapter_order ? `${item.chapter_order}. ` : ""}
+      {item.chapter}
+    </Text>
+  </View>
+)}
+
                       <Markdown
                         style={{
                           text: styles.questionText,
@@ -393,6 +411,19 @@ const FlashcardCard: React.FC<FlashcardCardProps> = ({
                     style={styles.textBorder}
                   >
                     <View style={[styles.textContent, styles.answerBackground]}>
+                      {/* 🟢 CBME Competency */}
+{item.topic && (
+  <View style={{ marginBottom: 12 }}>
+    <Text style={{ fontSize: 11, color: "#9ca3af", fontWeight: "700" }}>
+      Competency
+    </Text>
+    <Text style={{ fontSize: 13, color: "#10b981" }}>
+      {item.topic_order ? `${item.topic_order}. ` : ""}
+      {item.topic}
+    </Text>
+  </View>
+)}
+
                       <Markdown
                         style={{
                           text: styles.answerText,
@@ -514,15 +545,34 @@ useEffect(() => {
       return;
     }
 
-    const formatted = data.map((row: any) => ({
-      id: row.flashcard_id,
-      Question: row.flash_card_manu?.Question || '',
-      Answer: row.flash_card_manu?.Answer || '',
-      react_order_final: row.react_order_final,
-      maximum_value: row.maximum_value,
-      isBookmarked: row.is_bookmarked,
-      isViewed: row.is_viewed
-    }));
+const formatted = data.map((row: any) => ({
+  id: row.flashcard_id,
+
+  Question:
+    row.flash_card_manu?.Question ??
+    row.flash_card_manu?.question ??
+    '',
+
+  Answer:
+    row.flash_card_manu?.Answer ??
+    row.flash_card_manu?.answer ??
+    '',
+
+  react_order_final: row.react_order_final,
+  maximum_value: row.maximum_value,
+
+  // view + bookmark state
+  isBookmarked: row.is_bookmarked,
+  isViewed: row.is_viewed,
+
+  // ✅ CBME metadata
+  chapter: row.chapter,
+  chapter_order: row.chapter_order,
+  topic: row.topic,
+  topic_order: row.topic_order,
+}));
+
+
 
     if (newOffset === 0) {
       setFlashcards(formatted);

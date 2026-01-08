@@ -124,19 +124,25 @@ const Section1Mobile = memo(({ image }: { image: string }) => {
     <View style={styles.mobileSection}>
       <Image source={{ uri: image }} style={styles.mobileImageSection1} resizeMode="cover" progressiveRenderingEnabled />
       <View style={styles.mobilePadding}>
-        <Text style={styles.mobileHeading}>NEETPG Prep Became Complicated. You Didn't</Text>
-        <Text style={styles.mobileBody}>
-         You’re Not Struggling — The System Is Broken.
-        </Text>
-        <Text style={styles.mobileBody}>Most students today are stuck in a cycle of:</Text>
-        <Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Endless video lectures</Text> that eat hours but give no clarity</Text>
-        <Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Crowded classes</Text> where no one knows your weaknesses</Text>
-        <Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Mock tests</Text> that crush confidence instead of building it</Text>
-        <Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Overloaded Q-banks</Text> you'll never revise</Text>
-        <Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Notes</Text> that grow heavier every year</Text>
-        <Text style={[styles.mobileBody, styles.emphasis]}>
-          This isn't learning.{'\n'}This is burnout.{'\n'}And burnout doesn't produce ranks.
-        </Text>
+<Text style={styles.mobileHeading}>MBBS Learning Became Complicated. You Didn’t Fail.</Text>
+
+<Text style={styles.mobileBody}>
+  You’re Not a Poor Student — The System Is Broken.
+</Text>
+<Text style={styles.mobileBody}>Most MBBS students today are stuck in a cycle of:</Text>
+
+<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Fragmented CBME topics</Text> that feel disconnected and hard to revise</Text>
+<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Competency lists</Text> that sound important but lack exam clarity</Text>
+<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Practical postings</Text> where you observe a lot but learn very little</Text>
+<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Internal assessments</Text> that test memory instead of understanding</Text>
+<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>University exams</Text> that feel unpredictable and unfair</Text>
+<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Notes and manuals</Text> that grow heavier every year</Text>
+
+<Text style={[styles.mobileBody, styles.emphasis]}>
+  This isn’t learning.{'\n'}
+  This is confusion.{'\n'}
+  And confusion kills the joy of learning medicine.
+</Text>
       </View>
     </View>
   );
@@ -148,20 +154,25 @@ const Section1Web = memo(({ image }: { image: string }) => {
     <View style={styles.webSection}>
       <View style={styles.webHero}>
         <View style={styles.webHeroText}>
-          <Text style={styles.webHeading}>NEETPG Prep Became Complicated. You Didn't</Text>
-          <Text style={styles.webSubheading}>
-            You're Not Struggling — The System Is Broken
-          </Text>
-          <View style={styles.webBulletList}>
-            <Text style={styles.webBullet}>• <Text style={styles.highlight}>Endless video lectures</Text> that eat hours but give no clarity</Text>
-            <Text style={styles.webBullet}>• <Text style={styles.highlight}>Crowded classes</Text> where no one knows your weaknesses</Text>
-            <Text style={styles.webBullet}>• <Text style={styles.highlight}>Mock tests</Text> that crush confidence instead of building it</Text>
-            <Text style={styles.webBullet}>• <Text style={styles.highlight}>Overloaded Q-banks</Text> you'll never revise</Text>
-            <Text style={styles.webBullet}>• <Text style={styles.highlight}>Notes</Text> that grow heavier every year</Text>
-          </View>
-          <Text style={[styles.webBody, styles.emphasis]}>
-            This isn't learning. This is burnout.{'\n'}And burnout doesn't produce ranks.
-          </Text>
+          <Text style={styles.webHeading}>MBBS Learning Became Complicated. You Didn’t Fail.</Text>
+
+<Text style={styles.webSubheading}>
+  You’re Not a Poor Student — The System Is Broken.
+</Text>
+
+<View style={styles.webBulletList}>
+  <Text style={styles.webBullet}>• <Text style={styles.highlight}>Fragmented CBME topics</Text> that feel disconnected and hard to revise</Text>
+  <Text style={styles.webBullet}>• <Text style={styles.highlight}>Competency lists</Text> that sound important but lack exam clarity</Text>
+  <Text style={styles.webBullet}>• <Text style={styles.highlight}>Practical postings</Text> where you observe a lot but learn very little</Text>
+  <Text style={styles.webBullet}>• <Text style={styles.highlight}>Internal assessments</Text> that test memory instead of understanding</Text>
+  <Text style={styles.webBullet}>• <Text style={styles.highlight}>University exams</Text> that feel unpredictable and unfair</Text>
+  <Text style={styles.webBullet}>• <Text style={styles.highlight}>Notes and manuals</Text> that grow heavier every year</Text>
+</View>
+
+<Text style={[styles.webBody, styles.emphasis]}>
+  This isn’t learning. This is confusion.{'\n'}
+  And confusion kills the joy of learning medicine.
+</Text>
         </View>
         <Image source={{ uri: image }} style={styles.webHeroImage} resizeMode="contain" progressiveRenderingEnabled />
       </View>
@@ -336,11 +347,16 @@ const Section5Mobile = memo(({ image }: { image: string }) => {
     <View style={styles.mobileSection}>
       <Image source={{ uri: image }} style={styles.mobileImage} resizeMode="cover" progressiveRenderingEnabled />
       <View style={styles.mobilePadding}>
-        <Text style={styles.mobileHeading}>Your 10,000-Concepts based on NEETPG PYQs journey, Simplified</Text>
-        <Text style={styles.mobileBody}>
-          NEETPG looks overwhelming only if you walk it blindly.
-        </Text>
-        <Text style={styles.mobileBody}>
+        <Text style={styles.mobileHeading}>
+  Your 4-Year MBBS Journey to Master 5,000 Concepts and Competencies
+  Based on the NMC CBME Curriculum, Simplified
+</Text>
+
+<Text style={styles.mobileBody}>
+  University MBBS exam preparation every year looks overwhelming
+  only if you walk it blindly.
+</Text>
+<Text style={styles.mobileBody}>
           Paragraph breaks your preparation into a clear 4-step roadmap:
         </Text>
         <Text style={styles.mobileStep}>1️⃣ 10000 Concepts</Text>
@@ -366,10 +382,16 @@ const Section5Web = memo(({ image }: { image: string }) => {
     <View style={styles.webSection}>
       <View style={styles.webHero}>
         <View style={styles.webTextBlock}>
-          <Text style={styles.webHeading}>Your 10,000-Concepts based on NEETPG PYQs journey, Simplified</Text>
-          <Text style={styles.webSubheading}>
-            NEETPG looks overwhelming only if you walk it blindly.
-          </Text>
+ <Text style={styles.webHeading}>
+  Your 4-Year MBBS Journey to Master 5,000 Concepts and Competencies
+  Based on the NMC CBME Curriculum, Simplified
+</Text>
+
+<Text style={styles.webSubheading}>
+  University MBBS exam preparation every year looks overwhelming
+  only if you walk it blindly.
+</Text>
+
           <Text style={styles.webBody}>
             Paragraph breaks your preparation into a clear 4-step roadmap:
           </Text>

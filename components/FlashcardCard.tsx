@@ -19,9 +19,16 @@ interface FlashcardCardProps {
     Answer: string;
     react_order_final?: number;
     maximum_value?: number;
+     // ✅ CBME metadata
+    chapter?: string;
+    chapter_order?: number;
+    topic?: string;
+    topic_order?: number;
   };
   index: number;
   subject: string;
+  isBookmarked: boolean;                 // ✅ ADD
+  onBookmark: (id: string, subject: string) => void; // ✅ ADD
   onView: (flashcardId: string, subject: string) => void;
 }
 
@@ -153,6 +160,18 @@ const FlashcardCard: React.FC<FlashcardCardProps> = ({
                   <Text style={styles.badgeLabel}>QUESTION</Text>
             
                 </View>
+                {/* 🔵 CBME Topic */}
+{item.chapter && (
+  <View style={{ marginBottom: 10 }}>
+    <Text style={{ fontSize: 12, color: "#9ca3af", fontWeight: "600" }}>
+      CBME Topic:
+    </Text>
+    <Text style={{ fontSize: 13, color: "#e5e7eb" }}>
+      {item.chapter_order ? `${item.chapter_order}. ` : ""}
+      {item.chapter}
+    </Text>
+  </View>
+)}
 
                 <Markdown style={{ text: styles.questionText }}>
                   {item.Question}
@@ -174,8 +193,21 @@ const FlashcardCard: React.FC<FlashcardCardProps> = ({
                 style={styles.cardGradient}
               >
                 <Text style={styles.badgeLabel}>ANSWER</Text>
+                {/* 🟢 Competency */}
+{item.topic && (
+  <View style={{ marginBottom: 10 }}>
+    <Text style={{ fontSize: 12, color: "#9ca3af", fontWeight: "600" }}>
+      Competency:
+    </Text>
+    <Text style={{ fontSize: 13, color: "#10b981" }}>
+      {item.topic_order ? `${item.topic_order}. ` : ""}
+      {item.topic}
+    </Text>
+  </View>
+)}
+
                 <Markdown style={{ text: styles.answerText }}>
-                  {item.Answer}
+                  {item.Answer ?? item.answer ?? ""}
                 </Markdown>
               </LinearGradient>
             </Animated.View>
