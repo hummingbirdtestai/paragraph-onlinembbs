@@ -23,26 +23,36 @@ import { useScrollDirection } from "@/hooks/useScrollDirection";
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const SUBJECTS = [
-  { subject: 'Anatomy' },
-  { subject: 'Anesthesia' },
-  { subject: 'Biochemistry' },
-  { subject: 'Community Medicine' },
-  { subject: 'Dermatology' },
-  { subject: 'ENT' },
-  { subject: 'Forensic Medicine' },
-  { subject: 'General Medicine' },
-  { subject: 'General Surgery' },
-  { subject: 'Microbiology' },
-  { subject: 'Obstetrics and Gynaecology' },
-  { subject: 'Ophthalmology' },
-  { subject: 'Orthopedics' },
-  { subject: 'Pathology' },
-  { subject: 'Pediatrics' },
-  { subject: 'Pharmacology' },
-  { subject: 'Physiology' },
-  { subject: 'Psychiatry' },
-  { subject: 'Radiology' },
+  // 1st MBBS
+  { subject: "Anatomy" },
+  { subject: "Physiology" },
+  { subject: "Biochemistry" },
+
+  // 2nd MBBS
+  { subject: "Microbiology" },
+  { subject: "Pharmacology" },
+  { subject: "Pathology" },
+  { subject: "PSM" },
+  { subject: "Forensic" },
+
+  // 3rd MBBS – Part 1
+  { subject: "ENT" },
+  { subject: "Ophthalmology" },
+
+  // 3rd MBBS – Part 2 / Final Year
+  { subject: "General Medicine" },
+  { subject: "General Surgery" },
+  { subject: "Obstetrics" },
+  { subject: "Gynecology" },
+  { subject: "Pediatrics" },
+  { subject: "Orthopaedics" },
+  { subject: "Dermatology" },
+  { subject: "Psychiatry" },
+  { subject: "Anaesthesiology" },
+  { subject: "Radiodiagnosis" },
+  { subject: "Radiotherapy" },
 ];
+
 
 
 interface MarkupTextRendererProps {

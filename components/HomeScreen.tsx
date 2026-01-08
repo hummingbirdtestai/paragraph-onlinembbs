@@ -348,7 +348,7 @@ const Section5Mobile = memo(({ image }: { image: string }) => {
       <Image source={{ uri: image }} style={styles.mobileImage} resizeMode="cover" progressiveRenderingEnabled />
       <View style={styles.mobilePadding}>
         <Text style={styles.mobileHeading}>
-  Your 4-Year MBBS Journey to Master 5,000 Concepts and Competencies
+  Your 5-Year MBBS Journey to Master 5,000 Concepts and Competencies
   Based on the NMC CBME Curriculum, Simplified
 </Text>
 
@@ -383,7 +383,7 @@ const Section5Web = memo(({ image }: { image: string }) => {
       <View style={styles.webHero}>
         <View style={styles.webTextBlock}>
  <Text style={styles.webHeading}>
-  Your 4-Year MBBS Journey to Master 5,000 Concepts and Competencies
+  Your 5-Year MBBS Journey to Master 5,000 Concepts and Competencies
   Based on the NMC CBME Curriculum, Simplified
 </Text>
 
@@ -1196,11 +1196,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   mobileHeading: {
-    fontSize: 28,
+    fontSize: 16,
     fontWeight: '600',
     color: '#f4e4c1',
     marginBottom: 16,
-    lineHeight: 36,
+    lineHeight: 22,
     textAlign: 'center',
   },
   mobileBody: {
@@ -1273,12 +1273,12 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   mobileQuoteHeading: {
-    fontSize: 32,
+    fontSize: 18,
     fontWeight: '700',
     color: '#f4e4c1',
     marginBottom: 24,
     textAlign: 'center',
-    lineHeight: 40,
+    lineHeight: 24,
   },
   mobileQuote: {
     fontSize: 16,
@@ -1340,12 +1340,12 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   mobileCTAHeading: {
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: '700',
     color: '#f4e4c1',
     marginBottom: 24,
     textAlign: 'center',
-    lineHeight: 44,
+    lineHeight: 26,
   },
   mobileCTAText: {
     fontSize: 16,
@@ -1423,11 +1423,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#161b22',
   },
   webHeading: {
-    fontSize: 48,
+    fontSize: 24,
     fontWeight: '600',
     color: '#f4e4c1',
     marginBottom: 24,
-    lineHeight: 56,
+    lineHeight: 32,
     textAlign: 'center',
   },
   webSubheading: {
@@ -1553,12 +1553,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   webQuoteHeading: {
-    fontSize: 52,
+    fontSize: 26,
     fontWeight: '700',
     color: '#f4e4c1',
     marginBottom: 48,
     textAlign: 'center',
-    lineHeight: 64,
+    lineHeight: 34,
   },
   webQuoteGrid: {
     flexDirection: 'row',
@@ -1671,12 +1671,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   webCTAHeading: {
-    fontSize: 56,
+    fontSize: 28,
     fontWeight: '700',
     color: '#f4e4c1',
     marginBottom: 32,
     textAlign: 'center',
-    lineHeight: 68,
+    lineHeight: 36,
   },
   webCTAText: {
     fontSize: 20,
