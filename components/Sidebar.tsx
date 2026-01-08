@@ -23,8 +23,8 @@ interface SidebarProps {
 }
 
 const navItems: NavItem[] = [
-  { id: "home", label: "AI powered NEETPG Prep Strategy", href: "/", icon: Brain },
-  { id: "practice", label: "10000 NEETPG PYQs", href: "/practice", icon: BookOpen },
+  { id: "home", label: "Master NMC CBME Syllabus with AI", href: "/", icon: Brain },
+  { id: "practice", label: "5000 NMC CBME Syllabus Topics", href: "/practice", icon: BookOpen },
   { id: "flash", label: "45000 Flash Cards", href: "/flashcard-feed-demo", icon: CreditCard },
   { id: "videos", label: "Daily 20 NEETPG Reels", href: "/videos", icon: Video },
   { id: "image", label: "Daily 50 Image Based MCQs", href: "/image", icon: ImageIcon },
@@ -155,7 +155,7 @@ export default function Sidebar({
               style={styles.logoImage}
               resizeMode="contain"
             />
-            <Text style={styles.tagline}>100% AI-Driven NEETPG Self Prep Platform</Text>
+            <Text style={styles.tagline}>AI-Tutored NMC CBME Curriculum Mastery Platform</Text>
           </Pressable>
         ) : (
           <View style={styles.logoSection}>
@@ -164,7 +164,7 @@ export default function Sidebar({
               style={styles.logoImage}
               resizeMode="contain"
             />
-            <Text style={styles.tagline}>100% AI-Driven NEETPG Self Prep Platform</Text>
+            <Text style={styles.tagline}>AI-Tutored NMC CBME Curriculum Mastery Platform</Text>
           </View>
         )}
 

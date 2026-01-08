@@ -32,7 +32,7 @@ export default function AppHeader({ onMenuPress, onOpenAuth }: AppHeaderProps) {
                   style={styles.logo}
                   resizeMode="contain"
                 />
-                <Text style={styles.tagline}>100% AI-Driven NEETPG Self Prep Platform</Text>
+                <Text style={styles.tagline}>AI-Tutored NMC CBME Curriculum Mastery Platform</Text>
               </Pressable>
             </Link>
 
@@ -48,7 +48,7 @@ export default function AppHeader({ onMenuPress, onOpenAuth }: AppHeaderProps) {
                   style={styles.logo}
                   resizeMode="contain"
                 />
-                <Text style={styles.tagline}>100% AI-Driven NEETPG Self Prep Platform</Text>
+                <Text style={styles.tagline}>AI-Tutored NMC CBME Curriculum Mastery Platform</Text>
               </Pressable>
             </Link>
 
