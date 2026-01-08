@@ -359,18 +359,26 @@ const Section5Mobile = memo(({ image }: { image: string }) => {
 <Text style={styles.mobileBody}>
           Paragraph breaks your preparation into a clear 4-step roadmap:
         </Text>
-        <Text style={styles.mobileStep}>1️⃣ 10000 Concepts</Text>
-        <Text style={styles.mobileStep}>2️⃣ 45332 Flash Cards</Text>
-        <Text style={styles.mobileStep}>3️⃣ 50 Mock Tests</Text>
-        <Text style={styles.mobileStep}>4️⃣ Daily 14 Group Quizzes</Text>
+        <Text style={styles.mobileStep}>1️⃣ 5000 CBME Concepts</Text>
+        <Text style={styles.mobileStep}>2️⃣ 50000 Flash Cards</Text>
+        <Text style={styles.mobileStep}>3️⃣ 25000 Practice MCQs</Text>
+        <Text style={styles.mobileStep}>4️⃣ 25000 Clinical Cases</Text>
         <Text style={[styles.mobileBody, styles.emphasis]}>
           Every day you move forward.{'\n'}
           Every gap gets fixed automatically.{'\n'}
           Every milestone is visible.
         </Text>
-        <Text style={styles.mobileBody}>
-          This is your 10,000-concept path — made simple, structured, achievable.
-        </Text>
+       <Text style={styles.mobileBody}>
+  No costly tuitions.{'\n'}
+  No books or voluminous notes to buy.{'\n'}
+  No overhyped faculty needed.
+</Text>
+
+<Text style={[styles.mobileBody, styles.emphasis]}>
+  Just an AI-tutored, self-paced, hyper-personalised adaptive learning journey{'\n'}
+  covering the complete 5-year MBBS CBME curriculum{'\n'}
+  across all 19 MBBS subjects.
+</Text>
       </View>
     </View>
   );
@@ -398,28 +406,35 @@ const Section5Web = memo(({ image }: { image: string }) => {
           <View style={styles.webStepGrid}>
             <View style={styles.webStep}>
               <Text style={styles.webStepNumber}>1️⃣</Text>
-              <Text style={styles.webStepText}>10000 Concepts</Text>
+              <Text style={styles.webStepText}>5000 CBME Concepts</Text>
             </View>
             <View style={styles.webStep}>
               <Text style={styles.webStepNumber}>2️⃣</Text>
-              <Text style={styles.webStepText}>45332 Flash Cards</Text>
+              <Text style={styles.webStepText}>50000 Flash Cards</Text>
             </View>
             <View style={styles.webStep}>
               <Text style={styles.webStepNumber}>3️⃣</Text>
-              <Text style={styles.webStepText}>50 Mock Tests</Text>
+              <Text style={styles.webStepText}>25000 Practice MCQs</Text>
             </View>
             <View style={styles.webStep}>
               <Text style={styles.webStepNumber}>4️⃣</Text>
-              <Text style={styles.webStepText}>Daily 14 Group Quizzes</Text>
+             <Text style={styles.webStepText}>25000 Clinical Cases</Text>
             </View>
           </View>
           <Text style={[styles.webBody, styles.emphasis]}>
             Every day you move forward. Every gap gets fixed automatically.{'\n'}
             Every milestone is visible.
           </Text>
-          <Text style={styles.webBody}>
-            This is your 10,000-concept path — made simple, structured, achievable.
-          </Text>
+         <Text style={styles.webBody}>
+  No costly tuitions. No books or voluminous notes to buy.{'\n'}
+  No overhyped faculty needed.
+</Text>
+
+<Text style={[styles.webBody, styles.emphasis]}>
+  Just an AI-tutored, self-paced, hyper-personalised adaptive learning journey{'\n'}
+  covering the complete 5-year MBBS CBME curriculum{'\n'}
+  across all 19 MBBS subjects.
+</Text>
         </View>
         <Image source={{ uri: image }} style={styles.webSideImage} resizeMode="contain" progressiveRenderingEnabled />
       </View>
