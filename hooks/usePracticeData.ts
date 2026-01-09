@@ -27,23 +27,44 @@ export function usePracticeData(
       return;
     }
 
-    const { data, error } = await supabase.rpc(
-      "get_concept_practice_feed_v14",
-      {
-        p_textbook_chapter: textbookChapter,
-        p_student_id: userId,
-        p_filter: category,
-        p_limit: LIMIT,
-        p_offset: currentOffset
-      }
-    );
+    let rpcName: string;
+    let rpcArgs: any;
+
+// ✅ ALWAYS USE v14 — ONLY FILTER CHANGES
+rpcName = "get_concept_practice_feed_v14";
+
+rpcArgs = {
+  p_student_id: userId,
+  p_textbook_chapter: textbookChapter,
+
+  // ⭐ THIS IS THE ONLY SWITCH
+  p_filter:
+    category === "all"
+      ? "all"
+      : category === "bookmarked"
+      ? "bookmarked"
+      : "wrong",
+
+  p_limit: LIMIT,
+  p_offset: currentOffset,
+};
+
+console.log("🚀 RPC CALL", {
+  category,
+  rpcName,
+  textbookChapter,
+  offset: currentOffset,
+});
+
+
+    const { data, error } = await supabase.rpc(rpcName, rpcArgs);
 
     if (error) {
-    console.log("RPC Error", error);
-    setIsLoadingMore(false);
-    setLoading(false);
-    return;
-  }
+      console.log("RPC Error", error);
+      setIsLoadingMore(false);
+      setLoading(false);
+      return;
+    }
 
     // ⭐ If NO new records → no more pagination
     if (!data || data.length === 0) {
@@ -69,8 +90,10 @@ export function usePracticeData(
     userId,
     category,
   });
+    setPhases([]); 
     setOffset(0);
     setHasMoreData(true);
+    setIsLoadingMore(false);   // 👈 ADD THIS
     setLoading(true);
     fetchPhases(0);
   }, [textbookChapter, userId, category]);

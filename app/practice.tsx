@@ -473,7 +473,7 @@ useEffect(() => {
           </View>
         ) : (
    <FlatList
-  key={selectedChapter}   // 🔥 REQUIRED
+   key={`${selectedChapter}-${selectedCategory}`}
   ref={listRef}
   data={phases}
   keyExtractor={(item) => item.id}
