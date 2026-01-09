@@ -177,7 +177,7 @@ function AskParagraphButton({
   try {
     const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL!;
 
-    const response = await fetch(`${API_BASE_URL}/ask-paragraph/start`, {
+    const response = await fetch(`${API_BASE_URL}/ask-paragraph-mbbs/start`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -196,7 +196,7 @@ function AskParagraphButton({
     const data = await response.json();
 
     router.push({
-      pathname: "/ask-paragraph",
+      pathname: "/ask-paragraph-mbbs",
       params: {
         session_id: data.session_id,
         student_id: studentId,
