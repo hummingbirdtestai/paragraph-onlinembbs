@@ -223,47 +223,31 @@ const startTutor = async (
           keyboardShouldPersistTaps="handled"
         >
           {tutorMode === "idle" && (
-  <View style={{ marginTop: 40, alignItems: "center" }}>
-    <Text
-      style={{
-        color: theme.colors.text,
-        fontSize: 18,
-        fontWeight: "600",
-        marginBottom: 24,
-      }}
-    >
-      Start your MBBS learning journey
+  <View style={styles.yearSelectorContainer}>
+    <Text style={styles.yearSelectorLabel}>
+      Choose your current MBBS year
     </Text>
 
-    {[
-      { key: "first", label: "Start 1st Year MBBS" },
-      { key: "second", label: "Start 2nd Year MBBS" },
-      { key: "third", label: "Start 3rd Year MBBS" },
-      { key: "final", label: "Start Final Year MBBS" },
-    ].map((item) => (
-      <TouchableOpacity
-        key={item.key}
-        onPress={() => startTutor(item.key as any)}
-        style={{
-          width: "100%",
-          paddingVertical: 14,
-          marginBottom: 12,
-          borderRadius: 10,
-          backgroundColor: "#1A3A2E",
-          alignItems: "center",
-        }}
-      >
-        <Text
-          style={{
-            color: "#25D366",
-            fontSize: 15,
-            fontWeight: "600",
-          }}
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.yearPillsRow}
+    >
+      {[
+        { key: "first", label: "1st Year" },
+        { key: "second", label: "2nd Year" },
+        { key: "third", label: "3rd Year" },
+        { key: "final", label: "Final Year" },
+      ].map((item) => (
+        <TouchableOpacity
+          key={item.key}
+          onPress={() => startTutor(item.key as any)}
+          style={styles.yearPill}
         >
-          {item.label}
-        </Text>
-      </TouchableOpacity>
-    ))}
+          <Text style={styles.yearPillText}>{item.label}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
   </View>
 )}
 
@@ -402,5 +386,35 @@ const styles = StyleSheet.create({
   suggestionText: {
     fontSize: 13,
     color: theme.colors.text,
+  },
+    yearSelectorContainer: {
+    marginTop: 40,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  yearSelectorLabel: {
+    color: theme.colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  yearPillsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 4,
+  },
+  yearPill: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  yearPillText: {
+    color: theme.colors.accent,
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
