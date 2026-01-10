@@ -69,6 +69,7 @@ export function MessageInput({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.background,
+     width: '100%',              // ✅ FORCE FULL WIDTH
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.md,
     paddingBottom: Platform.OS === 'web' ? theme.spacing.md : theme.spacing.xl,

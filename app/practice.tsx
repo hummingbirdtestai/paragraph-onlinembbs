@@ -23,7 +23,6 @@ console.log("🚨 practice.tsx FILE LOADED 🚨");
 export default function PracticeScreen() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
-
   const [containersVisible, setContainersVisible] = useState(true);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState("General Medicine");
@@ -564,7 +563,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0b141a" },
 
   headerBlock: {
-    paddingTop: 60,
+    paddingTop: 8,
     backgroundColor: "#0b141a",
     zIndex: 10,
   },
