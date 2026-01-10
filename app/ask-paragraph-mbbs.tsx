@@ -10,13 +10,15 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { useLocalSearchParams } from 'expo-router';
+
 import { theme } from '@/constants/theme';
 import { StudentBubble } from '@/components/chat/StudentBubble';
 import MentorBubbleReply from '@/components/types/MentorBubbleReply';
 import { MessageInput } from '@/components/chat/MessageInput';
 import LLMMCQCard from '@/components/chat/llm/LLMMCQCard';
+import MainLayout from "@/components/MainLayout";
+
 // 🔒 Hide internal control + diagnostic labels (UI only)
 function stripControlBlocks(text: string) {
   return text
@@ -58,27 +60,22 @@ interface MCQData {
 
 
 export default function AskParagraphScreen() {
-  const router = useRouter();
   const params = useLocalSearchParams();
   const scrollViewRef = useRef<ScrollView>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [mcqData, setMcqData] = useState<MCQData | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [conversation, setConversation] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [nextSuggestions, setNextSuggestions] = useState<any[]>([]);
+  const [tutorMode, setTutorMode] = useState<
+    "idle" | "active"
+  >("idle");
   
-// 1️⃣ Parse MCQ JSON from router
-useEffect(() => {
-  if (!params.mcq_json) return;
+  const [selectedYear, setSelectedYear] = useState<
+    "first" | "second" | "third" | "final" | null
+  >(null);
 
-  try {
-    const parsed = JSON.parse(params.mcq_json as string);
-    setMcqData(parsed);
-  } catch (e) {
-    console.error("❌ Failed to parse mcq_json from params", e);
-  }
-}, [params.mcq_json]);
 
 // 2️⃣ Debug MCQ shape (SAFE)
 useEffect(() => {
@@ -93,42 +90,6 @@ useEffect(() => {
     learning_gap: mcqData.learning_gap,
   });
 }, [mcqData]);
-
-
-  useEffect(() => {
-  if (!params.session_id) return;
-
-  const sessionId = params.session_id as string;
-  setSessionId(sessionId);
-
-  const fetchSession = async () => {
-    try {
-      const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL!;
-      const res = await fetch(`${API_BASE_URL}/ask-paragraph-mbbs/session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId }),
-      });
-
-      if (!res.ok) throw new Error("Failed to load session");
-
-      const data = await res.json();
-      const dialogs = data.dialogs || [];
-      const suggestions = data.next_suggestions || [];
-
-      setConversation(dialogs);
-      setNextSuggestions(suggestions);
-
-    } catch (e) {
-      console.error("Failed to load session", e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchSession();
-}, [params.session_id]);
-
 
   useEffect(() => {
     setTimeout(() => {
@@ -156,10 +117,9 @@ setConversation(prev => [
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        student_id: params.student_id,
-        mcq_id: params.mcq_id,
-        message,
-      }),
+  session_id: sessionId,
+  message,
+}),
     });
 
     if (!res.body) throw new Error("No stream body");
@@ -202,24 +162,53 @@ setConversation(prev => {
   }
 };
 
+const startTutor = async (
+  year: "first" | "second" | "third" | "final"
+) => {
+  // ✅ ADD THIS LINE — VERY FIRST LINE
+  if (loading) return;
+  
+  setSelectedYear(year);
+  setTutorMode("active");
+  setLoading(true);
+
+  try {
+    const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL!;
+
+    const res = await fetch(
+      `${API_BASE_URL}/ask-paragraph-mbbs/start`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          student_id: params.student_id,
+          year,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    // backend decides where student left off
+    setSessionId(data.session_id || null);
+    setMcqData(data.phase_json || null);
+    setConversation(data.dialogs || []);
+    setNextSuggestions(data.next_suggestions || []);
+
+  } catch (e) {
+    console.error("❌ Failed to start tutor", e);
+  } finally {
+    setLoading(false);
+  }
+};
 
 
 // Allow MCQ to render even while chat loads
 
 
   return (
+      <MainLayout>
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-          activeOpacity={0.7}
-        >
-          <ArrowLeft size={24} color={theme.colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ask Paragraph</Text>
-        <View style={styles.headerSpacer} />
-      </View>
 
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
@@ -233,12 +222,56 @@ setConversation(prev => {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {mcqData && (
+          {tutorMode === "idle" && (
+  <View style={{ marginTop: 40, alignItems: "center" }}>
+    <Text
+      style={{
+        color: theme.colors.text,
+        fontSize: 18,
+        fontWeight: "600",
+        marginBottom: 24,
+      }}
+    >
+      Start your MBBS learning journey
+    </Text>
+
+    {[
+      { key: "first", label: "Start 1st Year MBBS" },
+      { key: "second", label: "Start 2nd Year MBBS" },
+      { key: "third", label: "Start 3rd Year MBBS" },
+      { key: "final", label: "Start Final Year MBBS" },
+    ].map((item) => (
+      <TouchableOpacity
+        key={item.key}
+        onPress={() => startTutor(item.key as any)}
+        style={{
+          width: "100%",
+          paddingVertical: 14,
+          marginBottom: 12,
+          borderRadius: 10,
+          backgroundColor: "#1A3A2E",
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={{
+            color: "#25D366",
+            fontSize: 15,
+            fontWeight: "600",
+          }}
+        >
+          {item.label}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+)}
+
+          {tutorMode === "active" && mcqData && (
   <View style={styles.mcqContainer}>
     <LLMMCQCard mcq={mcqData} />
   </View>
 )}
-
 
           <View style={styles.conversationContainer}>
 {conversation
@@ -293,16 +326,21 @@ setConversation(prev => {
         <View style={styles.inputContainer}>
           <MessageInput
             onSend={(message) => {
-              if (isTyping) return;
+              if (isTyping || tutorMode !== "active") return;
               handleSendMessage(message);
             }}
-            placeholder="Answer or ask anything…"
-            disabled={isTyping}
+            placeholder={
+              tutorMode === "idle"
+                ? "Select a year to begin…"
+                : "Answer or ask anything…"
+            }
+            disabled={isTyping || tutorMode !== "active"}
           />
 
         </View>
       </KeyboardAvoidingView>
     </View>
+          </MainLayout>
   );
 }
 
@@ -321,28 +359,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontSize: theme.typography.body.fontSize,
     marginTop: theme.spacing.md,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
-    paddingTop: Platform.OS === 'ios' ? 56 : theme.spacing.lg,
-    backgroundColor: theme.colors.mentorBubble,
-    borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  backButton: {
-    padding: theme.spacing.xs,
-  },
-  headerTitle: {
-    color: theme.colors.text,
-    fontSize: theme.typography.heading.fontSize,
-    fontWeight: theme.typography.heading.fontWeight,
-  },
-  headerSpacer: {
-    width: 40,
   },
   keyboardAvoid: {
     flex: 1,
