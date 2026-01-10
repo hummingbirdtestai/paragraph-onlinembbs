@@ -58,6 +58,44 @@ interface MCQData {
   feedback: any;
 }
 
+// ✅ MBBS YEAR → SUBJECTS (NMC-correct, final)
+const subjectsByYear: Record<
+  "first" | "second" | "third" | "final",
+  string[]
+> = {
+  first: [
+    "Anatomy",
+    "Physiology",
+    "Biochemistry",
+  ],
+
+  second: [
+    "Microbiology",
+    "Pharmacology",
+    "Pathology",
+  ],
+
+  third: [
+    "PSM",
+    "Forensic",
+  ],
+
+  final: [
+    "ENT",
+    "Ophthalmology",
+    "General Medicine",
+    "General Surgery",
+    "Obstetrics",
+    "Gynecology",
+    "Pediatrics",
+    "Orthopaedics",
+    "Dermatology",
+    "Psychiatry",
+    "Anaesthesiology",
+    "Radiodiagnosis",
+    "Radiotherapy",
+  ],
+};
 
 export default function AskParagraphScreen() {
   const params = useLocalSearchParams();
@@ -75,6 +113,7 @@ export default function AskParagraphScreen() {
   const [selectedYear, setSelectedYear] = useState<
     "first" | "second" | "third" | "final" | null
   >(null);
+const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 
 
 // 2️⃣ Debug MCQ shape (SAFE)
@@ -162,13 +201,11 @@ setConversation(prev => {
   }
 };
 
-const startTutor = async (
-  year: "first" | "second" | "third" | "final"
-) => {
+const startTutor = async (subject: string) => {
   // ✅ ADD THIS LINE — VERY FIRST LINE
   if (loading) return;
   
-  setSelectedYear(year);
+
   setTutorMode("active");
   setLoading(true);
 
@@ -182,7 +219,7 @@ const startTutor = async (
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           student_id: params.student_id,
-          year,
+          subject,
         }),
       }
     );
@@ -241,13 +278,81 @@ const startTutor = async (
       ].map((item) => (
         <TouchableOpacity
           key={item.key}
-          onPress={() => startTutor(item.key as any)}
-          style={styles.yearPill}
-        >
-          <Text style={styles.yearPillText}>{item.label}</Text>
+          onPress={() => {
+  setSelectedYear(item.key as any);
+  setSelectedSubject(subjectsByYear[item.key][0]);
+}}
+          style={[
+  styles.yearPill,
+   selectedYear === item.key && {
+  backgroundColor: theme.colors.accent,
+  borderColor: theme.colors.accent,
+},
+  ]}
+>
+          <Text
+  style={[
+    styles.yearPillText,
+    selectedYear === item.key && { color: "#000" },
+  ]}
+>
+  {item.label}
+</Text>
+
         </TouchableOpacity>
       ))}
     </ScrollView>
+  </View>
+)}
+{tutorMode === "idle" && selectedYear && (
+  <View style={{ marginTop: 8 }}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.yearPillsRow}
+    >
+      {subjectsByYear[selectedYear].map((subject) => (
+        <TouchableOpacity
+          key={subject}
+          onPress={() => {
+  setSelectedSubject(subject);
+}}
+          style={[
+            styles.yearPill,
+            selectedSubject === subject && {
+              backgroundColor: theme.colors.accent,
+              borderColor: theme.colors.accent,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.yearPillText,
+              selectedSubject === subject && { color: "#000" },
+            ]}
+          >
+            {subject}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  </View>
+)}
+{tutorMode === "idle" && selectedYear && selectedSubject && (
+  <View style={{ marginTop: 16, alignItems: "center" }}>
+    <TouchableOpacity
+      onPress={() => startTutor(selectedSubject)}
+      style={{
+        paddingHorizontal: 28,
+        paddingVertical: 12,
+        borderRadius: 24,
+        backgroundColor: theme.colors.accent,
+      }}
+    >
+      <Text style={{ color: "#000", fontWeight: "700" }}>
+        Start {selectedSubject}
+      </Text>
+    </TouchableOpacity>
   </View>
 )}
 
