@@ -277,35 +277,34 @@ const startTutor = async (subject: string) => {
         { key: "final", label: "Final Year" },
       ].map((item) => (
         <TouchableOpacity
-          key={item.key}
-          onPress={() => {
-  setSelectedYear(item.key as any);
-  setSelectedSubject(subjectsByYear[item.key][0]);
-}}
-          style={[
-  styles.yearPill,
-   selectedYear === item.key && {
-  backgroundColor: theme.colors.accent,
-  borderColor: theme.colors.accent,
-},
-  ]}
->
-          <Text
+  key={item.key}
+  onPress={() => {
+    setSelectedYear(item.key as any);
+    setSelectedSubject(null);
+  }}
   style={[
-    styles.yearPillText,
-    selectedYear === item.key && { color: "#000" },
+    styles.yearPill,
+    selectedYear === item.key && {
+      backgroundColor: theme.colors.accent,
+      borderColor: theme.colors.accent,
+    },
   ]}
 >
-  {item.label}
-</Text>
-
-        </TouchableOpacity>
+  <Text
+    style={[
+      styles.yearPillText,
+      selectedYear === item.key && { color: "#000" },
+    ]}
+  >
+    {item.label}
+  </Text>
+</TouchableOpacity>
       ))}
     </ScrollView>
   </View>
 )}
 {tutorMode === "idle" && selectedYear && (
-  <View style={{ marginTop: 8 }}>
+  <View style={styles.subjectPillsContainer}>
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
@@ -318,7 +317,7 @@ const startTutor = async (subject: string) => {
   setSelectedSubject(subject);
 }}
           style={[
-            styles.yearPill,
+            styles.subjectPill,
             selectedSubject === subject && {
               backgroundColor: theme.colors.accent,
               borderColor: theme.colors.accent,
@@ -327,7 +326,7 @@ const startTutor = async (subject: string) => {
         >
           <Text
             style={[
-              styles.yearPillText,
+              styles.subjectPillText,
               selectedSubject === subject && { color: "#000" },
             ]}
           >
@@ -339,19 +338,11 @@ const startTutor = async (subject: string) => {
   </View>
 )}
 {tutorMode === "idle" && selectedYear && selectedSubject && (
-  <View style={{ marginTop: 16, alignItems: "center" }}>
-    <TouchableOpacity
-      onPress={() => startTutor(selectedSubject)}
-      style={{
-        paddingHorizontal: 28,
-        paddingVertical: 12,
-        borderRadius: 24,
-        backgroundColor: theme.colors.accent,
-      }}
-    >
-      <Text style={{ color: "#000", fontWeight: "700" }}>
-        Start {selectedSubject}
-      </Text>
+ <View style={styles.startButtonContainer}>
+  <TouchableOpacity style={styles.startButton}>
+   <Text style={styles.startButtonText}>
+  Start {selectedSubject}
+</Text>
     </TouchableOpacity>
   </View>
 )}
@@ -492,34 +483,72 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: theme.colors.text,
   },
-    yearSelectorContainer: {
-    marginTop: 40,
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  yearSelectorLabel: {
-    color: theme.colors.textSecondary,
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  yearPillsRow: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingHorizontal: 4,
-  },
-  yearPill: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-    backgroundColor: theme.colors.backgroundSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  yearPillText: {
-    color: theme.colors.accent,
-    fontSize: 15,
-    fontWeight: '600',
-  },
+  // Start button
+startButtonContainer: {
+  marginTop: 20,
+  alignItems: 'center',
+  paddingBottom: 12,
+},
+
+startButton: {
+  paddingHorizontal: 32,
+  paddingVertical: 11,
+  borderRadius: 12,
+  backgroundColor: theme.colors.accent,
+},
+
+startButtonText: {
+  color: '#000',
+  fontWeight: '600',
+  fontSize: 14,
+  letterSpacing: 0.2,
+},
+  // Subject selector (Secondary)
+subjectPillsContainer: {
+  marginTop: 12,
+  marginBottom: 20,
+},
+
+subjectPill: {
+  paddingHorizontal: 16,
+  paddingVertical: 7,
+  borderRadius: 10,
+  backgroundColor: 'transparent',
+  borderWidth: 1,
+  borderColor: 'rgba(255, 255, 255, 0.06)',
+},
+
+subjectPillText: {
+  color: theme.colors.textSecondary,
+  fontSize: 13,
+  fontWeight: '500',
+  letterSpacing: 0.1,
+},
+   yearSelectorContainer: {
+  marginTop: 32,
+  marginBottom: 8,
+  alignItems: 'center',
+},
+
+yearSelectorLabel: {
+  color: theme.colors.textSecondary,
+  fontSize: 13,
+  fontWeight: '500',
+  marginBottom: 12,
+  paddingHorizontal: theme.spacing.lg,
+  letterSpacing: 0.3,
+},
+
+yearPillsRow: {
+  flexDirection: 'row',
+  gap: 10,
+  paddingHorizontal: theme.spacing.lg,
+},
+
+yearPillText: {
+  color: theme.colors.textSecondary,
+  fontSize: 14,
+  fontWeight: '500',
+  letterSpacing: 0.2,
+},
 });
