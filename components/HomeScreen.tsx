@@ -11,6 +11,11 @@ import {
 } from 'react-native';
 import Footer from './Footer';
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  CBMECurriculumTableMobile,
+  CBMECurriculumTableWeb,
+} from "@/components/CBMECurriculumTable";
+
 
 interface HomeScreenProps {
   images: {
@@ -66,22 +71,20 @@ function MobileLayout({ images, onOpenAuth, isLoggedIn }: HomeScreenProps & {
     <ScrollView style={styles.container} contentContainerStyle={styles.mobileContent}>
       <Section1Mobile image={images.img1} />
       <Section5Mobile image={images.img5} />
-      <Section8Mobile />
+      <CBMECurriculumTableMobile />
       <ProFeaturesUnlockMobile />
       <AIPersonalizationMobile />
       <SystemNotFacultyMobile />
       <PersonalMentorMobile />
-      <Section7Mobile />
       <Section2Mobile image={images.img2} />
       <Section4Mobile image={images.img4} />
       <Section3Mobile image={images.img3} />
       <Section6Mobile image={images.img6} />
       <Block1Mobile image={images.img7} />
-      <Block2Mobile image={images.img8} />
       <Block3Mobile image={images.img9} />
-      <Block4Mobile image={images.img10} />
       <Block5Mobile image={images.img11} />
       <Section9Mobile onOpenAuth={onOpenAuth} isLoggedIn={isLoggedIn} />
+
       <Footer />
     </ScrollView>
   );
@@ -95,23 +98,22 @@ function WebLayout({ images, onOpenAuth, isLoggedIn }: HomeScreenProps & {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.webContent}>
       <Section1Web image={images.img1} />
-      <Section5Web image={images.img5} />
-      <Section8Web />
-      <ProFeaturesUnlockWeb />
-      <AIPersonalizationWeb />
-      <SystemNotFacultyWeb />
-      <PersonalMentorWeb />
-      <Section7Web />
-      <Section2Web image={images.img2} />
-      <Section4Web image={images.img4} />
-      <Section3Web image={images.img3} />
-      <Section6Web image={images.img6} />
-      <Block1Web image={images.img7} />
-      <Block2Web image={images.img8} />
-      <Block3Web image={images.img9} />
-      <Block4Web image={images.img10} />
-      <Block5Web image={images.img11} />
+  <Section5Web image={images.img5} />
+       <CBMECurriculumTableWeb />
+<ProFeaturesUnlockWeb />
+<AIPersonalizationWeb />
+<SystemNotFacultyWeb />
+<PersonalMentorWeb />
+<Section2Web image={images.img2} />
+<Section4Web image={images.img4} />
+<Section3Web image={images.img3} />
+<Section6Web image={images.img6} />
+<Block1Web image={images.img7} />
+<Block3Web image={images.img9} />
+<Block5Web image={images.img11} />
       <Section9Web onOpenAuth={onOpenAuth} isLoggedIn={isLoggedIn} />
+     
+     
       <Footer />
     </ScrollView>
   );
@@ -359,10 +361,10 @@ const Section5Mobile = memo(({ image }: { image: string }) => {
 <Text style={styles.mobileBody}>
           Paragraph breaks your preparation into a clear 4-step roadmap:
         </Text>
-        <Text style={styles.mobileStep}>1️⃣ 5000 CBME Concepts</Text>
+        <Text style={styles.mobileStep}>1️⃣ 4577 CBME Concepts</Text>
         <Text style={styles.mobileStep}>2️⃣ 50000 Flash Cards</Text>
-        <Text style={styles.mobileStep}>3️⃣ 25000 Practice MCQs</Text>
-        <Text style={styles.mobileStep}>4️⃣ 25000 Clinical Cases</Text>
+        <Text style={styles.mobileStep}>3️⃣ 22885 Practice MCQs</Text>
+        <Text style={styles.mobileStep}>4️⃣ 22885 Clinical Cases</Text>
         <Text style={[styles.mobileBody, styles.emphasis]}>
           Every day you move forward.{'\n'}
           Every gap gets fixed automatically.{'\n'}
@@ -406,7 +408,7 @@ const Section5Web = memo(({ image }: { image: string }) => {
           <View style={styles.webStepGrid}>
             <View style={styles.webStep}>
               <Text style={styles.webStepNumber}>1️⃣</Text>
-              <Text style={styles.webStepText}>5000 CBME Concepts</Text>
+              <Text style={styles.webStepText}>4577 CBME Concepts</Text>
             </View>
             <View style={styles.webStep}>
               <Text style={styles.webStepNumber}>2️⃣</Text>
@@ -414,11 +416,11 @@ const Section5Web = memo(({ image }: { image: string }) => {
             </View>
             <View style={styles.webStep}>
               <Text style={styles.webStepNumber}>3️⃣</Text>
-              <Text style={styles.webStepText}>25000 Practice MCQs</Text>
+              <Text style={styles.webStepText}>22885 Practice MCQs</Text>
             </View>
             <View style={styles.webStep}>
               <Text style={styles.webStepNumber}>4️⃣</Text>
-             <Text style={styles.webStepText}>25000 Clinical Cases</Text>
+             <Text style={styles.webStepText}>22885 Clinical Cases</Text>
             </View>
           </View>
           <Text style={[styles.webBody, styles.emphasis]}>
@@ -869,55 +871,54 @@ const ProFeaturesUnlockMobile = memo(() => {
   return (
     <View style={styles.mobileSection}>
       <View style={styles.mobilePadding}>
-        <Text style={styles.mobileHeading}>What You Unlock with Paragraph Pro</Text>
+  <Text style={styles.mobileHeading}>
+    What You Unlock with Paragraph (MBBS NMC-CBME Edition)
+  </Text>
 
-        <View style={styles.proFeatureCard}>
-          <Text style={styles.proFeatureTitle}>10,000 NEET-PG PYQs</Text>
-          <Text style={styles.proFeatureText}>– Mapped to concepts, mistakes, and exam patterns</Text>
-          <Text style={styles.proFeatureText}>– ~150 hours of focused revision</Text>
-        </View>
+  <View style={styles.proFeatureCard}>
+    <Text style={styles.proFeatureTitle}>4,577 NMC-Mapped CBME Topics</Text>
+    <Text style={styles.proFeatureText}>– Every topic taught from first principles</Text>
+    <Text style={styles.proFeatureText}>– Structured exactly as competencies demand</Text>
+  </View>
 
-        <View style={styles.proFeatureCard}>
-          <Text style={styles.proFeatureTitle}>10,000 High-Yield Concepts</Text>
-          <Text style={styles.proFeatureText}>– Exam-critical only</Text>
-          <Text style={styles.proFeatureText}>– No duplication, no fluff</Text>
-        </View>
+  <View style={styles.proFeatureCard}>
+    <Text style={styles.proFeatureTitle}>50,000 Flashcards</Text>
+    <Text style={styles.proFeatureText}>– Rapid recall with spaced repetition</Text>
+    <Text style={styles.proFeatureText}>– Built directly from CBME concepts</Text>
+    <Text style={styles.proFeatureText}>– Long-term retention across 5 MBBS years</Text>
+  </View>
 
-        <View style={styles.proFeatureCard}>
-          <Text style={styles.proFeatureTitle}>45,000 Flashcards</Text>
-          <Text style={styles.proFeatureText}>– Rapid recall</Text>
-          <Text style={styles.proFeatureText}>– Long-term memory</Text>
-          <Text style={styles.proFeatureText}>– Last-minute revision</Text>
-        </View>
+  <View style={styles.proFeatureCard}>
+    <Text style={styles.proFeatureTitle}>45,770 High-Yield Facts</Text>
+    <Text style={styles.proFeatureText}>– Embedded inside concepts</Text>
+    <Text style={styles.proFeatureText}>– Strictly exam-relevant, zero fluff</Text>
+  </View>
 
-        <View style={styles.proFeatureCard}>
-          <Text style={styles.proFeatureTitle}>Daily Short Videos (3-minute reels)</Text>
-          <Text style={styles.proFeatureText}>– 6,000 videos total</Text>
-          <Text style={styles.proFeatureText}>– ~60,000 high-yield facts</Text>
-          <Text style={styles.proFeatureText}>– No binge-watching</Text>
-        </View>
+  <View style={styles.proFeatureCard}>
+    <Text style={styles.proFeatureTitle}>22,885 Clinical Case Vignettes</Text>
+    <Text style={styles.proFeatureText}>– CBME-aligned, bedside-oriented</Text>
+    <Text style={styles.proFeatureText}>– Theory translated into clinical reasoning</Text>
+  </View>
 
-        <View style={styles.proFeatureCard}>
-          <Text style={styles.proFeatureTitle}>Daily Image-Based Learning</Text>
-          <Text style={styles.proFeatureText}>– 4,500 clinical images</Text>
-          <Text style={styles.proFeatureText}>– Visual exam-pattern recognition</Text>
-        </View>
+  <View style={styles.proFeatureCard}>
+    <Text style={styles.proFeatureTitle}>22,885 Core MCQs (Adaptive & Recursive)</Text>
+    <Text style={styles.proFeatureText}>– Minimum 5 MCQs per topic</Text>
+    <Text style={styles.proFeatureText}>– Automatically repeated until gaps close</Text>
+  </View>
 
-        <View style={styles.proFeatureCard}>
-          <Text style={styles.proFeatureTitle}>100 Full-Length NEET-PG Mock Tests</Text>
-          <Text style={styles.proFeatureText}>– Bi-weekly</Text>
-          <Text style={styles.proFeatureText}>– Exam-level difficulty</Text>
-          <Text style={styles.proFeatureText}>– Rank prediction & analysis</Text>
-        </View>
+  <View style={styles.proFeatureCard}>
+    <Text style={styles.proFeatureTitle}>22,885 Viva Voce Questions</Text>
+    <Text style={styles.proFeatureText}>– University-exam ready answers</Text>
+    <Text style={styles.proFeatureText}>– Ward-round & practical focused</Text>
+  </View>
 
-        <View style={styles.proFeatureCard}>
-          <Text style={styles.proFeatureTitle}>Daily Group Quizzes</Text>
-          <Text style={styles.proFeatureText}>– 15 quizzes every day</Text>
-          <Text style={styles.proFeatureText}>– 450 MCQs/day</Text>
-          <Text style={styles.proFeatureText}>– All 19 NEET-PG subjects</Text>
-          <Text style={styles.proFeatureText}>– Live competition & feedback</Text>
-        </View>
-      </View>
+  <View style={styles.proFeatureCard}>
+    <Text style={styles.proFeatureTitle}>1,505 AI-Guided Study Hours</Text>
+    <Text style={styles.proFeatureText}>– Distributed across all 5 MBBS years</Text>
+    <Text style={styles.proFeatureText}>– Delivered via AI-planned daily learning objectives</Text>
+    <Text style={styles.proFeatureText}>– No overload, no burnout</Text>
+  </View>
+</View>
     </View>
   );
 });
@@ -926,61 +927,61 @@ const ProFeaturesUnlockWeb = memo(() => {
   return (
     <View style={styles.webSection}>
       <View style={styles.webTextBlock}>
-        <Text style={styles.webHeading}>What You Unlock with Paragraph Pro</Text>
+        <Text style={styles.webHeading}>
+          What You Unlock with Paragraph (MBBS NMC-CBME Edition)
+        </Text>
 
         <View style={styles.webProGrid}>
           <View style={styles.webProCard}>
-            <Text style={styles.webProCardTitle}>10,000 NEET-PG PYQs</Text>
-            <Text style={styles.webProCardText}>– Mapped to concepts, mistakes, and exam patterns</Text>
-            <Text style={styles.webProCardText}>– ~150 hours of focused revision</Text>
+            <Text style={styles.webProCardTitle}>4,577 NMC-Mapped CBME Topics</Text>
+            <Text style={styles.webProCardText}>– Every topic taught from first principles</Text>
+            <Text style={styles.webProCardText}>– Structured exactly as competencies demand</Text>
           </View>
 
           <View style={styles.webProCard}>
-            <Text style={styles.webProCardTitle}>10,000 High-Yield Concepts</Text>
-            <Text style={styles.webProCardText}>– Exam-critical only</Text>
-            <Text style={styles.webProCardText}>– No duplication, no fluff</Text>
+            <Text style={styles.webProCardTitle}>50,000 Flashcards</Text>
+            <Text style={styles.webProCardText}>– Rapid recall with spaced repetition</Text>
+            <Text style={styles.webProCardText}>– Built directly from CBME concepts</Text>
+            <Text style={styles.webProCardText}>– Long-term retention across 5 MBBS years</Text>
           </View>
 
           <View style={styles.webProCard}>
-            <Text style={styles.webProCardTitle}>45,000 Flashcards</Text>
-            <Text style={styles.webProCardText}>– Rapid recall</Text>
-            <Text style={styles.webProCardText}>– Long-term memory</Text>
-            <Text style={styles.webProCardText}>– Last-minute revision</Text>
+            <Text style={styles.webProCardTitle}>45,770 High-Yield Facts</Text>
+            <Text style={styles.webProCardText}>– Embedded inside concepts</Text>
+            <Text style={styles.webProCardText}>– Strictly exam-relevant, zero fluff</Text>
           </View>
 
           <View style={styles.webProCard}>
-            <Text style={styles.webProCardTitle}>Daily Short Videos (3-minute reels)</Text>
-            <Text style={styles.webProCardText}>– 6,000 videos total</Text>
-            <Text style={styles.webProCardText}>– ~60,000 high-yield facts</Text>
-            <Text style={styles.webProCardText}>– No binge-watching</Text>
+            <Text style={styles.webProCardTitle}>22,885 Clinical Case Vignettes</Text>
+            <Text style={styles.webProCardText}>– CBME-aligned, bedside-oriented</Text>
+            <Text style={styles.webProCardText}>– Theory translated into clinical reasoning</Text>
           </View>
 
           <View style={styles.webProCard}>
-            <Text style={styles.webProCardTitle}>Daily Image-Based Learning</Text>
-            <Text style={styles.webProCardText}>– 4,500 clinical images</Text>
-            <Text style={styles.webProCardText}>– Visual exam-pattern recognition</Text>
+            <Text style={styles.webProCardTitle}>22,885 Core MCQs (Adaptive & Recursive)</Text>
+            <Text style={styles.webProCardText}>– Minimum 5 MCQs per topic</Text>
+            <Text style={styles.webProCardText}>– Automatically repeated until gaps close</Text>
           </View>
 
           <View style={styles.webProCard}>
-            <Text style={styles.webProCardTitle}>100 Full-Length NEET-PG Mock Tests</Text>
-            <Text style={styles.webProCardText}>– Bi-weekly</Text>
-            <Text style={styles.webProCardText}>– Exam-level difficulty</Text>
-            <Text style={styles.webProCardText}>– Rank prediction & analysis</Text>
+            <Text style={styles.webProCardTitle}>22,885 Viva Voce Questions</Text>
+            <Text style={styles.webProCardText}>– University-exam ready answers</Text>
+            <Text style={styles.webProCardText}>– Ward-round & practical focused</Text>
           </View>
 
-          <View style={[styles.webProCard, styles.webProCardCentered]}>
-            <Text style={[styles.webProCardTitle, styles.centeredText]}>Daily Group Quizzes</Text>
-            <Text style={[styles.webProCardText, styles.centeredText]}>– 15 quizzes every day</Text>
-            <Text style={[styles.webProCardText, styles.centeredText]}>– 450 MCQs/day</Text>
-            <Text style={[styles.webProCardText, styles.centeredText]}>– All 19 NEET-PG subjects</Text>
-            <Text style={[styles.webProCardText, styles.centeredText]}>– Live competition & feedback</Text>
+          <View style={styles.webProCard}>
+            <Text style={styles.webProCardTitle}>1,505 AI-Guided Study Hours</Text>
+            <Text style={styles.webProCardText}>– Distributed across all 5 MBBS years</Text>
+            <Text style={styles.webProCardText}>
+              – Delivered via AI-planned daily learning objectives
+            </Text>
+            <Text style={styles.webProCardText}>– No overload, no burnout</Text>
           </View>
         </View>
       </View>
     </View>
   );
 });
-
 const AIPersonalizationMobile = memo(() => {
   return (
     <View style={styles.mobileSection}>
