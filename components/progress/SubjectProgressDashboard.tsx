@@ -1,7 +1,7 @@
-//components/progress/SubjectProgressDashboard.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
 import { supabase } from '@/lib/supabaseClient';
+
 
 interface SubjectProgressDashboardProps {
   student_id: string;
@@ -36,7 +36,7 @@ export default function SubjectProgressDashboard({ student_id, subject }: Subjec
     setError(null);
     
     try {
-      const { data: result, error: rpcError } = await supabase.rpc('get_subject_progress_v4', {
+      const { data: result, error: rpcError } = await supabase.rpc('get_subject_progress_v3', {
         p_student_id: student_id,
         p_subject: subject
       });
@@ -56,205 +56,326 @@ export default function SubjectProgressDashboard({ student_id, subject }: Subjec
     }
   };
 
+  // LOADING STATE
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
-        <Text>Loading progress...</Text>
+      <View style={styles.card}>
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="small" color="#10b981" />
+          <Text style={styles.mutedText}>Loading progress...</Text>
+        </View>
       </View>
     );
   }
 
+  // ERROR STATE
   if (error) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-        <Text>Error: {error}</Text>
+      <View style={styles.card}>
+        <View style={styles.centerContent}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
       </View>
     );
   }
 
+  // EMPTY STATE
   if (!data) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>No data available</Text>
+      <View style={styles.card}>
+        <View style={styles.centerContent}>
+          <Text style={styles.mutedText}>No progress data available</Text>
+        </View>
       </View>
     );
   }
 
   const remainingTopics = data.total_topics - data.completed_topics;
 
-  const renderGraphicalView = () => (
-    <View style={{ padding: 20 }}>
-      <View style={{ marginBottom: 40 }}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-          Completion Progress
-        </Text>
-        <View style={{ alignItems: 'center', marginVertical: 20 }}>
-          <View style={{ 
-            width: 150, 
-            height: 150, 
-            borderRadius: 75, 
-            borderWidth: 10,
-       borderColor: '#10b981',   // 🔥 REQUIRED
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <Text style={{ fontSize: 32, fontWeight: 'bold' }}>
-              {data.completion_percent.toFixed(1)}%
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      <View>
-        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-          Time Distribution
-        </Text>
-        <View style={{ marginVertical: 20 }}>
-          <View style={{ flexDirection: 'row', marginBottom: 10 }}>
-            <View style={{ flex: 1 }}>
-              <Text>Time Spent</Text>
-              <Text style={{ fontSize: 24, fontWeight: 'bold' }}>
-                {data.time_spent_hours.toFixed(1)}h
-              </Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text>Remaining</Text>
-              <Text style={{ fontSize: 24, fontWeight: 'bold' }}>
-                {data.remaining_hours.toFixed(1)}h
-              </Text>
-            </View>
-          </View>
-          <View style={{ height: 20, backgroundColor: '#e0e0e0', borderRadius: 10, overflow: 'hidden' }}>
-            <View 
-              style={{ 
-                height: '100%', 
-                width: `${(data.time_spent_hours / data.total_hours) * 100}%`,
-                backgroundColor: '#4CAF50'
-              }} 
-            />
-          </View>
-        </View>
-      </View>
-    </View>
-  );
-
+  // TAB CONTENT RENDERER
   const renderTabContent = () => {
     switch (activeTab) {
       case 'Overview':
         return (
-          <View style={{ padding: 20 }}>
-            <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 16 }}>Total Topics</Text>
-              <Text style={{ fontSize: 28, fontWeight: 'bold' }}>{data.total_topics}</Text>
+          <View style={styles.tabContent}>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Total Topics</Text>
+              <Text style={styles.metricValue}>{data.total_topics}</Text>
             </View>
-            <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 16 }}>Total Hours</Text>
-              <Text style={{ fontSize: 28, fontWeight: 'bold' }}>{data.total_hours}</Text>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Total Hours</Text>
+              <Text style={styles.metricValue}>{data.total_hours}</Text>
             </View>
-            <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 16 }}>Completion</Text>
-              <Text style={{ fontSize: 28, fontWeight: 'bold' }}>{data.completion_percent.toFixed(1)}%</Text>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Completion</Text>
+              <Text style={styles.metricValue}>{data.completion_percent.toFixed(1)}%</Text>
             </View>
           </View>
         );
 
       case 'Topics':
         return (
-          <View style={{ padding: 20 }}>
-            <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 16 }}>Completed Topics</Text>
-              <Text style={{ fontSize: 28, fontWeight: 'bold' }}>{data.completed_topics}</Text>
+          <View style={styles.tabContent}>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Completed Topics</Text>
+              <Text style={styles.metricValue}>{data.completed_topics}</Text>
             </View>
-            <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 16 }}>Remaining Topics</Text>
-              <Text style={{ fontSize: 28, fontWeight: 'bold' }}>{remainingTopics}</Text>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Remaining Topics</Text>
+              <Text style={styles.metricValue}>{remainingTopics}</Text>
+            </View>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Total Topics</Text>
+              <Text style={styles.metricValue}>{data.total_topics}</Text>
             </View>
           </View>
         );
 
       case 'MCQs':
         return (
-          <View style={{ padding: 20 }}>
-            <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 16 }}>Completed MCQs</Text>
-              <Text style={{ fontSize: 28, fontWeight: 'bold' }}>{data.completed_mcqs}</Text>
+          <View style={styles.tabContent}>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Completed MCQs</Text>
+              <Text style={styles.metricValue}>{data.completed_mcqs}</Text>
             </View>
           </View>
         );
 
       case 'Time':
         return (
-          <View style={{ padding: 20 }}>
-            <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 16 }}>Time Spent (hours)</Text>
-              <Text style={{ fontSize: 28, fontWeight: 'bold' }}>{data.time_spent_hours.toFixed(2)}</Text>
+          <View style={styles.tabContent}>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Time Spent (hours)</Text>
+              <Text style={styles.metricValue}>{data.time_spent_hours.toFixed(2)}</Text>
             </View>
-            <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 16 }}>Remaining Time (hours)</Text>
-              <Text style={{ fontSize: 28, fontWeight: 'bold' }}>{data.remaining_hours.toFixed(2)}</Text>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Remaining Time (hours)</Text>
+              <Text style={styles.metricValue}>{data.remaining_hours.toFixed(2)}</Text>
             </View>
           </View>
         );
     }
   };
 
-    return (
-    <View
-      style={{
-        backgroundColor: '#0d1821',
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#1c2730',
-        margin: 16,
-        overflow: 'hidden',
-      }}
-    >
-      <ScrollView>
-        <View style={{ padding: 20 }}>
-          <Text
-            style={{
-              fontSize: 22,
-              fontWeight: 'bold',
-              color: '#e5e7eb',
-              marginBottom: 12,
-            }}
+  return (
+    <View style={styles.card}>
+      {/* SECTION 1: SUBJECT HEADER */}
+      <View style={styles.header}>
+        <Text style={styles.subjectTitle}>{data.subject}</Text>
+      </View>
+      <View style={styles.divider} />
+
+      {/* SECTION 2: PROGRESS SUMMARY */}
+      <View style={styles.progressSection}>
+        <Text style={styles.percentageText}>{data.completion_percent.toFixed(1)}%</Text>
+        <Text style={styles.progressLabel}>Progress Completed</Text>
+        
+        {/* Horizontal Progress Bar */}
+        <View style={styles.progressBarContainer}>
+          <View 
+            style={[
+              styles.progressBarFill, 
+              { width: `${Math.min(data.completion_percent, 100)}%` }
+            ]} 
+          />
+        </View>
+      </View>
+
+      {/* SECTION 3: TIME METRICS (TWO MINI CARDS) */}
+      <View style={styles.timeMetrics}>
+        <View style={styles.miniCard}>
+          <Text style={styles.miniCardLabel}>Time Spent</Text>
+          <Text style={styles.miniCardValue}>{data.time_spent_hours.toFixed(1)}h</Text>
+        </View>
+        <View style={styles.miniCard}>
+          <Text style={styles.miniCardLabel}>Remaining Time</Text>
+          <Text style={styles.miniCardValue}>{data.remaining_hours.toFixed(1)}h</Text>
+        </View>
+      </View>
+
+      {/* SECTION 4: TAB STRIP */}
+      <View style={styles.tabStrip}>
+        {(['Overview', 'Topics', 'MCQs', 'Time'] as TabType[]).map((tab) => (
+          <TouchableOpacity
+            key={tab}
+            onPress={() => setActiveTab(tab)}
+            style={styles.tab}
           >
-            {data.subject}
-          </Text>
-        </View>
+            <Text style={[
+              styles.tabText,
+              activeTab === tab && styles.tabTextActive
+            ]}>
+              {tab}
+            </Text>
+            {activeTab === tab && <View style={styles.tabIndicator} />}
+          </TouchableOpacity>
+        ))}
+      </View>
 
-        {renderGraphicalView()}
-
-        <View style={{ padding: 20 }}>
-          <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-            {(['Overview', 'Topics', 'MCQs', 'Time'] as TabType[]).map((tab) => (
-              <TouchableOpacity
-                key={tab}
-                onPress={() => setActiveTab(tab)}
-                style={{
-                  flex: 1,
-                  paddingVertical: 10,
-                  alignItems: 'center',
-                  borderBottomWidth: activeTab === tab ? 2 : 0,
-                  borderBottomColor: '#10b981',
-                }}
-              >
-                <Text
-                  style={{
-                    fontWeight: activeTab === tab ? '700' : '500',
-                    color: activeTab === tab ? '#10b981' : '#9ca3af',
-                  }}
-                >
-                  {tab}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {renderTabContent()}
-        </View>
-      </ScrollView>
+      {/* SECTION 5: TAB CONTENT */}
+      {renderTabContent()}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  // CARD WRAPPER (NOT FULLSCREEN)
+  card: {
+    backgroundColor: '#0d1821',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#1c2730',
+    padding: 16,
+    marginVertical: 8,
+  },
+
+  centerContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 24,
+  },
+
+  // HEADER SECTION
+  header: {
+    marginBottom: 8,
+  },
+
+  subjectTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#e5e7eb',
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: '#1c2730',
+    marginBottom: 16,
+  },
+
+  // PROGRESS SECTION
+  progressSection: {
+    marginBottom: 16,
+  },
+
+  percentageText: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#10b981',
+    marginBottom: 4,
+  },
+
+  progressLabel: {
+    fontSize: 14,
+    color: '#9ca3af',
+    marginBottom: 12,
+  },
+
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: '#1c2730',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#10b981',
+    borderRadius: 4,
+  },
+
+  // TIME METRICS (MINI CARDS)
+  timeMetrics: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+
+  miniCard: {
+    flex: 1,
+    backgroundColor: '#111827',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#1c2730',
+    padding: 12,
+  },
+
+  miniCardLabel: {
+    fontSize: 12,
+    color: '#9ca3af',
+    marginBottom: 4,
+  },
+
+  miniCardValue: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#e5e7eb',
+  },
+
+  // TAB STRIP
+  tabStrip: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#1c2730',
+    marginBottom: 16,
+  },
+
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+
+  tabText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    fontWeight: '500',
+  },
+
+  tabTextActive: {
+    color: '#e5e7eb',
+  },
+
+  tabIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: '#10b981',
+  },
+
+  // TAB CONTENT
+  tabContent: {
+    gap: 12,
+  },
+
+  metricRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+
+  metricLabel: {
+    fontSize: 14,
+    color: '#9ca3af',
+  },
+
+  metricValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#e5e7eb',
+  },
+
+  // STATES
+  mutedText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    marginTop: 8,
+  },
+
+  errorText: {
+    fontSize: 14,
+    color: '#ef4444',
+  },
+});
