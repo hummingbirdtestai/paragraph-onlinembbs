@@ -26,6 +26,7 @@ import MentorBubbleReply from '@/components/types/MentorBubbleReply';
 import { MessageInput } from '@/components/chat/MessageInput';
 import LLMMCQCard from '@/components/chat/llm/LLMMCQCard';
 import { ActivityIndicator } from 'react-native';
+import SubjectProgressDashboard from '@/components/progress/SubjectProgressDashboard';
 import ConfettiCannon from 'react-native-confetti-cannon';
 function stripControlBlocks(text: string) {
   return text
@@ -61,6 +62,7 @@ const [loadingPhase, setLoadingPhase] = useState(false);
   const { user } = useAuth();
 const router = useRouter();
   const conversationRef = useRef<any[]>([]);
+  const [showSubjectProgress, setShowSubjectProgress] = useState(false);
   const yearOptions: { key: Year; label: string }[] = [
     { key: 'first', label: 'First Year' },
     { key: 'second', label: 'Second Year' },
@@ -180,6 +182,7 @@ if (chunk.includes("[SYSTEM_RETRY]")) {
 
   const handleStartChat = async () => {
      setSessionCompleted(false);   // 🔑 ADD THIS LINE
+    setShowSubjectProgress(false);
   if (!user?.id || !selectedSubject) return;
 
   setLoadingPhase(true);
@@ -331,7 +334,11 @@ if (!res.ok) {
                 styles.pillSubject,
                 selectedSubject === subject && styles.pillSelected,
               ]}
-              onPress={() => setSelectedSubject(subject)}
+              onPress={() => {
+  setSelectedSubject(subject);
+  setChatStarted(false);
+  setShowSubjectProgress(true);
+}}
             >
               <Text
                 style={[
@@ -419,6 +426,12 @@ return (
   contentContainerStyle={{ paddingBottom: 120 }}
   keyboardShouldPersistTaps="handled"
 >
+{showSubjectProgress && selectedSubject && user?.id && (
+  <SubjectProgressDashboard
+    student_id={user.id}
+    subject={selectedSubject}
+  />
+)}
 
   {/* ───── Selection / Phase content scrolls ───── */}
   {!chatStarted && renderSelectionScreen()}
@@ -479,6 +492,8 @@ return (
         setActiveMcqId(null);
 setIsStartingDiscussion(false); // 🔑 ADD THIS
         // 🔑 Load next CBME phase
+         // 🔑 ADD THIS LINE HERE
+  setCurrentPhase(null);
         handleStartChat();
       }}
     >
