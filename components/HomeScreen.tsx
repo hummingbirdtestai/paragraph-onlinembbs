@@ -188,7 +188,7 @@ const Section2Mobile = memo(({ image }: { image: string }) => {
     <View style={styles.mobileSection}>
       <Image source={{ uri: image }} style={styles.mobileImage} resizeMode="cover" progressiveRenderingEnabled />
       <View style={styles.mobilePadding}>
-        <Text style={styles.mobileHeading}>NEETPG Prep That Actually Works</Text>
+        <Text style={styles.mobileHeading}>MBBS CBME Syllabus Mastery That Actually Works</Text>
         <Text style={styles.mobileBody}>
           Learning can be rewarding, sharp, and energising.
         </Text>
@@ -211,7 +211,7 @@ const Section2Web = memo(({ image }: { image: string }) => {
       <View style={styles.webReverse}>
         <Image source={{ uri: image }} style={styles.webSideImage} resizeMode="contain" progressiveRenderingEnabled />
         <View style={styles.webTextBlock}>
-          <Text style={styles.webHeading}>But NEETPG was never meant to feel like torture.</Text>
+          <Text style={styles.webHeading}>MBBS CBME Syllabus Mastery That Actually Works</Text>
           <Text style={styles.webBody}>
             Learning can be rewarding, sharp, and energising.
           </Text>

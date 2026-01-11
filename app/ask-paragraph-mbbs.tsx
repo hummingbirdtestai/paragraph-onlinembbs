@@ -26,7 +26,7 @@ import MentorBubbleReply from '@/components/types/MentorBubbleReply';
 import { MessageInput } from '@/components/chat/MessageInput';
 import LLMMCQCard from '@/components/chat/llm/LLMMCQCard';
 import { ActivityIndicator } from 'react-native';
-
+import ConfettiCannon from 'react-native-confetti-cannon';
 function stripControlBlocks(text: string) {
   return text
     .replace(
@@ -36,7 +36,7 @@ function stripControlBlocks(text: string) {
     .replace(/\[STUDENT_REPLY_REQUIRED\]/g, "")
     .replace(/\[FEEDBACK_CORRECT\]/g, "")
     .replace(/\[FEEDBACK_WRONG\]/g, "")
-    .replace(/\[SYSTEM_RETRY\]/g, "")
+     .replace(/\[SESSION_COMPLETED\]/g, "") // ✅ ADD THIS LINE
     .replace(/^Correct:\s*[A-D]\s*$/gim, "")
     .trim();
 }
@@ -54,10 +54,13 @@ export default function AskParagraphChat() {
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [chatStarted, setChatStarted] = useState(false);
  // 🔑 Phase execution state (RPC-driven)
+  const [sessionCompleted, setSessionCompleted] = useState(false);
+const [showConfetti, setShowConfetti] = useState(false);
 const [currentPhase, setCurrentPhase] = useState<any | null>(null);
 const [loadingPhase, setLoadingPhase] = useState(false);
   const { user } = useAuth();
 const router = useRouter();
+  const conversationRef = useRef<any[]>([]);
   const yearOptions: { key: Year; label: string }[] = [
     { key: 'first', label: 'First Year' },
     { key: 'second', label: 'Second Year' },
@@ -65,11 +68,16 @@ const router = useRouter();
     { key: 'final', label: 'Final Year' },
   ];
 const [sessionId, setSessionId] = useState<string | null>(null);
+  const [activeMcqId, setActiveMcqId] = useState<string | null>(null); // ✅ HERE
 const [conversation, setConversation] = useState<any[]>([]);
 const [tutorMode, setTutorMode] = useState<"idle" | "active">("idle");
+  const [isStartingDiscussion, setIsStartingDiscussion] = useState(false);
 const scrollViewRef = useRef<ScrollView>(null);
 const [isTyping, setIsTyping] = useState(false);
   useEffect(() => {
+  conversationRef.current = conversation;
+}, [conversation]);
+useEffect(() => {
   const timeout = setTimeout(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, 100);
@@ -77,9 +85,13 @@ const [isTyping, setIsTyping] = useState(false);
   return () => clearTimeout(timeout);
 }, [conversation, isTyping]);
 
+
 const [nextSuggestions, setNextSuggestions] = useState<any[]>([]);
 const handleSendMessage = async (message: string) => {
-  if (!message.trim() || !sessionId || isTyping) return;
+if (!message.trim() || isTyping) return;
+    // 🔑 EXACT LINE YOU ASKED ABOUT
+  if (!user?.id || !activeMcqId) return;
+
 
   setConversation(prev => [
     ...prev,
@@ -94,10 +106,11 @@ const handleSendMessage = async (message: string) => {
     const res = await fetch(`${API_BASE_URL}/ask-paragraph-mbbs/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        session_id: sessionId,
-        message,
-      }),
+  body: JSON.stringify({
+  student_id: user.id,
+  mcq_id: activeMcqId,
+  message,
+}),
     });
 
     if (!res.body) throw new Error("No stream body");
@@ -107,30 +120,57 @@ const handleSendMessage = async (message: string) => {
 
     let done = false;
 
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
+   while (!done) {
+  const { value, done: doneReading } = await reader.read();
+  done = doneReading;
 
-      if (value) {
-        const chunk = decoder.decode(value, { stream: true });
+  if (!value) continue;
 
-        setConversation(prev => {
-          const updated = [...prev];
-          const last = updated[updated.length - 1];
+  const chunk = decoder.decode(value, { stream: true });
 
-          if (!last || last.role !== "mentor") {
-            updated.push({ role: "mentor", content: chunk });
-          } else {
-            updated[updated.length - 1] = {
-              ...last,
-              content: last.content + chunk,
-            };
-          }
+  // 1️⃣ Render streamed chunk ONCE
+  setConversation(prev => {
+    const updated = [...prev];
+    const last = updated[updated.length - 1];
 
-          return updated;
-        });
-      }
+    if (!last || last.role !== "mentor") {
+      updated.push({ role: "mentor", content: chunk });
+    } else {
+      updated[updated.length - 1] = {
+        ...last,
+        content: last.content + chunk,
+      };
     }
+
+    return updated;
+  });
+// 🔁 SYSTEM RETRY — re-trigger same answer
+if (chunk.includes("[SYSTEM_RETRY]")) {
+  setIsTyping(false);
+
+  // resend last student answer automatically
+  const lastStudent = conversationRef.current
+    .slice()
+    .reverse()
+    .find(m => m.role === "student");
+
+  if (lastStudent?.content) {
+    handleSendMessage(lastStudent.content);
+  }
+
+  return; // ⛔ stop this stream
+}
+
+  // 2️⃣ Detect session completion AFTER rendering
+     
+  if (chunk.includes("[SESSION_COMPLETED]")) {
+    setSessionCompleted(true);
+    setTutorMode("idle");
+    setIsTyping(false);
+      setShowConfetti(true); // 🎉 ADD THIS
+    break; // ✅ exit loop cleanly
+  }
+}
   } catch (e) {
     console.error("Chat error", e);
   } finally {
@@ -139,6 +179,7 @@ const handleSendMessage = async (message: string) => {
 };
 
   const handleStartChat = async () => {
+     setSessionCompleted(false);   // 🔑 ADD THIS LINE
   if (!user?.id || !selectedSubject) return;
 
   setLoadingPhase(true);
@@ -193,8 +234,11 @@ if (data) {
   }
 };
 const handleDiscussWithParagraph = async () => {
+    setSessionCompleted(false);   // 🔑 ADD THIS LINE
   if (!currentPhase || !user?.id) return;
-
+// ✅ ADD THESE TWO LINES
+  setIsStartingDiscussion(true);
+  setTutorMode("idle"); // lock input
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL!;
 
   const payload =
@@ -222,16 +266,19 @@ const handleDiscussWithParagraph = async () => {
     }),
   });
 
-  if (!res.ok) {
-    console.error("❌ Start failed", res.status);
-    return;
-  }
+if (!res.ok) {
+  console.error("❌ Start failed", res.status);
+  setIsStartingDiscussion(false);   // 🔑 IMPORTANT
+  return;
+}
 
   const data = await res.json();
 
   setSessionId(data.session_id);
+  setActiveMcqId(currentPhase.phase_row_id);   // 🔑 REQUIRED
   setConversation(data.final_dialogs || []);
   setTutorMode("active");
+  setIsStartingDiscussion(false); // ✅ DONE
 };
 
 
@@ -385,19 +432,21 @@ return (
   {chatStarted && !loadingPhase && renderPhase()}
 
   {/* ───── Discuss CTA (VISIBLE AFTER SCROLL) ───── */}
-  {currentPhase && (
-    <View style={styles.discussContainer}>
-      <TouchableOpacity
-        style={styles.discussButton}
-        onPress={handleDiscussWithParagraph}
-      >
+{currentPhase && !sessionId && !isStartingDiscussion && (
+  <View style={styles.discussContainer}>
+    <TouchableOpacity
+      style={styles.discussButton}
+      onPress={handleDiscussWithParagraph}
+    >
         <Text style={styles.discussButtonText}>
           💬 Discuss with Paragraph AI Tutor
         </Text>
       </TouchableOpacity>
     </View>
   )}
-
+{isStartingDiscussion && (
+  <MentorBubbleReply markdownText="⏳ *Paragraph AI Mentor is starting discussion…*" />
+)}
   {/* ───── Chat messages (only after chat starts) ───── */}
   {conversation
     .filter(msg => msg.role !== "system")
@@ -416,6 +465,29 @@ return (
       )
     )
   }
+{/* 🔴 NEXT CBME CTA — INSERT HERE */}
+{sessionCompleted && (
+  <View style={styles.nextConceptContainer}>
+    <TouchableOpacity
+      style={styles.nextConceptButton}
+      onPress={() => {
+        setConversation([]);
+        setSessionCompleted(false);
+        setShowConfetti(false); // ✅ RESET HERE
+        setTutorMode("idle");
+        setSessionId(null);
+        setActiveMcqId(null);
+setIsStartingDiscussion(false); // 🔑 ADD THIS
+        // 🔑 Load next CBME phase
+        handleStartChat();
+      }}
+    >
+      <Text style={styles.nextConceptText}>
+        ▶ Next CBME Concept
+      </Text>
+    </TouchableOpacity>
+  </View>
+)}
 
   {isTyping && (
     <MentorBubbleReply markdownText="💬 *Paragraph Mentor is typing…*" />
@@ -424,7 +496,7 @@ return (
 </ScrollView>
 
 {/* ───────── INPUT BAR (ONLY AFTER CHAT STARTS) ───────── */}
-{tutorMode === "active" && sessionId && (
+{tutorMode === "active" && sessionId && !sessionCompleted && (
   <View style={styles.inputContainer}>
     <MessageInput
       onSend={handleSendMessage}
@@ -435,6 +507,15 @@ return (
 )}
 </KeyboardAvoidingView>
     </View>
+    {/* 🎉 CONFETTI ON SESSION COMPLETE */}
+{showConfetti && (
+  <ConfettiCannon
+    count={180}
+    origin={{ x: -10, y: 0 }}
+    fadeOut
+  />
+)}
+
   </MainLayout>
 );
 }
@@ -614,4 +695,22 @@ discussButtonText: {
   fontSize: 15,
   fontWeight: "700",
 },
+  nextConceptContainer: {
+  paddingVertical: 24,
+  alignItems: "center",
+},
+
+nextConceptButton: {
+  paddingVertical: 14,
+  paddingHorizontal: 32,
+  borderRadius: 24,
+  backgroundColor: "#10b981",
+},
+
+nextConceptText: {
+  color: "#ffffff",
+  fontSize: 16,
+  fontWeight: "700",
+},
+
 });
