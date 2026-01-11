@@ -28,8 +28,10 @@ import LLMMCQCard from '@/components/chat/llm/LLMMCQCard';
 import { ActivityIndicator } from 'react-native';
 import SubjectProgressDashboard from '@/components/progress/SubjectProgressDashboard';
 import ConfettiCannon from 'react-native-confetti-cannon';
+
 function stripControlBlocks(text: string) {
   return text
+    .replace(/\[SYSTEM_RETRY\]/g, "")
     .replace(
       /\[(CORE_CONCEPT|GAP|EXPLANATION|COMMON_CONFUSION|MEMORY_HOOK|SUB_CONCEPT)\]:\s*/gi,
       ""
@@ -75,6 +77,10 @@ const [conversation, setConversation] = useState<any[]>([]);
 const [tutorMode, setTutorMode] = useState<"idle" | "active">("idle");
   const [isStartingDiscussion, setIsStartingDiscussion] = useState(false);
 const scrollViewRef = useRef<ScrollView>(null);
+  const hasRetriedRef = useRef(false); // 🔑 SYSTEM_RETRY guard
+const skipStudentAppendRef = useRef(false);
+const sendingLockRef = useRef(false);
+
 const [isTyping, setIsTyping] = useState(false);
   useEffect(() => {
   conversationRef.current = conversation;
@@ -90,15 +96,19 @@ useEffect(() => {
 
 const [nextSuggestions, setNextSuggestions] = useState<any[]>([]);
 const handleSendMessage = async (message: string) => {
-if (!message.trim() || isTyping) return;
-    // 🔑 EXACT LINE YOU ASKED ABOUT
-  if (!user?.id || !activeMcqId) return;
+  if (!message.trim() || isTyping || sendingLockRef.current) return;
+if (!user?.id || !activeMcqId) return;
+
+sendingLockRef.current = true;
+hasRetriedRef.current = false;
 
 
+  if (!skipStudentAppendRef.current) {
   setConversation(prev => [
     ...prev,
     { role: "student", content: message }
   ]);
+}
 
   setIsTyping(true);
 
@@ -150,24 +160,40 @@ if (!message.trim() || isTyping) return;
 if (chunk.includes("[SYSTEM_RETRY]")) {
   setIsTyping(false);
 
-  // resend last student answer automatically
-  const lastStudent = conversationRef.current
-    .slice()
-    .reverse()
-    .find(m => m.role === "student");
+  if (!hasRetriedRef.current) {
+    hasRetriedRef.current = true;
 
-  if (lastStudent?.content) {
-    handleSendMessage(lastStudent.content);
+    const lastStudent = conversationRef.current
+      .slice()
+      .reverse()
+      .find(m => m.role === "student");
+
+    if (lastStudent?.content) {
+      skipStudentAppendRef.current = true; // 🔑 PREVENT DUPLICATE UI
+      handleSendMessage(lastStudent.content);
+      skipStudentAppendRef.current = false;
+    }
+  } else {
+    setConversation(prev => [
+      ...prev,
+      {
+        role: "mentor",
+        content: "⚠️ I’m having trouble processing that. Please rephrase your answer."
+      }
+    ]);
   }
 
-  return; // ⛔ stop this stream
+  return;
 }
+
+
 
   // 2️⃣ Detect session completion AFTER rendering
      
   if (chunk.includes("[SESSION_COMPLETED]")) {
     setSessionCompleted(true);
     setTutorMode("idle");
+    hasRetriedRef.current = false; // 🔄 reset retry for new phase
     setIsTyping(false);
       setShowConfetti(true); // 🎉 ADD THIS
     break; // ✅ exit loop cleanly
@@ -176,8 +202,9 @@ if (chunk.includes("[SYSTEM_RETRY]")) {
   } catch (e) {
     console.error("Chat error", e);
   } finally {
-    setIsTyping(false);
-  }
+  setIsTyping(false);
+  sendingLockRef.current = false;
+}
 };
 
   const handleStartChat = async () => {
@@ -426,15 +453,19 @@ return (
   contentContainerStyle={{ paddingBottom: 120 }}
   keyboardShouldPersistTaps="handled"
 >
-{showSubjectProgress && selectedSubject && user?.id && (
-  <SubjectProgressDashboard
-    student_id={user.id}
-    subject={selectedSubject}
-  />
-)}
 
   {/* ───── Selection / Phase content scrolls ───── */}
   {!chatStarted && renderSelectionScreen()}
+ {/* 2️⃣ Analytics comes AFTER selection */}
+{!chatStarted && showSubjectProgress && selectedSubject && user?.id && (
+  <View style={{ marginTop: 16 }}>
+    <View style={{ height: 1, backgroundColor: '#1c2730', marginBottom: 12 }} />
+    <SubjectProgressDashboard
+      student_id={user.id}
+      subject={selectedSubject}
+    />
+  </View>
+)}
 
   {chatStarted && loadingPhase && (
     <Text style={{ color: "#999", textAlign: "center", marginTop: 20 }}>
@@ -494,6 +525,7 @@ setIsStartingDiscussion(false); // 🔑 ADD THIS
         // 🔑 Load next CBME phase
          // 🔑 ADD THIS LINE HERE
   setCurrentPhase(null);
+        hasRetriedRef.current = false; // 🔄 reset retry for next concept
         handleStartChat();
       }}
     >
@@ -551,46 +583,62 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 8,
   },
-  pill: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
-    backgroundColor: '#1c2730',
-    marginRight: 8,
-    borderWidth: 2,
-    borderColor: '#1c2730',
-  },
-  pillSelected: {
-    backgroundColor: '#10b981',
-    borderColor: '#10b981',
-  },
+pill: {
+  paddingHorizontal: 16,
+  paddingVertical: 10,
+  borderRadius: 999,            // 👈 pill shape like Practice
+  backgroundColor: '#0b141a',   // dark canvas
+  marginRight: 8,
+
+  borderWidth: 2,
+  borderColor: '#10b981',
+},
+
+
+pillSelected: {
+  backgroundColor: '#0d2017',   // dark green inner fill
+  borderColor: '#10b981',
+  borderWidth: 2,
+
+  shadowColor: '#10b981',
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0.55,
+  shadowRadius: 8,
+
+  elevation: 6,                 // Android glow
+},
+
   pillYear: {
-    borderRadius: 20,
-    borderWidth: 1.5,
-    backgroundColor: '#0d1821',
-  },
+  borderRadius: 999,
+  borderWidth: 1.8,
+  backgroundColor: 'transparent',
+  borderColor: '#10b981',
+},
   pillYearSelected: {
     backgroundColor: '#065f46',
     borderColor: '#10b981',
   },
   pillSubject: {
-    borderRadius: 8,
-    borderWidth: 1,
-    backgroundColor: '#1c2730',
-    borderStyle: 'solid',
-  },
+  borderRadius: 999,
+  borderWidth: 1.8,
+  backgroundColor: 'transparent',
+  borderColor: '#10b981',
+},
+
   pillSubjectSelected: {
     backgroundColor: '#0d9668',
     borderColor: '#10b981',
   },
-  pillText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#8b949e',
-  },
-  pillTextSelected: {
-    color: '#fff',
-  },
+pillText: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#10b981',
+},
+
+
+pillTextSelected: {
+  color: '#ffffff',
+},
   startButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
