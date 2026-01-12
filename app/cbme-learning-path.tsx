@@ -1,12 +1,11 @@
 //app/cbme-learning-path.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
 } from 'react-native';
 
 // HARD-CODED DATA
@@ -48,7 +47,10 @@ interface LearningPathProps {
 }
 
 export default function LearningPath({ onSubjectSelect }: LearningPathProps) {
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+
   const handleSubjectPress = (subject: string) => {
+    setSelectedSubject(subject);
     if (onSubjectSelect) {
       onSubjectSelect(subject);
     }
@@ -100,48 +102,28 @@ export default function LearningPath({ onSubjectSelect }: LearningPathProps) {
               </View>
             </View>
 
-            {/* SUBJECTS PATHWAY */}
-            <View style={styles.subjectsPathway}>
-              {yearData.subjects.map((subject, subjectIndex) => {
-                const isLeft = subjectIndex % 2 === 0;
-
-                return (
-                  <View key={subjectIndex} style={styles.subjectMilestone}>
-                    {/* CENTER LINE WITH DOT */}
-                    <View style={styles.centerLineContainer}>
-                      <View style={styles.centerLine} />
-                      <View style={styles.centerDot} />
-                      <View
-                        style={[
-                          styles.branchLine,
-                          isLeft ? styles.branchLeft : styles.branchRight,
-                        ]}
-                      />
-                    </View>
-
-                    {/* SUBJECT CARD */}
-                    <View
-                      style={[
-                        styles.subjectCardWrapper,
-                        isLeft
-                          ? styles.subjectCardLeft
-                          : styles.subjectCardRight,
-                      ]}
-                    >
-                      <TouchableOpacity
-                        style={styles.subjectCard}
-                        onPress={() => handleSubjectPress(subject)}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={styles.subjectName}>{subject}</Text>
-                        <View style={styles.subjectArrow}>
-                          <Text style={styles.subjectArrowText}>→</Text>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                );
-              })}
+            {/* SUBJECTS AS PILLS */}
+            <View style={styles.subjectsContainer}>
+              {yearData.subjects.map((subject, subjectIndex) => (
+                <TouchableOpacity
+                  key={subjectIndex}
+                  style={[
+                    styles.pill,
+                    selectedSubject === subject && styles.pillSelected,
+                  ]}
+                  onPress={() => handleSubjectPress(subject)}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.pillText,
+                      selectedSubject === subject && styles.pillTextSelected,
+                    ]}
+                  >
+                    {subject}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
         ))}
@@ -158,10 +140,6 @@ export default function LearningPath({ onSubjectSelect }: LearningPathProps) {
     </View>
   );
 }
-
-const { width } = Dimensions.get('window');
-const CENTER_OFFSET = 24;
-const CARD_WIDTH = (width - 80) * 0.85;
 
 const styles = StyleSheet.create({
   // MAIN CONTAINER
@@ -234,7 +212,7 @@ const styles = StyleSheet.create({
   // PATH LINE
   pathLineContainer: {
     position: 'absolute',
-    left: CENTER_OFFSET + 4,
+    left: 28,
     top: 0,
     bottom: 0,
     width: 3,
@@ -298,117 +276,43 @@ const styles = StyleSheet.create({
     color: '#64748b',
   },
 
-  // SUBJECTS PATHWAY
-  subjectsPathway: {
-    paddingLeft: 20,
+  // SUBJECTS CONTAINER
+  subjectsContainer: {
+    paddingHorizontal: 20,
+    paddingLeft: 88,
     marginBottom: 24,
   },
 
-  subjectMilestone: {
-    position: 'relative',
-    minHeight: 80,
-    marginBottom: 12,
+  // PILL STYLES (EXACT MATCH FROM ask-paragraph-mbbs.tsx)
+  pill: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: '#0b141a',
+    marginBottom: 10,
+    borderWidth: 2,
+    borderColor: '#10b981',
   },
 
-  // CENTER LINE WITH DOT
-  centerLineContainer: {
-    position: 'absolute',
-    left: 4,
-    top: 0,
-    bottom: 0,
-    width: 3,
-    alignItems: 'center',
-    zIndex: 1,
+  pillSelected: {
+    backgroundColor: '#0d2017',
+    borderColor: '#10b981',
+    borderWidth: 2,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.55,
+    shadowRadius: 8,
+    elevation: 6,
   },
 
-  centerLine: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: 3,
-    backgroundColor: '#1e293b',
-  },
-
-  centerDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#10b981',
-    marginTop: 24,
-    zIndex: 3,
-  },
-
-  branchLine: {
-    position: 'absolute',
-    top: 24,
-    height: 2,
-    backgroundColor: '#1e293b',
-    width: 40,
-  },
-
-  branchLeft: {
-    left: 8,
-  },
-
-  branchRight: {
-    right: 8,
-  },
-
-  // SUBJECT CARD
-  subjectCardWrapper: {
-    position: 'absolute',
-    top: 0,
-  },
-
-  subjectCardLeft: {
-    left: 54,
-    right: width * 0.15,
-  },
-
-  subjectCardRight: {
-    left: width * 0.15,
-    right: 20,
-  },
-
-  subjectCard: {
-    backgroundColor: '#14181f',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#1e293b',
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-
-  subjectName: {
-    fontSize: 15,
+  pillText: {
+    fontSize: 14,
     fontWeight: '600',
-    color: '#f8fafc',
-    flex: 1,
-    lineHeight: 20,
-  },
-
-  subjectArrow: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#1e293b',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 12,
-  },
-
-  subjectArrowText: {
-    fontSize: 16,
     color: '#10b981',
-    fontWeight: '600',
+  },
+
+  pillTextSelected: {
+    color: '#ffffff',
   },
 
   // END INDICATOR
