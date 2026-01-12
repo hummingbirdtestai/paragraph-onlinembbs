@@ -959,7 +959,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 2,
     letterSpacing: 0.3,
-    color: '#e1e1e1',
+    color: '#F5E6C8',
   },
 
   yearBlockSubjects: {
@@ -1109,7 +1109,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.3,
-    color: '#e1e1e1',
+    color: '#FFD700',
   },
 
   chapterConnectionPoint: {
