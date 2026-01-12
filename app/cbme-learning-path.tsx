@@ -17,6 +17,15 @@ import MainLayout from '@/components/MainLayout';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+const formatDate = (iso: string) => {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
 const YEARS = [
   {
     year: "First Year",
@@ -126,8 +135,9 @@ interface LearningPathProps {
 
 interface TopicItem {
   topic: string;
+  topic_id: string;
   is_complete: boolean;
-  is_current: boolean;
+  visited_at: string | null;
 }
 
 interface ChapterItem {
@@ -158,7 +168,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
     setError(null);
 
     try {
-      const { data, error: rpcError } = await supabase.rpc('get_curriculum_tree_with_student_path', {
+      const { data, error: rpcError } = await supabase.rpc('get_student_subject_curriculum_tree_orchestra', {
         p_student_id: user.id,
         p_subject: subject
       });
@@ -321,8 +331,8 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                       {tbChapter.chapters.map((chapter, chapterIndex) => {
                         const chapterColor = getChapterColor(chapterGlobalIndex);
                         const isLastChapter = chapterIndex === tbChapter.chapters.length - 1;
-                        const allTopicsComplete = chapter.topics.every(t => t.is_complete);
-                        const firstIncomplete = chapter.topics.findIndex(t => !t.is_complete);
+                        const allTopicsComplete = chapter.topics.every(t => !!t.visited_at);
+                        const firstIncomplete = chapter.topics.findIndex(t => !t.visited_at);
                         const isCurrent = firstIncomplete >= 0;
                         
                         const currentChapterIndex = chapterGlobalIndex;
@@ -398,8 +408,8 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                             <View style={styles.topicsContainer}>
                               {chapter.topics.map((topic, topicIndex) => {
                                 const topicColor = getTopicColor(topicIndex);
-                                const isComplete = topic.is_complete;
-                                const isCurrentTopic = topic.is_current;
+                                const isComplete = !!topic.visited_at;
+                                const isCurrentTopic = !isComplete && firstIncomplete === topicIndex;
                                 const isLastTopic = topicIndex === chapter.topics.length - 1;
                                 const isFuture = !isComplete && !isCurrentTopic;
 
@@ -424,40 +434,40 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                         },
                                       ]}
                                     >
-                                    <View style={styles.topicTabContent}>
-    {isCurrentTopic && (
-      <View style={[styles.currentBadgeTop, { backgroundColor: topicColor.color }]}>
-        <Text style={styles.currentBadgeText}>ACTIVE</Text>
-      </View>
-    )}
+                                      <View style={styles.topicTabContent}>
+                                        {isComplete && topic.visited_at && (
+                                          <Text style={styles.completedDateText}>
+                                            {formatDate(topic.visited_at)}
+                                          </Text>
+                                        )}
 
-    <View style={styles.topicMainRow}>
-      <View style={styles.topicIconContainer}>
-        {isComplete ? (
-          <CheckCircle2 size={14} color="#25D366" strokeWidth={2} />
-        ) : isCurrentTopic ? (
-          <Zap size={14} color={topicColor.color} fill={topicColor.color} strokeWidth={2} />
-        ) : (
-          <Circle size={12} color="rgba(100, 100, 100, 0.5)" strokeWidth={1.5} />
-        )}
-      </View>
+                                        <View style={styles.topicMainRow}>
+                                          <View style={styles.topicIconContainer}>
+                                            {isComplete ? (
+                                              <CheckCircle2 size={14} color="#25D366" strokeWidth={2} />
+                                            ) : isCurrentTopic ? (
+                                              <Zap size={14} color={topicColor.color} fill={topicColor.color} strokeWidth={2} />
+                                            ) : (
+                                              <Circle size={12} color="rgba(100, 100, 100, 0.5)" strokeWidth={1.5} />
+                                            )}
+                                          </View>
 
-      <Text
-        style={[
-          styles.topicTabText,
-          {
-            color: isComplete
-              ? '#25D366'
-              : isCurrentTopic
-              ? topicColor.color
-              : '#808080',
-          },
-        ]}
-      >
-        {topic.topic}
-      </Text>
-    </View>
-  </View>
+                                          <Text
+                                            style={[
+                                              styles.topicTabText,
+                                              {
+                                                color: isComplete
+                                                  ? '#25D366'
+                                                  : isCurrentTopic
+                                                  ? topicColor.color
+                                                  : '#808080',
+                                              },
+                                            ]}
+                                          >
+                                            {topic.topic}
+                                          </Text>
+                                        </View>
+                                      </View>
                                       <View
                                         style={[
                                           styles.topicConnectionPoint,
@@ -1164,18 +1174,20 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
     lineHeight: 20,
   },
-topicMainRow: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  width: '100%',
-},
 
-currentBadgeTop: {
-  paddingHorizontal: 6,
-  paddingVertical: 2,
-  borderRadius: 4,
-  marginBottom: 4,
-},
+  topicMainRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+
+  completedDateText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#25D366',
+    marginBottom: 4,
+    letterSpacing: 0.4,
+  },
 
   currentBadge: {
     paddingHorizontal: 7,
@@ -1260,6 +1272,7 @@ currentBadgeTop: {
   bottomSpacer: {
     height: 40,
   },
+
   timelineSegment: {
     flex: 1,
     width: 2,
