@@ -43,6 +43,7 @@ function stripControlBlocks(text: string) {
     .replace(/^Correct:\s*[A-D]\s*$/gim, "")
     .trim();
 }
+
 type Year = 'first' | 'second' | 'third' | 'final';
 
 type Message = {
@@ -190,6 +191,41 @@ export default function AskParagraphChat() {
 
       if (error) {
         console.error("❌ start_pointer error", error);
+        return;
+      }
+
+      if (data?.status === "subject_completed") {
+        alert("🎉 Subject completed!");
+        return;
+      }
+
+      setCurrentPhase(data);
+      setChatStarted(true);
+
+    } finally {
+      setLoadingPhase(false);
+    }
+  };
+
+  const handleNextConcept = async () => {
+    if (!user?.id || !currentPhase) return;
+
+    setLoadingPhase(true);
+
+    try {
+      const { data, error } = await supabase.rpc(
+        "next_pointer",
+        {
+          p_student_id: user.id,
+          p_subject: currentPhase.subject,
+          p_react_order_final: currentPhase.react_order_final,
+        }
+      );
+
+      console.log("🟣 next_pointer RAW response:", { data, error });
+
+      if (error) {
+        console.error("❌ next_pointer error", error);
         return;
       }
 
@@ -454,7 +490,7 @@ export default function AskParagraphChat() {
                     setIsStartingDiscussion(false);
                     setCurrentPhase(null);
                     hasRetriedRef.current = false;
-                    handleStartChat();
+                    handleNextConcept();
                   }}
                 >
                   <Text style={styles.nextConceptText}>
