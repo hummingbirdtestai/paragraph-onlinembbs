@@ -127,26 +127,20 @@ interface LearningPathProps {
   onSubjectSelect?: (subject: string) => void;
 }
 
-interface SubjectProgressItem {
-  textbook_chapter: string;
-  textbook_chapter_order: number;
-  chapter: string;
-  chapter_order: number;
+interface TopicItem {
   topic: string;
-  topic_order: number;
   is_complete: boolean;
-  started_at: string | null;
-  completed_at: string | null;
+  is_current: boolean;
+}
+
+interface ChapterItem {
+  chapter: string;
+  topics: TopicItem[];
 }
 
 interface GroupedProgress {
-  textbookChapter: string;
-  textbookChapterOrder: number;
-  chapters: {
-    chapterName: string;
-    chapterOrder: number;
-    topics: SubjectProgressItem[];
-  }[];
+  textbook_chapter: string;
+  chapters: ChapterItem[];
 }
 
 export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps) {
@@ -167,19 +161,15 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
     setError(null);
 
     try {
-      const { data, error: rpcError } = await supabase.rpc('get_subject_progress_v4', {
+      const { data, error: rpcError } = await supabase.rpc('get_curriculum_tree_with_student_path', {
         p_student_id: user.id,
         p_subject: subject
       });
 
       if (rpcError) throw rpcError;
 
-      if (data && Array.isArray(data)) {
-        const grouped = groupProgressData(data);
-        setSubjectProgress(grouped);
-      } else {
-        setSubjectProgress([]);
-      }
+      const normalized = Array.isArray(data) ? data : [];
+      setSubjectProgress(normalized);
 
       if (onSubjectSelect) {
         onSubjectSelect(subject);
@@ -191,46 +181,6 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
     } finally {
       setLoading(false);
     }
-  };
-
-  const groupProgressData = (data: SubjectProgressItem[]): GroupedProgress[] => {
-    const grouped = new Map<string, GroupedProgress>();
-
-    data.forEach(item => {
-      if (!grouped.has(item.textbook_chapter)) {
-        grouped.set(item.textbook_chapter, {
-          textbookChapter: item.textbook_chapter,
-          textbookChapterOrder: item.textbook_chapter_order,
-          chapters: []
-        });
-      }
-
-      const tbChapter = grouped.get(item.textbook_chapter)!;
-      let chapter = tbChapter.chapters.find(c => c.chapterName === item.chapter);
-
-      if (!chapter) {
-        chapter = {
-          chapterName: item.chapter,
-          chapterOrder: item.chapter_order,
-          topics: []
-        };
-        tbChapter.chapters.push(chapter);
-      }
-
-      chapter.topics.push(item);
-    });
-
-    return Array.from(grouped.values())
-      .sort((a, b) => a.textbookChapterOrder - b.textbookChapterOrder)
-      .map(tbChapter => ({
-        ...tbChapter,
-        chapters: tbChapter.chapters
-          .sort((a, b) => a.chapterOrder - b.chapterOrder)
-          .map(chapter => ({
-            ...chapter,
-            topics: chapter.topics.sort((a, b) => a.topic_order - b.topic_order)
-          }))
-      }));
   };
 
   const handleBackToSubjects = () => {
@@ -378,7 +328,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                           </View>
                           <View style={styles.yearBlockTextContainer}>
                             <Text style={[styles.yearBlockTitle, { color: subjectColor.lightColor }]}>
-                              {tbChapter.textbookChapter}
+                              {tbChapter.textbook_chapter}
                             </Text>
                             <Text style={styles.yearBlockSubjects}>
                               {tbChapter.chapters.length} Chapters
@@ -472,7 +422,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                     },
                                   ]}
                                 >
-                                  {chapter.chapterName}
+                                  {chapter.chapter}
                                 </Text>
                                 {allTopicsComplete && (
                                   <CheckCircle2 size={20} color={chapterColor.lightColor} strokeWidth={2.5} />
@@ -510,9 +460,9 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                             {chapter.topics.map((topic, topicIndex) => {
                               const topicColor = getTopicColor(topicIndex);
                               const isComplete = topic.is_complete;
-                              const isCurrentTopic = topicIndex === firstIncomplete;
+                              const isCurrentTopic = topic.is_current;
                               const isLastTopic = topicIndex === chapter.topics.length - 1;
-                              const isFuture = !isComplete && topicIndex > firstIncomplete;
+                              const isFuture = !isComplete && !isCurrentTopic;
 
                               return (
                                 <View key={topicIndex} style={styles.topicWrapper}>
