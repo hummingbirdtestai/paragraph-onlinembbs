@@ -88,12 +88,14 @@ export default function AskParagraphChat() {
   }, [conversation]);
 
   useEffect(() => {
+    if (!chatStarted) return;
+
     const timeout = setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 100);
 
     return () => clearTimeout(timeout);
-  }, [conversation, isTyping]);
+  }, [conversation, isTyping, chatStarted]);
 
   const [nextSuggestions, setNextSuggestions] = useState<any[]>([]);
 
@@ -286,6 +288,23 @@ export default function AskParagraphChat() {
     setIsStartingDiscussion(false);
   };
 
+  const handleBackToSelection = () => {
+    setChatStarted(false);
+    setCurrentPhase(null);
+    setSessionId(null);
+    setActiveMcqId(null);
+    setConversation([]);
+    setTutorMode("idle");
+    setIsStartingDiscussion(false);
+    setSessionCompleted(false);
+    setShowConfetti(false);
+    setShowSubjectProgress(true);
+
+    requestAnimationFrame(() => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+    });
+  };
+
   const renderSelectionScreen = () => (
     <View style={styles.selectionContainer}>
       <Text style={styles.instructionText}>
@@ -423,93 +442,105 @@ export default function AskParagraphChat() {
             contentContainerStyle={{ paddingBottom: 120 }}
             keyboardShouldPersistTaps="handled"
           >
-            {!chatStarted && renderSelectionScreen()}
+            <View style={styles.webCenterWrapper}>
+              <View style={styles.webContent}>
+                {!chatStarted && renderSelectionScreen()}
 
-            {!chatStarted && showSubjectProgress && selectedSubject && user?.id && (
-              <View style={{ marginTop: 12 }}>
-                <SubjectProgressDashboard
-                  student_id={user.id}
-                  subject={selectedSubject}
-                />
-              </View>
-            )}
+                {!chatStarted && showSubjectProgress && selectedSubject && user?.id && (
+                  <View style={{ marginTop: 12 }}>
+                    <SubjectProgressDashboard
+                      student_id={user.id}
+                      subject={selectedSubject}
+                    />
+                  </View>
+                )}
 
-            {!chatStarted && (
-              <View style={{ marginTop: 16 }}>
-                <ParagraphMentorIntro />
-              </View>
-            )}
+                {!chatStarted && (
+                  <View style={{ marginTop: 16 }}>
+                    <ParagraphMentorIntro />
+                  </View>
+                )}
 
-            {chatStarted && loadingPhase && (
-              <Text style={{ color: "#999", textAlign: "center", marginTop: 20 }}>
-                Loading…
-              </Text>
-            )}
+                {chatStarted && (
+                  <View style={styles.backButtonContainer}>
+                    <TouchableOpacity onPress={handleBackToSelection}>
+                      <Text style={styles.backButtonText}>← Back to Subjects</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
 
-            {chatStarted && !loadingPhase && renderPhase()}
-
-            {currentPhase && !sessionId && !isStartingDiscussion && (
-              <View style={styles.discussContainer}>
-                <TouchableOpacity
-                  style={styles.discussButton}
-                  onPress={handleDiscussWithParagraph}
-                >
-                  <Text style={styles.discussButtonText}>
-                    💬 Discuss with Paragraph AI Tutor
+                {chatStarted && loadingPhase && (
+                  <Text style={{ color: "#999", textAlign: "center", marginTop: 20 }}>
+                    Loading…
                   </Text>
-                </TouchableOpacity>
+                )}
+
+                {chatStarted && !loadingPhase && renderPhase()}
+
+                {currentPhase && !sessionId && !isStartingDiscussion && (
+                  <View style={styles.discussContainer}>
+                    <TouchableOpacity
+                      style={styles.discussButton}
+                      onPress={handleDiscussWithParagraph}
+                    >
+                      <Text style={styles.discussButtonText}>
+                        💬 Discuss with Paragraph AI Tutor
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {isStartingDiscussion && (
+                  <MentorBubbleReply markdownText="⏳ *Paragraph AI Mentor is starting discussion…*" />
+                )}
+
+                {conversation
+                  .filter(msg => msg.role !== "system")
+                  .map((msg, index) =>
+                    msg.role === "student" ? (
+                      <StudentBubble key={index} text={msg.content} />
+                    ) : (
+                      <MentorBubbleReply
+                        key={index}
+                        markdownText={
+                          typeof msg.content === "string"
+                            ? stripControlBlocks(msg.content)
+                            : ""
+                        }
+                      />
+                    )
+                  )
+                }
+
+                {sessionCompleted && (
+                  <View style={styles.nextConceptContainer}>
+                    <TouchableOpacity
+                      style={styles.nextConceptButton}
+                      onPress={() => {
+                        setConversation([]);
+                        setSessionCompleted(false);
+                        setShowConfetti(false);
+                        setTutorMode("idle");
+                        setSessionId(null);
+                        setActiveMcqId(null);
+                        setIsStartingDiscussion(false);
+                        setCurrentPhase(null);
+                        hasRetriedRef.current = false;
+                        handleNextConcept();
+                      }}
+                    >
+                      <Text style={styles.nextConceptText}>
+                        ▶ Next CBME Concept
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {isTyping && (
+                  <MentorBubbleReply markdownText="💬 *Paragraph Mentor is typing…*" />
+                )}
               </View>
-            )}
-
-            {isStartingDiscussion && (
-              <MentorBubbleReply markdownText="⏳ *Paragraph AI Mentor is starting discussion…*" />
-            )}
-
-            {conversation
-              .filter(msg => msg.role !== "system")
-              .map((msg, index) =>
-                msg.role === "student" ? (
-                  <StudentBubble key={index} text={msg.content} />
-                ) : (
-                  <MentorBubbleReply
-                    key={index}
-                    markdownText={
-                      typeof msg.content === "string"
-                        ? stripControlBlocks(msg.content)
-                        : ""
-                    }
-                  />
-                )
-              )
-            }
-
-            {sessionCompleted && (
-              <View style={styles.nextConceptContainer}>
-                <TouchableOpacity
-                  style={styles.nextConceptButton}
-                  onPress={() => {
-                    setConversation([]);
-                    setSessionCompleted(false);
-                    setShowConfetti(false);
-                    setTutorMode("idle");
-                    setSessionId(null);
-                    setActiveMcqId(null);
-                    setIsStartingDiscussion(false);
-                    setCurrentPhase(null);
-                    hasRetriedRef.current = false;
-                    handleNextConcept();
-                  }}
-                >
-                  <Text style={styles.nextConceptText}>
-                    ▶ Next CBME Concept
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
-
-            {isTyping && (
-              <MentorBubbleReply markdownText="💬 *Paragraph Mentor is typing…*" />
-            )}
+            </View>
           </ScrollView>
 
           {tutorMode === "active" && sessionId && !sessionCompleted && (
@@ -539,6 +570,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0b141a',
+  },
+  webCenterWrapper: {
+    alignItems: 'center',
+  },
+  webContent: {
+    width: '100%',
+    maxWidth: 820,
   },
   selectionContainer: {
     flex: 1,
@@ -618,6 +656,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: '#fff',
+  },
+  backButtonContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  backButtonText: {
+    color: '#10b981',
+    fontSize: 15,
+    fontWeight: '600',
   },
   messagesContainer: {
     flex: 1,
