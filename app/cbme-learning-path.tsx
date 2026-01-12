@@ -264,11 +264,6 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
             {/* Subject Progress Flowchart */}
             {!loading && !error && subjectProgress && (
               <View style={styles.flowchartContainer}>
-                {/* Vertical Timeline Line (Right Side) */}
-                <View style={[styles.timelineLineContainer]}>
-                  <View style={[styles.timelineLine, { backgroundColor: subjectColor.borderColor }]} />
-                </View>
-
                 {/* Start Node */}
                 <View style={styles.startNode}>
                   <View style={[styles.startNodeCircle, { backgroundColor: subjectColor.color }]}>
@@ -340,6 +335,14 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
 
                         return (
                           <View key={chapterIndex} style={styles.chapterSection}>
+                            {/* Per-Chapter Vertical Timeline Segment */}
+                            <View
+                              style={[
+                                styles.chapterTimelineSegment,
+                                { backgroundColor: chapterColor.color },
+                              ]}
+                            />
+
                             {/* Chapter Block */}
                             <View style={styles.subjectWrapper}>
                               <View
@@ -575,39 +578,30 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
               <Sparkles size={14} color="#FFD700" />
               <Text style={[styles.journeyBadgeText, { color: '#FFD700' }]}>YOUR JOURNEY</Text>
             </View>
-            <Text style={styles.headerTitle}>MBBS Learning Path</Text>
+            <Text style={styles.headerTitle}>MBBS NMC CBME Learning Path</Text>
             <Text style={styles.headerSubtitle}>
-              Follow the path through 4 years of medical excellence
+              Paragraph AI-Tutored Hyper-Personalised Adaptive Learning Path to Master CBME Curriculum
             </Text>
           </View>
 
           {/* Flowchart Container */}
           <View style={styles.flowchartContainer}>
             {/* Vertical Timeline Line (Right Side) */}
-          <View style={styles.timelineLineContainer}>
-    {Array.isArray(subjectProgress) &&
-      subjectProgress.map((tbChapter, tbIndex) =>
-        tbChapter.chapters.map((_, chapterIndex) => {
-          const globalIndex =
-            subjectProgress
-              .slice(0, tbIndex)
-              .reduce((acc, tb) => acc + tb.chapters.length, 0) +
-            chapterIndex;
+<View style={styles.timelineLineContainer}>
+  {YEARS.map((yearData, yearIndex) => (
+    <View
+      key={`year-line-${yearIndex}`}
+      style={[
+        styles.timelineSegment,
+        {
+          backgroundColor: yearData.color,
+          flex: 1, // one solid segment per year
+        },
+      ]}
+    />
+  ))}
+</View>
 
-          const chapterColor = getChapterColor(globalIndex);
-
-          return (
-            <View
-              key={`line-${tbIndex}-${chapterIndex}`}
-              style={[
-                styles.timelineSegment,
-                { backgroundColor: chapterColor.color },
-              ]}
-            />
-          );
-        })
-      )}
-  </View>
 
             {/* Start Node */}
             <View style={styles.startNode}>
@@ -789,7 +783,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#e1e1e1',
+    color: '#F5E6C8', // ← Image 2 heading color
     marginBottom: 6,
     letterSpacing: -0.3,
   },
@@ -959,7 +953,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 2,
     letterSpacing: 0.3,
-    color: '#F5E6C8',
+    color: '#e1e1e1',
   },
 
   yearBlockSubjects: {
@@ -1074,6 +1068,17 @@ const styles = StyleSheet.create({
   // CHAPTER SECTION
   chapterSection: {
     marginBottom: 10,
+    position: 'relative',
+  },
+
+  chapterTimelineSegment: {
+    position: 'absolute',
+    right: -48,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    borderRadius: 2,
+    opacity: 0.9,
   },
 
   chapterBlock: {
@@ -1109,7 +1114,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.3,
-    color: '#FFD700',
+    color: '#e1e1e1',
   },
 
   chapterConnectionPoint: {
@@ -1279,9 +1284,9 @@ const styles = StyleSheet.create({
   },
 
   timelineSegment: {
-    flex: 1,
-    width: 2,
-    marginVertical: 2,
-    borderRadius: 1,
-  },
+  flex: 1,          // keeps one solid segment per YEAR
+  width: 4,         // ⬅️ thicker, clearly visible
+  borderRadius: 2,
+  opacity: 0.9,
+},
 });
