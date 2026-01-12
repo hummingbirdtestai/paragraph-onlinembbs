@@ -28,6 +28,7 @@ import LLMMCQCard from '@/components/chat/llm/LLMMCQCard';
 import { ActivityIndicator } from 'react-native';
 import SubjectProgressDashboard from '@/components/progress/SubjectProgressDashboard';
 import ConfettiCannon from 'react-native-confetti-cannon';
+import ParagraphMentorIntro from '@/components/ParagraphMentorIntro';
 
 function stripControlBlocks(text: string) {
   return text
@@ -422,6 +423,13 @@ export default function AskParagraphChat() {
             keyboardShouldPersistTaps="handled"
           >
             {!chatStarted && renderSelectionScreen()}
+
+            {/* 🔽 Paragraph Mentor Intro — always visible on entry */}
+            {!chatStarted && (
+              <View style={{ marginTop: 12 }}>
+                <ParagraphMentorIntro />
+              </View>
+            )}
 
             {!chatStarted && showSubjectProgress && selectedSubject && user?.id && (
               <View style={{ marginTop: 16 }}>
