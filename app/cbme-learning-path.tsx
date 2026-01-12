@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BookOpen, Award, Star, Trophy, Sparkles, ChevronRight, ArrowLeft, CheckCircle2, Circle } from 'lucide-react-native';
+import { BookOpen, Award, Star, Trophy, Sparkles, ChevronRight, ArrowLeft, CheckCircle2, Circle, Zap } from 'lucide-react-native';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -74,50 +74,85 @@ const YEARS = [
 ];
 
 const SUBJECT_COLORS: Record<string, any> = {
-  "Anatomy": { color: "#3b82f6", lightColor: "#60a5fa", bgColor: "rgba(59, 130, 246, 0.1)", borderColor: "rgba(59, 130, 246, 0.3)" },
-  "Physiology": { color: "#06b6d4", lightColor: "#22d3ee", bgColor: "rgba(6, 182, 212, 0.1)", borderColor: "rgba(6, 182, 212, 0.3)" },
-  "Biochemistry": { color: "#8b5cf6", lightColor: "#a78bfa", bgColor: "rgba(139, 92, 246, 0.1)", borderColor: "rgba(139, 92, 246, 0.3)" },
-  "Pathology": { color: "#ec4899", lightColor: "#f472b6", bgColor: "rgba(236, 72, 153, 0.1)", borderColor: "rgba(236, 72, 153, 0.3)" },
-  "Pharmacology": { color: "#f59e0b", lightColor: "#fbbf24", bgColor: "rgba(245, 158, 11, 0.1)", borderColor: "rgba(245, 158, 11, 0.3)" },
-  "Microbiology": { color: "#10b981", lightColor: "#34d399", bgColor: "rgba(16, 185, 129, 0.1)", borderColor: "rgba(16, 185, 129, 0.3)" },
-  "Forensic Medicine": { color: "#6366f1", lightColor: "#818cf8", bgColor: "rgba(99, 102, 241, 0.1)", borderColor: "rgba(99, 102, 241, 0.3)" },
-  "Community Medicine": { color: "#14b8a6", lightColor: "#2dd4bf", bgColor: "rgba(20, 184, 166, 0.1)", borderColor: "rgba(20, 184, 166, 0.3)" },
-  "General Medicine": { color: "#ef4444", lightColor: "#f87171", bgColor: "rgba(239, 68, 68, 0.1)", borderColor: "rgba(239, 68, 68, 0.3)" },
-  "Pediatrics": { color: "#8b5cf6", lightColor: "#a78bfa", bgColor: "rgba(139, 92, 246, 0.1)", borderColor: "rgba(139, 92, 246, 0.3)" },
-  "Psychiatry": { color: "#06b6d4", lightColor: "#22d3ee", bgColor: "rgba(6, 182, 212, 0.1)", borderColor: "rgba(6, 182, 212, 0.3)" },
-  "Radiodiagnosis": { color: "#ec4899", lightColor: "#f472b6", bgColor: "rgba(236, 72, 153, 0.1)", borderColor: "rgba(236, 72, 153, 0.3)" },
-  "Radiotherapy": { color: "#f59e0b", lightColor: "#fbbf24", bgColor: "rgba(245, 158, 11, 0.1)", borderColor: "rgba(245, 158, 11, 0.3)" },
-  "Dermatology": { color: "#10b981", lightColor: "#34d399", bgColor: "rgba(16, 185, 129, 0.1)", borderColor: "rgba(16, 185, 129, 0.3)" },
-  "Gynecology": { color: "#ec4899", lightColor: "#f472b6", bgColor: "rgba(236, 72, 153, 0.1)", borderColor: "rgba(236, 72, 153, 0.3)" },
-  "Obstetrics": { color: "#f472b6", lightColor: "#fbcfe8", bgColor: "rgba(244, 114, 182, 0.1)", borderColor: "rgba(244, 114, 182, 0.3)" },
-  "General Surgery": { color: "#ef4444", lightColor: "#f87171", bgColor: "rgba(239, 68, 68, 0.1)", borderColor: "rgba(239, 68, 68, 0.3)" },
-  "Anaesthesiology": { color: "#6366f1", lightColor: "#818cf8", bgColor: "rgba(99, 102, 241, 0.1)", borderColor: "rgba(99, 102, 241, 0.3)" },
-  "Orthopaedics": { color: "#f59e0b", lightColor: "#fbbf24", bgColor: "rgba(245, 158, 11, 0.1)", borderColor: "rgba(245, 158, 11, 0.3)" },
-  "ENT": { color: "#14b8a6", lightColor: "#2dd4bf", bgColor: "rgba(20, 184, 166, 0.1)", borderColor: "rgba(20, 184, 166, 0.3)" },
-  "Ophthalmology": { color: "#3b82f6", lightColor: "#60a5fa", bgColor: "rgba(59, 130, 246, 0.1)", borderColor: "rgba(59, 130, 246, 0.3)" },
+  "Anatomy": { color: "#3b82f6", lightColor: "#60a5fa", bgColor: "rgba(59, 130, 246, 0.12)", borderColor: "rgba(59, 130, 246, 0.4)" },
+  "Physiology": { color: "#06b6d4", lightColor: "#22d3ee", bgColor: "rgba(6, 182, 212, 0.12)", borderColor: "rgba(6, 182, 212, 0.4)" },
+  "Biochemistry": { color: "#8b5cf6", lightColor: "#a78bfa", bgColor: "rgba(139, 92, 246, 0.12)", borderColor: "rgba(139, 92, 246, 0.4)" },
+  "Pathology": { color: "#ec4899", lightColor: "#f472b6", bgColor: "rgba(236, 72, 153, 0.12)", borderColor: "rgba(236, 72, 153, 0.4)" },
+  "Pharmacology": { color: "#f59e0b", lightColor: "#fbbf24", bgColor: "rgba(245, 158, 11, 0.12)", borderColor: "rgba(245, 158, 11, 0.4)" },
+  "Microbiology": { color: "#10b981", lightColor: "#34d399", bgColor: "rgba(16, 185, 129, 0.12)", borderColor: "rgba(16, 185, 129, 0.4)" },
+  "Forensic Medicine": { color: "#6366f1", lightColor: "#818cf8", bgColor: "rgba(99, 102, 241, 0.12)", borderColor: "rgba(99, 102, 241, 0.4)" },
+  "Community Medicine": { color: "#14b8a6", lightColor: "#2dd4bf", bgColor: "rgba(20, 184, 166, 0.12)", borderColor: "rgba(20, 184, 166, 0.4)" },
+  "General Medicine": { color: "#ef4444", lightColor: "#f87171", bgColor: "rgba(239, 68, 68, 0.12)", borderColor: "rgba(239, 68, 68, 0.4)" },
+  "Pediatrics": { color: "#8b5cf6", lightColor: "#a78bfa", bgColor: "rgba(139, 92, 246, 0.12)", borderColor: "rgba(139, 92, 246, 0.4)" },
+  "Psychiatry": { color: "#06b6d4", lightColor: "#22d3ee", bgColor: "rgba(6, 182, 212, 0.12)", borderColor: "rgba(6, 182, 212, 0.4)" },
+  "Radiodiagnosis": { color: "#ec4899", lightColor: "#f472b6", bgColor: "rgba(236, 72, 153, 0.12)", borderColor: "rgba(236, 72, 153, 0.4)" },
+  "Radiotherapy": { color: "#f59e0b", lightColor: "#fbbf24", bgColor: "rgba(245, 158, 11, 0.12)", borderColor: "rgba(245, 158, 11, 0.4)" },
+  "Dermatology": { color: "#10b981", lightColor: "#34d399", bgColor: "rgba(16, 185, 129, 0.12)", borderColor: "rgba(16, 185, 129, 0.4)" },
+  "Gynecology": { color: "#ec4899", lightColor: "#f472b6", bgColor: "rgba(236, 72, 153, 0.12)", borderColor: "rgba(236, 72, 153, 0.4)" },
+  "Obstetrics": { color: "#f472b6", lightColor: "#fbcfe8", bgColor: "rgba(244, 114, 182, 0.12)", borderColor: "rgba(244, 114, 182, 0.4)" },
+  "General Surgery": { color: "#ef4444", lightColor: "#f87171", bgColor: "rgba(239, 68, 68, 0.12)", borderColor: "rgba(239, 68, 68, 0.4)" },
+  "Anaesthesiology": { color: "#6366f1", lightColor: "#818cf8", bgColor: "rgba(99, 102, 241, 0.12)", borderColor: "rgba(99, 102, 241, 0.4)" },
+  "Orthopaedics": { color: "#f59e0b", lightColor: "#fbbf24", bgColor: "rgba(245, 158, 11, 0.12)", borderColor: "rgba(245, 158, 11, 0.4)" },
+  "ENT": { color: "#14b8a6", lightColor: "#2dd4bf", bgColor: "rgba(20, 184, 166, 0.12)", borderColor: "rgba(20, 184, 166, 0.4)" },
+  "Ophthalmology": { color: "#3b82f6", lightColor: "#60a5fa", bgColor: "rgba(59, 130, 246, 0.12)", borderColor: "rgba(59, 130, 246, 0.4)" },
 };
+
+const CHAPTER_COLORS = [
+  { color: "#3b82f6", lightColor: "#60a5fa", glowColor: "rgba(59, 130, 246, 0.6)" },
+  { color: "#8b5cf6", lightColor: "#a78bfa", glowColor: "rgba(139, 92, 246, 0.6)" },
+  { color: "#ec4899", lightColor: "#f472b6", glowColor: "rgba(236, 72, 153, 0.6)" },
+  { color: "#f59e0b", lightColor: "#fbbf24", glowColor: "rgba(245, 158, 11, 0.6)" },
+  { color: "#10b981", lightColor: "#34d399", glowColor: "rgba(16, 185, 129, 0.6)" },
+  { color: "#06b6d4", lightColor: "#22d3ee", glowColor: "rgba(6, 182, 212, 0.6)" },
+  { color: "#6366f1", lightColor: "#818cf8", glowColor: "rgba(99, 102, 241, 0.6)" },
+  { color: "#ef4444", lightColor: "#f87171", glowColor: "rgba(239, 68, 68, 0.6)" },
+  { color: "#14b8a6", lightColor: "#2dd4bf", glowColor: "rgba(20, 184, 166, 0.6)" },
+  { color: "#f97316", lightColor: "#fb923c", glowColor: "rgba(249, 115, 22, 0.6)" },
+];
+
+const TOPIC_COLORS = [
+  { color: "#60a5fa", lightColor: "#93c5fd", glowColor: "rgba(96, 165, 250, 0.8)", bgColor: "rgba(96, 165, 250, 0.15)" },
+  { color: "#a78bfa", lightColor: "#c4b5fd", glowColor: "rgba(167, 139, 250, 0.8)", bgColor: "rgba(167, 139, 250, 0.15)" },
+  { color: "#f472b6", lightColor: "#f9a8d4", glowColor: "rgba(244, 114, 182, 0.8)", bgColor: "rgba(244, 114, 182, 0.15)" },
+  { color: "#fbbf24", lightColor: "#fcd34d", glowColor: "rgba(251, 191, 36, 0.8)", bgColor: "rgba(251, 191, 36, 0.15)" },
+  { color: "#34d399", lightColor: "#6ee7b7", glowColor: "rgba(52, 211, 153, 0.8)", bgColor: "rgba(52, 211, 153, 0.15)" },
+  { color: "#22d3ee", lightColor: "#67e8f9", glowColor: "rgba(34, 211, 238, 0.8)", bgColor: "rgba(34, 211, 238, 0.15)" },
+  { color: "#818cf8", lightColor: "#a5b4fc", glowColor: "rgba(129, 140, 248, 0.8)", bgColor: "rgba(129, 140, 248, 0.15)" },
+  { color: "#fb923c", lightColor: "#fdba74", glowColor: "rgba(251, 146, 60, 0.8)", bgColor: "rgba(251, 146, 60, 0.15)" },
+  { color: "#2dd4bf", lightColor: "#5eead4", glowColor: "rgba(45, 212, 191, 0.8)", bgColor: "rgba(45, 212, 191, 0.15)" },
+  { color: "#f87171", lightColor: "#fca5a5", glowColor: "rgba(248, 113, 113, 0.8)", bgColor: "rgba(248, 113, 113, 0.15)" },
+];
 
 interface LearningPathProps {
   onSubjectSelect?: (subject: string) => void;
 }
 
-const getChapterAccentColor = (baseColor: string, index: number) => {
-  const accents = [
-    baseColor,
-    '#22c55e', // green
-    '#38bdf8', // sky
-    '#a78bfa', // violet
-    '#fbbf24', // amber
-    '#f472b6', // pink
-  ];
+interface SubjectProgressItem {
+  textbook_chapter: string;
+  textbook_chapter_order: number;
+  chapter: string;
+  chapter_order: number;
+  topic: string;
+  topic_order: number;
+  is_complete: boolean;
+  started_at: string | null;
+  completed_at: string | null;
+}
 
-  return accents[index % accents.length];
-};
+interface GroupedProgress {
+  textbookChapter: string;
+  textbookChapterOrder: number;
+  chapters: {
+    chapterName: string;
+    chapterOrder: number;
+    topics: SubjectProgressItem[];
+  }[];
+}
 
 export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps) {
   const { user } = useAuth();
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [subjectProgress, setSubjectProgress] = useState<any[] | null>(null);
+  const [subjectProgress, setSubjectProgress] = useState<GroupedProgress[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -132,29 +167,19 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
     setError(null);
 
     try {
-      const { data, error: rpcError } = await supabase.rpc(
-        'get_curriculum_tree_with_student_path',
-        {
-          p_student_id: user.id,
-          p_subject: subject,
-        }
-      );
+      const { data, error: rpcError } = await supabase.rpc('get_subject_progress_v4', {
+        p_student_id: user.id,
+        p_subject: subject
+      });
 
       if (rpcError) throw rpcError;
 
-      const normalized = Array.isArray(data) ? data : [];
-
-console.log('📦 curriculum tree RPC:', normalized);
-      console.log('📦 curriculum tree RPC (raw):', normalized);
-
-// 🔍 ADD THIS EXACTLY HERE
-console.log(
-  '🧠 curriculum tree STRUCTURE CHECK',
-  JSON.stringify(normalized, null, 2)
-);
-
-setSubjectProgress(normalized);
-
+      if (data && Array.isArray(data)) {
+        const grouped = groupProgressData(data);
+        setSubjectProgress(grouped);
+      } else {
+        setSubjectProgress([]);
+      }
 
       if (onSubjectSelect) {
         onSubjectSelect(subject);
@@ -168,6 +193,46 @@ setSubjectProgress(normalized);
     }
   };
 
+  const groupProgressData = (data: SubjectProgressItem[]): GroupedProgress[] => {
+    const grouped = new Map<string, GroupedProgress>();
+
+    data.forEach(item => {
+      if (!grouped.has(item.textbook_chapter)) {
+        grouped.set(item.textbook_chapter, {
+          textbookChapter: item.textbook_chapter,
+          textbookChapterOrder: item.textbook_chapter_order,
+          chapters: []
+        });
+      }
+
+      const tbChapter = grouped.get(item.textbook_chapter)!;
+      let chapter = tbChapter.chapters.find(c => c.chapterName === item.chapter);
+
+      if (!chapter) {
+        chapter = {
+          chapterName: item.chapter,
+          chapterOrder: item.chapter_order,
+          topics: []
+        };
+        tbChapter.chapters.push(chapter);
+      }
+
+      chapter.topics.push(item);
+    });
+
+    return Array.from(grouped.values())
+      .sort((a, b) => a.textbookChapterOrder - b.textbookChapterOrder)
+      .map(tbChapter => ({
+        ...tbChapter,
+        chapters: tbChapter.chapters
+          .sort((a, b) => a.chapterOrder - b.chapterOrder)
+          .map(chapter => ({
+            ...chapter,
+            topics: chapter.topics.sort((a, b) => a.topic_order - b.topic_order)
+          }))
+      }));
+  };
+
   const handleBackToSubjects = () => {
     setSelectedSubject(null);
     setSubjectProgress(null);
@@ -178,15 +243,25 @@ setSubjectProgress(normalized);
     return SUBJECT_COLORS[subject] || SUBJECT_COLORS["Anatomy"];
   };
 
+  const getChapterColor = (index: number) => {
+    return CHAPTER_COLORS[index % CHAPTER_COLORS.length];
+  };
+
+  const getTopicColor = (index: number) => {
+    return TOPIC_COLORS[index % TOPIC_COLORS.length];
+  };
+
   const renderSubjectProgress = () => {
     if (!selectedSubject) return null;
 
     const subjectColor = getSubjectColor(selectedSubject);
 
+    let chapterGlobalIndex = 0;
+
     return (
       <View style={styles.container}>
         <LinearGradient
-          colors={['#0f172a', '#1e293b', '#0f172a']}
+          colors={['#0a0f1e', '#0f172a', '#1e1b4b', '#0f172a']}
           style={StyleSheet.absoluteFillObject}
         />
 
@@ -208,13 +283,13 @@ setSubjectProgress(normalized);
               </Text>
             </TouchableOpacity>
 
-          <View style={styles.journeyBadge}>
-  <Sparkles size={16} color="#fbbf24" />
-  <Text style={styles.journeyBadgeText}>YOUR JOURNEY</Text>
-</View>
+            <View style={[styles.journeyBadge, { backgroundColor: subjectColor.bgColor, borderColor: subjectColor.borderColor }]}>
+              <Sparkles size={16} color={subjectColor.color} />
+              <Text style={[styles.journeyBadgeText, { color: subjectColor.color }]}>YOUR JOURNEY</Text>
+            </View>
             <Text style={styles.headerTitle}>{selectedSubject}</Text>
             <Text style={styles.headerSubtitle}>
-              Follow your personalized learning path
+              Follow your personalized learning path through vibrant chapters
             </Text>
           </View>
 
@@ -236,17 +311,17 @@ setSubjectProgress(normalized);
           {/* Subject Progress Flowchart */}
           {!loading && !error && subjectProgress && (
             <View style={styles.flowchartContainer}>
-              {/* Vertical Timeline Line (Right Side) */}
+              {/* Vertical Timeline Line (Right Side) - Multicolor */}
               <View style={styles.timelineLineContainer}>
                 <LinearGradient
-                  colors={[subjectColor.color, subjectColor.lightColor, subjectColor.color]}
+                  colors={CHAPTER_COLORS.map(c => c.color)}
                   style={styles.timelineLine}
                 />
               </View>
 
               {/* Start Node */}
               <View style={styles.startNode}>
-                <View style={styles.startNodeCircle}>
+                <View style={[styles.startNodeCircle, { shadowColor: subjectColor.color }]}>
                   <LinearGradient
                     colors={[subjectColor.color, subjectColor.lightColor]}
                     style={styles.startNodeGradient}
@@ -255,7 +330,7 @@ setSubjectProgress(normalized);
                   </LinearGradient>
                 </View>
                 <View style={styles.startNodeContent}>
-                  <Text style={[styles.startNodeText, { color: subjectColor.color }]}>
+                  <Text style={[styles.startNodeText, { color: subjectColor.lightColor }]}>
                     Start Learning {selectedSubject}
                   </Text>
                 </View>
@@ -263,17 +338,22 @@ setSubjectProgress(normalized);
               </View>
 
               {/* Textbook Chapters and Topics Flow */}
-{subjectProgress
-  .filter(tb => Array.isArray(tb.chapters))
-  .map((tbChapter, tbIndex) => (
-
+              {subjectProgress.map((tbChapter, tbIndex) => (
                 <View key={tbIndex} style={styles.yearSection}>
                   {/* Textbook Chapter Block (like Year Block) */}
                   <View style={styles.yearBlockWrapper}>
                     <View
                       style={[
                         styles.yearBlock,
-                        { backgroundColor: subjectColor.bgColor, borderColor: subjectColor.borderColor },
+                        { 
+                          backgroundColor: subjectColor.bgColor, 
+                          borderColor: subjectColor.borderColor,
+                          shadowColor: subjectColor.color,
+                          shadowOffset: { width: 0, height: 8 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 16,
+                          elevation: 8,
+                        },
                       ]}
                     >
                       <LinearGradient
@@ -285,13 +365,20 @@ setSubjectProgress(normalized);
                       <View style={styles.yearBlockContent}>
                         <View style={styles.yearBlockHeader}>
                           <View
-                            style={[styles.yearIconCircle, { backgroundColor: subjectColor.bgColor }]}
+                            style={[
+                              styles.yearIconCircle, 
+                              { 
+                                backgroundColor: subjectColor.bgColor,
+                                borderWidth: 2,
+                                borderColor: subjectColor.borderColor,
+                              }
+                            ]}
                           >
-                            <BookOpen size={20} color={subjectColor.color} />
+                            <BookOpen size={22} color={subjectColor.lightColor} strokeWidth={2.5} />
                           </View>
                           <View style={styles.yearBlockTextContainer}>
-                            <Text style={[styles.yearBlockTitle, { color: subjectColor.color }]}>
-                              {tbChapter.textbook_chapter}
+                            <Text style={[styles.yearBlockTitle, { color: subjectColor.lightColor }]}>
+                              {tbChapter.textbookChapter}
                             </Text>
                             <Text style={styles.yearBlockSubjects}>
                               {tbChapter.chapters.length} Chapters
@@ -300,129 +387,276 @@ setSubjectProgress(normalized);
                         </View>
                       </View>
                       <View
-                        style={[styles.yearConnectionPoint, { backgroundColor: subjectColor.color }]}
+                        style={[
+                          styles.yearConnectionPoint, 
+                          { 
+                            backgroundColor: subjectColor.lightColor,
+                            shadowColor: subjectColor.color,
+                            shadowOffset: { width: 0, height: 4 },
+                            shadowOpacity: 0.6,
+                            shadowRadius: 8,
+                            elevation: 6,
+                          }
+                        ]}
                       />
                     </View>
-                    <View style={[styles.horizontalConnector, { backgroundColor: subjectColor.color }]} />
+                    <View style={[styles.horizontalConnector, { backgroundColor: subjectColor.lightColor }]} />
                   </View>
 
-       {/* Chapters and Topics */}
-<View style={styles.subjectsContainer}>
-  {Array.isArray(tbChapter.chapters) &&
-    tbChapter.chapters.map((chapter, chapterIndex) => {
-      const topics = Array.isArray(chapter.topics) ? chapter.topics : [];
-      const isLastChapter = chapterIndex === tbChapter.chapters.length - 1;
-      const allTopicsComplete =
-        topics.length > 0 && topics.every(t => t.is_complete);
-const chapterAccent = getChapterAccentColor(subjectColor.color, chapterIndex);
-      return (
-        <View key={chapterIndex} style={styles.chapterSection}>
-          {/* Chapter Block */}
-          <View style={styles.subjectWrapper}>
+                  {/* Chapters and Topics */}
+                  <View style={styles.subjectsContainer}>
+                    {tbChapter.chapters.map((chapter, chapterIndex) => {
+                      const chapterColor = getChapterColor(chapterGlobalIndex);
+                      const isLastChapter = chapterIndex === tbChapter.chapters.length - 1;
+                      const allTopicsComplete = chapter.topics.every(t => t.is_complete);
+                      const firstIncomplete = chapter.topics.findIndex(t => !t.is_complete);
+                      const isCurrent = firstIncomplete >= 0;
+                      
+                      const currentChapterIndex = chapterGlobalIndex;
+                      chapterGlobalIndex++;
 
+                      return (
+                        <View key={chapterIndex} style={styles.chapterSection}>
+                          {/* Chapter Block */}
+                          <View style={styles.subjectWrapper}>
+                            <View
+                              style={[
+                                styles.chapterBlock,
+                                {
+                                  backgroundColor: allTopicsComplete
+                                    ? `${chapterColor.color}20`
+                                    : 'rgba(30, 41, 59, 0.5)',
+                                  borderColor: allTopicsComplete || isCurrent
+                                    ? chapterColor.color
+                                    : 'rgba(71, 85, 105, 0.6)',
+                                  borderWidth: 2,
+                                  shadowColor: chapterColor.color,
+                                  shadowOffset: { width: 0, height: 4 },
+                                  shadowOpacity: allTopicsComplete || isCurrent ? 0.4 : 0.1,
+                                  shadowRadius: 12,
+                                  elevation: allTopicsComplete || isCurrent ? 6 : 2,
+                                },
+                              ]}
+                            >
+                              {(allTopicsComplete || isCurrent) && (
+                                <LinearGradient
+                                  colors={[chapterColor.color, chapterColor.lightColor]}
+                                  start={{ x: 0, y: 0 }}
+                                  end={{ x: 1, y: 1 }}
+                                  style={styles.chapterBlockAccent}
+                                />
+                              )}
+                              <View style={styles.chapterBlockContent}>
+                                <View
+                                  style={[
+                                    styles.chapterIconDot,
+                                    {
+                                      backgroundColor: allTopicsComplete || isCurrent
+                                        ? chapterColor.lightColor
+                                        : 'rgba(100, 116, 139, 0.6)',
+                                      shadowColor: chapterColor.color,
+                                      shadowOffset: { width: 0, height: 2 },
+                                      shadowOpacity: allTopicsComplete || isCurrent ? 0.6 : 0,
+                                      shadowRadius: 6,
+                                      elevation: 3,
+                                    },
+                                  ]}
+                                />
+                                <Text
+                                  style={[
+                                    styles.chapterText,
+                                    { 
+                                      color: allTopicsComplete || isCurrent 
+                                        ? chapterColor.lightColor 
+                                        : '#94a3b8' 
+                                    },
+                                  ]}
+                                >
+                                  {chapter.chapterName}
+                                </Text>
+                                {allTopicsComplete && (
+                                  <CheckCircle2 size={20} color={chapterColor.lightColor} strokeWidth={2.5} />
+                                )}
+                              </View>
+                              <View
+                                style={[
+                                  styles.chapterConnectionPoint,
+                                  {
+                                    backgroundColor: allTopicsComplete || isCurrent
+                                      ? chapterColor.lightColor
+                                      : 'rgba(71, 85, 105, 0.8)',
+                                    shadowColor: chapterColor.color,
+                                    shadowOffset: { width: 0, height: 3 },
+                                    shadowOpacity: 0.5,
+                                    shadowRadius: 6,
+                                    elevation: 4,
+                                  },
+                                ]}
+                              />
+                            </View>
+                            <View
+                              style={[
+                                styles.horizontalConnectorChapter,
+                                { 
+                                  backgroundColor: chapterColor.lightColor,
+                                  opacity: allTopicsComplete || isCurrent ? 0.7 : 0.3,
+                                },
+                              ]}
+                            />
+                          </View>
 
-  {/* LEFT COLORED STRIP */}
-  <View
-    style={[
-      styles.chapterAccentStrip,
-      { backgroundColor: chapterAccent },
-    ]}
-  />
+                          {/* Topics (nested) - TAB STYLE WITH GLOWING SHADOWS */}
+                          <View style={styles.topicsContainer}>
+                            {chapter.topics.map((topic, topicIndex) => {
+                              const topicColor = getTopicColor(topicIndex);
+                              const isComplete = topic.is_complete;
+                              const isCurrentTopic = topicIndex === firstIncomplete;
+                              const isLastTopic = topicIndex === chapter.topics.length - 1;
+                              const isFuture = !isComplete && topicIndex > firstIncomplete;
 
-  {/* MAIN CARD */}
-  <View
-    style={[
-      styles.subjectBlock,
-      {
-        backgroundColor: allTopicsComplete
-          ? subjectColor.bgColor
-          : 'rgba(30, 41, 59, 0.4)',
-      },
-    ]}
-  >
-  
-              <View style={styles.subjectBlockContent}>
-                <View
-                  style={[
-                    styles.subjectDot,
-                    {
-                      backgroundColor: allTopicsComplete
-                        ? subjectColor.color
-                        : 'rgba(100, 116, 139, 0.6)',
-                    },
-                  ]}
-                />
-                <Text
-                  style={[
-                    styles.chapterText,
-                    {
-color: allTopicsComplete
-  ? chapterAccent
-  : '#CBD5E1',
+                              return (
+                                <View key={topicIndex} style={styles.topicWrapper}>
+                                  <TouchableOpacity
+                                    activeOpacity={0.8}
+                                    style={[
+                                      styles.topicTab,
+                                      {
+                                        backgroundColor: isComplete
+                                          ? 'rgba(16, 185, 129, 0.2)'
+                                          : isCurrentTopic
+                                          ? topicColor.bgColor
+                                          : 'rgba(30, 41, 59, 0.4)',
+                                        borderColor: isComplete
+                                          ? '#10b981'
+                                          : isCurrentTopic
+                                          ? topicColor.color
+                                          : 'rgba(71, 85, 105, 0.5)',
+                                        borderWidth: isCurrentTopic || isComplete ? 2.5 : 1.5,
+                                        shadowColor: isComplete
+                                          ? '#10b981'
+                                          : isCurrentTopic
+                                          ? topicColor.glowColor
+                                          : 'transparent',
+                                        shadowOffset: { width: 0, height: 6 },
+                                        shadowOpacity: isComplete || isCurrentTopic ? 0.8 : 0,
+                                        shadowRadius: 15,
+                                        elevation: isComplete || isCurrentTopic ? 8 : 1,
+                                        opacity: isFuture ? 0.5 : 1,
+                                      },
+                                    ]}
+                                  >
+                                    {isCurrentTopic && (
+                                      <LinearGradient
+                                        colors={[topicColor.color, topicColor.lightColor]}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 1, y: 1 }}
+                                        style={styles.topicTabGlow}
+                                      />
+                                    )}
+                                    <View style={styles.topicTabContent}>
+                                      <View style={styles.topicIconContainer}>
+                                        {isComplete ? (
+                                          <CheckCircle2 size={18} color="#10b981" strokeWidth={3} />
+                                        ) : isCurrentTopic ? (
+                                          <Zap size={18} color={topicColor.color} fill={topicColor.color} strokeWidth={2.5} />
+                                        ) : (
+                                          <Circle size={16} color="rgba(100, 116, 139, 0.6)" strokeWidth={2} />
+                                        )}
+                                      </View>
+                                      <Text
+                                        style={[
+                                          styles.topicTabText,
+                                          {
+                                            color: isComplete
+                                              ? '#34d399'
+                                              : isCurrentTopic
+                                              ? topicColor.color
+                                              : '#64748b',
+                                            fontWeight: isComplete || isCurrentTopic ? '800' : '600',
+                                          },
+                                        ]}
+                                      >
+                                        {topic.topic}
+                                      </Text>
+                                      {isCurrentTopic && (
+                                        <View style={[styles.currentBadge, { backgroundColor: topicColor.color }]}>
+                                          <Text style={styles.currentBadgeText}>ACTIVE</Text>
+                                        </View>
+                                      )}
+                                    </View>
+                                    <View
+                                      style={[
+                                        styles.topicConnectionPoint,
+                                        {
+                                          backgroundColor: isComplete
+                                            ? '#10b981'
+                                            : isCurrentTopic
+                                            ? topicColor.color
+                                            : 'rgba(71, 85, 105, 0.6)',
+                                          shadowColor: isComplete
+                                            ? '#10b981'
+                                            : topicColor.color,
+                                          shadowOffset: { width: 0, height: 2 },
+                                          shadowOpacity: isComplete || isCurrentTopic ? 0.7 : 0,
+                                          shadowRadius: 8,
+                                          elevation: 5,
+                                        },
+                                      ]}
+                                    />
+                                  </TouchableOpacity>
+                                  {!isLastTopic && (
+                                    <View
+                                      style={[
+                                        styles.topicConnector,
+                                        {
+                                          backgroundColor: isComplete
+                                            ? '#10b981'
+                                            : chapterColor.color,
+                                          opacity: 0.4,
+                                        },
+                                      ]}
+                                    />
+                                  )}
+                                  <View
+                                    style={[
+                                      styles.horizontalConnectorTopic,
+                                      {
+                                        backgroundColor: isComplete
+                                          ? '#34d399'
+                                          : isCurrentTopic
+                                          ? topicColor.color
+                                          : chapterColor.color,
+                                        opacity: isComplete || isCurrentTopic ? 0.6 : 0.3,
+                                      },
+                                    ]}
+                                  />
+                                </View>
+                              );
+                            })}
+                          </View>
 
-                    },
-                  ]}
-                >
-                  {chapter.chapter}
-                </Text>
-                {allTopicsComplete && (
-                  <CheckCircle2 size={18} color={subjectColor.color} />
-                )}
-              </View>
-            </View>
-          </View>
-
-          {/* Topics */}
-          <View style={styles.topicsContainer}>
-            {topics.map((topic, topicIndex) => {
-              const isComplete = topic.is_complete;
-              const isCurrent = topic.is_current;
-
-              return (
-                <View key={topicIndex} style={styles.topicWrapper}>
-                  <View style={styles.topicBlock}>
-                    <View style={styles.topicBlockContent}>
-                      {isComplete ? (
-                        <CheckCircle2 size={14} color="#10b981" />
-                      ) : isCurrent ? (
-                        <Circle
-                          size={14}
-                          fill={subjectColor.color}
-                          color={subjectColor.color}
-                        />
-                      ) : (
-                        <Circle size={14} color="#64748b" />
-                      )}
-                      <Text style={styles.topicText}>
-                        {topic.topic}
-                      </Text>
-                    </View>
+                          {!isLastChapter && (
+                            <View
+                              style={[
+                                styles.chapterConnector,
+                                { 
+                                  backgroundColor: chapterColor.lightColor, 
+                                  opacity: 0.4,
+                                },
+                              ]}
+                            />
+                          )}
+                        </View>
+                      );
+                    })}
                   </View>
-                </View>
-              );
-            })}
-          </View>
-
-          {!isLastChapter && (
-            <View
-              style={[
-                styles.chapterConnector,
-                { backgroundColor: subjectColor.color, opacity: 0.3 },
-              ]}
-            />
-          )}
-        </View>
-      );
-    })}
-</View>
-
 
                   {/* Textbook Chapter to Chapter Connector */}
                   {tbIndex < subjectProgress.length - 1 && (
                     <View
                       style={[
                         styles.yearToYearConnector,
-                        { backgroundColor: subjectColor.color, opacity: 0.4 },
+                        { backgroundColor: subjectColor.lightColor, opacity: 0.5 },
                       ]}
                     />
                   )}
@@ -431,12 +665,12 @@ color: allTopicsComplete
 
               {/* End Node */}
               <View style={styles.endNode}>
-                <View style={styles.endNodeCircle}>
+                <View style={[styles.endNodeCircle, { shadowColor: '#10b981' }]}>
                   <LinearGradient
-                    colors={['#10b981', '#059669']}
+                    colors={['#10b981', '#34d399', '#059669']}
                     style={styles.endNodeGradient}
                   >
-                    <Trophy size={24} color="#ffffff" />
+                    <Trophy size={28} color="#ffffff" strokeWidth={2.5} />
                   </LinearGradient>
                 </View>
                 <View style={styles.endNodeContent}>
@@ -468,7 +702,7 @@ color: allTopicsComplete
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#0f172a', '#1e293b', '#0f172a']}
+        colors={['#0a0f1e', '#0f172a', '#1e1b4b', '#0f172a']}
         style={StyleSheet.absoluteFillObject}
       />
 
@@ -699,26 +933,19 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
 
- headerTitle: {
-  fontSize: 32,
-  fontWeight: '900',
-  color: '#F5E6C8', // 🔥 Image-2 font color
-  marginBottom: 8,
-  letterSpacing: -0.5,
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#ffffff',
+    marginBottom: 8,
+    letterSpacing: -0.5,
+  },
 
-  // subtle premium glow
-  textShadowColor: 'rgba(245, 230, 200, 0.35)',
-  textShadowOffset: { width: 0, height: 2 },
-  textShadowRadius: 6,
-},
-
-
-headerSubtitle: {
-  fontSize: 15,
-  color: '#C7B89A', // muted gold-gray
-  lineHeight: 22,
-},
-
+  headerSubtitle: {
+    fontSize: 15,
+    color: '#94a3b8',
+    lineHeight: 22,
+  },
 
   // BACK BUTTON
   backButton: {
@@ -785,13 +1012,13 @@ headerSubtitle: {
     right: 32,
     top: 0,
     bottom: 0,
-    width: 4,
+    width: 5,
     zIndex: 0,
   },
 
   timelineLine: {
     flex: 1,
-    borderRadius: 2,
+    borderRadius: 3,
   },
 
   // START NODE
@@ -809,9 +1036,9 @@ headerSubtitle: {
     overflow: 'hidden',
     shadowColor: '#10b981',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
+    elevation: 8,
   },
 
   startNodeGradient: {
@@ -838,7 +1065,7 @@ headerSubtitle: {
     width: 32,
     height: 2,
     backgroundColor: '#10b981',
-    opacity: 0.5,
+    opacity: 0.6,
   },
 
   // YEAR SECTION
@@ -863,12 +1090,12 @@ headerSubtitle: {
     left: 0,
     top: 0,
     bottom: 0,
-    width: 4,
+    width: 5,
   },
 
   yearBlockContent: {
     padding: 16,
-    paddingLeft: 20,
+    paddingLeft: 22,
   },
 
   yearBlockHeader: {
@@ -877,9 +1104,9 @@ headerSubtitle: {
   },
 
   yearIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -889,18 +1116,12 @@ headerSubtitle: {
     flex: 1,
   },
 
- yearBlockTitle: {
-  fontSize: 20,
-  fontWeight: '800',
-  color: '#F5E6C8', // same hero tone
-  marginBottom: 2,
-  letterSpacing: -0.3,
-
-  textShadowColor: 'rgba(245, 230, 200, 0.25)',
-  textShadowOffset: { width: 0, height: 1 },
-  textShadowRadius: 4,
-},
-
+  yearBlockTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    marginBottom: 2,
+    letterSpacing: -0.3,
+  },
 
   yearBlockSubjects: {
     fontSize: 13,
@@ -976,13 +1197,6 @@ headerSubtitle: {
     letterSpacing: 0.2,
   },
 
-  chapterText: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 0.2,
-  },
-
   selectedBadge: {
     marginLeft: 8,
   },
@@ -1026,97 +1240,164 @@ headerSubtitle: {
     marginVertical: 8,
   },
 
-  // CHAPTER SECTION (for subject progress view)
+  // CHAPTER SECTION (Enhanced with different colors per chapter)
   chapterSection: {
-    marginBottom: 8,
+    marginBottom: 12,
+  },
+
+  chapterBlock: {
+    borderRadius: 14,
+    marginBottom: 4,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+
+  chapterBlockAccent: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+  },
+
+  chapterBlockContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    paddingLeft: 18,
+  },
+
+  chapterIconDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 14,
+  },
+
+  chapterText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+  },
+
+  chapterConnectionPoint: {
+    position: 'absolute',
+    right: -10,
+    top: '50%',
+    marginTop: -5,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 2.5,
+    borderColor: '#0f172a',
+    zIndex: 2,
+  },
+
+  horizontalConnectorChapter: {
+    position: 'absolute',
+    right: -48,
+    top: '50%',
+    marginTop: -1,
+    width: 38,
+    height: 2,
+    zIndex: 1,
   },
 
   chapterConnector: {
-    width: 2,
-    height: 16,
-    marginLeft: 4,
-    marginVertical: 4,
+    width: 2.5,
+    height: 20,
+    marginLeft: 6,
+    marginVertical: 6,
   },
 
-  // TOPICS (nested under chapters in subject progress view)
+  // TOPICS (TAB STYLE WITH GLOWING SHADOWS)
   topicsContainer: {
-    paddingLeft: 32,
-    marginTop: 4,
+    paddingLeft: 40,
+    marginTop: 8,
     marginBottom: 8,
   },
 
   topicWrapper: {
     position: 'relative',
+    marginBottom: 6,
   },
 
-  topicBlock: {
-    borderRadius: 10,
-    marginBottom: 2,
+  topicTab: {
+    borderRadius: 12,
     position: 'relative',
     overflow: 'hidden',
   },
 
-  topicBlockAccent: {
+  topicTabGlow: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    width: 2,
+    width: 3,
   },
 
-  topicBlockContent: {
+  topicTabContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    paddingLeft: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    paddingLeft: 18,
   },
 
-  topicText: {
-  flex: 1,
-  fontSize: 13,
-  fontWeight: '600',
-  marginLeft: 10,
-  letterSpacing: 0.2,
+  topicIconContainer: {
+    marginRight: 12,
+  },
 
-  // 🔥 FIX: high-contrast readable color
-  color: '#E5E7EB', // light gray (Tailwind gray-200)
+  topicTabText: {
+    flex: 1,
+    fontSize: 14,
+    letterSpacing: 0.3,
+  },
 
-  // subtle lift on dark background
-  textShadowColor: 'rgba(0,0,0,0.4)',
-  textShadowOffset: { width: 0, height: 1 },
-  textShadowRadius: 2,
-},
+  currentBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
 
+  currentBadgeText: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#ffffff',
+    letterSpacing: 1,
+  },
 
   topicConnectionPoint: {
     position: 'absolute',
-    right: -6,
+    right: -7,
     top: '50%',
-    marginTop: -3,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    borderWidth: 1.5,
+    marginTop: -3.5,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    borderWidth: 2,
     borderColor: '#0f172a',
     zIndex: 2,
   },
 
   topicConnector: {
     position: 'absolute',
-    right: -6,
+    right: -7,
     top: '50%',
-    width: 1.5,
+    width: 2,
     height: '100%',
     zIndex: 0,
   },
 
-  horizontalConnectorTiny: {
+  horizontalConnectorTopic: {
     position: 'absolute',
     right: -48,
     top: '50%',
     marginTop: -0.5,
-    width: 42,
-    height: 0.5,
+    width: 41,
+    height: 1.5,
     zIndex: 1,
   },
 
@@ -1133,11 +1414,11 @@ headerSubtitle: {
     height: 56,
     borderRadius: 28,
     overflow: 'hidden',
-    shadowColor: '#f59e0b',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.7,
+    shadowRadius: 20,
+    elevation: 10,
   },
 
   endNodeGradient: {
@@ -1165,20 +1446,7 @@ headerSubtitle: {
     fontWeight: '600',
   },
 
-bottomSpacer: {
-  height: 40,
-},
-
-chapterCardWrapper: {
-  position: 'relative',
-  flexDirection: 'row',
-  alignItems: 'stretch',
-},
-
-chapterAccentStrip: {
-  width: 5,
-  borderTopLeftRadius: 12,
-  borderBottomLeftRadius: 12,
-},
-
+  bottomSpacer: {
+    height: 40,
+  },
 });
