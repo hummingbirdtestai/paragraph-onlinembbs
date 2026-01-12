@@ -416,8 +416,10 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                             : 'rgba(30, 30, 30, 0.3)',
                                           borderLeftColor: isComplete
                                             ? '#25D366'
-                                            : '#E91E63',
-                                    
+                                            : isCurrentTopic
+                                            ? topicColor.color
+                                            : '#9FB3C8',
+
                                         },
                                       ]}
                                     >
@@ -433,9 +435,9 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                             {isComplete ? (
                                               <CheckCircle2 size={14} color="#25D366" strokeWidth={2} />
                                             ) : isCurrentTopic ? (
-                                              <Circle size={12} color="#E91E63" strokeWidth={2} fill="#E91E63" />
+                                              <Circle size={12} color={topicColor.color} strokeWidth={2} fill={topicColor.color} />
                                             ) : (
-                                              <Circle size={12} color="#E91E63" strokeWidth={1.5} />
+                                              <Circle size={12} color="#9FB3C8" strokeWidth={1.5} />
                                             )}
                                           </View>
 
@@ -443,7 +445,11 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                             style={[
                                               styles.topicTabText,
                                               {
-                                                color: isComplete ? '#25D366' : '#E91E63',
+                                                color: isComplete
+                                                  ? '#25D366'
+                                                  : isCurrentTopic
+                                                  ? topicColor.color
+                                                  : '#9FB3C8',
                                               },
                                             ]}
                                           >
@@ -455,7 +461,11 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                         style={[
                                           styles.topicConnectionPoint,
                                           {
-                                            backgroundColor: isComplete ? '#25D366' : '#E91E63',
+                                            backgroundColor: isComplete
+                                              ? '#25D366'
+                                              : isCurrentTopic
+                                              ? topicColor.color
+                                              : '#9FB3C8',
                                           },
                                         ]}
                                       />
