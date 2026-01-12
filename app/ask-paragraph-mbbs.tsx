@@ -39,7 +39,7 @@ function stripControlBlocks(text: string) {
     .replace(/\[STUDENT_REPLY_REQUIRED\]/g, "")
     .replace(/\[FEEDBACK_CORRECT\]/g, "")
     .replace(/\[FEEDBACK_WRONG\]/g, "")
-     .replace(/\[SESSION_COMPLETED\]/g, "") // ✅ ADD THIS LINE
+     .replace(/\[SESSION_COMPLETED\]/g, "")
     .replace(/^Correct:\s*[A-D]\s*$/gim, "")
     .trim();
 }
@@ -56,13 +56,12 @@ export default function AskParagraphChat() {
   const [selectedYear, setSelectedYear] = useState<Year | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [chatStarted, setChatStarted] = useState(false);
- // 🔑 Phase execution state (RPC-driven)
   const [sessionCompleted, setSessionCompleted] = useState(false);
-const [showConfetti, setShowConfetti] = useState(false);
-const [currentPhase, setCurrentPhase] = useState<any | null>(null);
-const [loadingPhase, setLoadingPhase] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState<any | null>(null);
+  const [loadingPhase, setLoadingPhase] = useState(false);
   const { user } = useAuth();
-const router = useRouter();
+  const router = useRouter();
   const conversationRef = useRef<any[]>([]);
   const [showSubjectProgress, setShowSubjectProgress] = useState(false);
   const yearOptions: { key: Year; label: string }[] = [
@@ -71,247 +70,188 @@ const router = useRouter();
     { key: 'third', label: 'Third Year' },
     { key: 'final', label: 'Final Year' },
   ];
-const [sessionId, setSessionId] = useState<string | null>(null);
-  const [activeMcqId, setActiveMcqId] = useState<string | null>(null); // ✅ HERE
-const [conversation, setConversation] = useState<any[]>([]);
-const [tutorMode, setTutorMode] = useState<"idle" | "active">("idle");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [activeMcqId, setActiveMcqId] = useState<string | null>(null);
+  const [conversation, setConversation] = useState<any[]>([]);
+  const [tutorMode, setTutorMode] = useState<"idle" | "active">("idle");
   const [isStartingDiscussion, setIsStartingDiscussion] = useState(false);
-const scrollViewRef = useRef<ScrollView>(null);
-  const hasRetriedRef = useRef(false); // 🔑 SYSTEM_RETRY guard
-const skipStudentAppendRef = useRef(false);
-const sendingLockRef = useRef(false);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const hasRetriedRef = useRef(false);
+  const skipStudentAppendRef = useRef(false);
+  const sendingLockRef = useRef(false);
+  const [isTyping, setIsTyping] = useState(false);
 
-const [isTyping, setIsTyping] = useState(false);
   useEffect(() => {
-  conversationRef.current = conversation;
-}, [conversation]);
-useEffect(() => {
-  const timeout = setTimeout(() => {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
-  }, 100);
+    conversationRef.current = conversation;
+  }, [conversation]);
 
-  return () => clearTimeout(timeout);
-}, [conversation, isTyping]);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
 
+    return () => clearTimeout(timeout);
+  }, [conversation, isTyping]);
 
-const [nextSuggestions, setNextSuggestions] = useState<any[]>([]);
-const handleSendMessage = async (message: string) => {
-  if (!message.trim() || isTyping || sendingLockRef.current) return;
-if (!user?.id || !activeMcqId) return;
+  const [nextSuggestions, setNextSuggestions] = useState<any[]>([]);
 
-sendingLockRef.current = true;
-hasRetriedRef.current = false;
+  const handleSendMessage = async (message: string) => {
+    if (!message.trim() || isTyping || sendingLockRef.current) return;
+    if (!user?.id || !activeMcqId) return;
 
+    sendingLockRef.current = true;
+    hasRetriedRef.current = false;
 
-  if (!skipStudentAppendRef.current) {
-  setConversation(prev => [
-    ...prev,
-    { role: "student", content: message }
-  ]);
-}
-
-  setIsTyping(true);
-
-  try {
-    const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL!;
-
-    const res = await fetch(`${API_BASE_URL}/ask-paragraph-mbbs/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-  student_id: user.id,
-  mcq_id: activeMcqId,
-  message,
-}),
-    });
-
-    if (!res.body) throw new Error("No stream body");
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-
-    let done = false;
-
-   while (!done) {
-  const { value, done: doneReading } = await reader.read();
-  done = doneReading;
-
-  if (!value) continue;
-
-  const chunk = decoder.decode(value, { stream: true });
-
-  // 1️⃣ Render streamed chunk ONCE
-  setConversation(prev => {
-    const updated = [...prev];
-    const last = updated[updated.length - 1];
-
-    if (!last || last.role !== "mentor") {
-      updated.push({ role: "mentor", content: chunk });
-    } else {
-      updated[updated.length - 1] = {
-        ...last,
-        content: last.content + chunk,
-      };
+    if (!skipStudentAppendRef.current) {
+      setConversation(prev => [
+        ...prev,
+        { role: "student", content: message }
+      ]);
     }
 
-    return updated;
-  });
-// 🔁 SYSTEM RETRY — re-trigger same answer
-if (chunk.includes("[SYSTEM_RETRY]")) {
-  setIsTyping(false);
+    setIsTyping(true);
 
-  if (!hasRetriedRef.current) {
-    hasRetriedRef.current = true;
+    try {
+      const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL!;
 
-    const lastStudent = conversationRef.current
-      .slice()
-      .reverse()
-      .find(m => m.role === "student");
+      const res = await fetch(`${API_BASE_URL}/ask-paragraph-mbbs/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          student_id: user.id,
+          mcq_id: activeMcqId,
+          message,
+        }),
+      });
 
-    if (lastStudent?.content) {
-      skipStudentAppendRef.current = true; // 🔑 PREVENT DUPLICATE UI
-      handleSendMessage(lastStudent.content);
-      skipStudentAppendRef.current = false;
-    }
-  } else {
-    setConversation(prev => [
-      ...prev,
-      {
-        role: "mentor",
-        content: "⚠️ I’m having trouble processing that. Please rephrase your answer."
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+
+      // 🔥 Read full response atomically (no streaming)
+      const text = await res.text();
+
+      // 1️⃣ Append mentor reply ONCE
+      setConversation(prev => [
+        ...prev,
+        { role: "mentor", content: text }
+      ]);
+
+      // 2️⃣ Handle session completion
+      if (text.includes("[SESSION_COMPLETED]")) {
+        setSessionCompleted(true);
+        setTutorMode("idle");
+        setShowConfetti(true);
       }
-    ]);
-  }
 
-  return;
-}
+      // 3️⃣ Unlock UI
+      setIsTyping(false);
+      sendingLockRef.current = false;
 
-
-
-  // 2️⃣ Detect session completion AFTER rendering
-     
-  if (chunk.includes("[SESSION_COMPLETED]")) {
-    setSessionCompleted(true);
-    setTutorMode("idle");
-    hasRetriedRef.current = false; // 🔄 reset retry for new phase
-    setIsTyping(false);
-      setShowConfetti(true); // 🎉 ADD THIS
-    break; // ✅ exit loop cleanly
-  }
-}
-  } catch (e) {
-    console.error("Chat error", e);
-  } finally {
-  setIsTyping(false);
-  sendingLockRef.current = false;
-}
-};
+    } catch (e) {
+      console.error("Chat error", e);
+      setIsTyping(false);
+      sendingLockRef.current = false;
+    }
+  };
 
   const handleStartChat = async () => {
-     setSessionCompleted(false);   // 🔑 ADD THIS LINE
+    setSessionCompleted(false);
     setShowSubjectProgress(false);
-  if (!user?.id || !selectedSubject) return;
+    if (!user?.id || !selectedSubject) return;
 
-  setLoadingPhase(true);
+    setLoadingPhase(true);
 
-  try {
-   const { data, error } = await supabase.rpc(
-  "start_pointer",
-  {
-    p_student_id: user.id,
-    p_subject: selectedSubject,
-  }
-);
-
-// 🔍 RAW RPC RESPONSE
-console.log("🟢 start_pointer RAW response:", {
-  data,
-  error,
-});
-
-// 🔍 SANITY CHECK FIELDS
-if (data) {
-  console.log("🧭 start_pointer PARSED:", {
-    status: data.status,
-    phase_type: data.phase_type,
-    react_order_final: data.react_order_final,
-    phase_row_id: data.phase_row_id,
-    subject: data.subject,
-    chapter: data.chapter,
-    topic: data.topic,
-    has_phase_json: !!data.phase_json,
-    phase_json_keys: data.phase_json ? Object.keys(data.phase_json) : null,
-  });
-}
-
-
-    if (error) {
-      console.error("❌ start_pointer error", error);
-      return;
-    }
-
-    if (data?.status === "subject_completed") {
-      alert("🎉 Subject completed!");
-      return;
-    }
-
-    // 🔑 SINGLE SOURCE OF TRUTH
-    setCurrentPhase(data);
-    setChatStarted(true);
-
-  } finally {
-    setLoadingPhase(false);
-  }
-};
-const handleDiscussWithParagraph = async () => {
-    setSessionCompleted(false);   // 🔑 ADD THIS LINE
-  if (!currentPhase || !user?.id) return;
-// ✅ ADD THESE TWO LINES
-  setIsStartingDiscussion(true);
-  setTutorMode("idle"); // lock input
-  const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL!;
-
-  const payload =
-    currentPhase.phase_type === "concept"
-      ? {
-          type: "concept",
-          chapter: currentPhase.chapter,
-          topic: currentPhase.topic,
+    try {
+      const { data, error } = await supabase.rpc(
+        "start_pointer",
+        {
+          p_student_id: user.id,
+          p_subject: selectedSubject,
         }
-      : currentPhase.phase_json; // MCQ unchanged
+      );
 
-  console.log("🚀 Ask-Paragraph START payload", {
-    student_id: user.id,
-    mcq_id: currentPhase.phase_row_id,
-    mcq_payload: payload,
-  });
+      console.log("🟢 start_pointer RAW response:", {
+        data,
+        error,
+      });
 
-  const res = await fetch(`${API_BASE_URL}/ask-paragraph-mbbs/start`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+      if (data) {
+        console.log("🧭 start_pointer PARSED:", {
+          status: data.status,
+          phase_type: data.phase_type,
+          react_order_final: data.react_order_final,
+          phase_row_id: data.phase_row_id,
+          subject: data.subject,
+          chapter: data.chapter,
+          topic: data.topic,
+          has_phase_json: !!data.phase_json,
+          phase_json_keys: data.phase_json ? Object.keys(data.phase_json) : null,
+        });
+      }
+
+      if (error) {
+        console.error("❌ start_pointer error", error);
+        return;
+      }
+
+      if (data?.status === "subject_completed") {
+        alert("🎉 Subject completed!");
+        return;
+      }
+
+      setCurrentPhase(data);
+      setChatStarted(true);
+
+    } finally {
+      setLoadingPhase(false);
+    }
+  };
+
+  const handleDiscussWithParagraph = async () => {
+    setSessionCompleted(false);
+    if (!currentPhase || !user?.id) return;
+    setIsStartingDiscussion(true);
+    setTutorMode("idle");
+    const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL!;
+
+    const payload =
+      currentPhase.phase_type === "concept"
+        ? {
+            type: "concept",
+            chapter: currentPhase.chapter,
+            topic: currentPhase.topic,
+          }
+        : currentPhase.phase_json;
+
+    console.log("🚀 Ask-Paragraph START payload", {
       student_id: user.id,
-      mcq_id: currentPhase.phase_row_id, // 🔑 always phase row id
+      mcq_id: currentPhase.phase_row_id,
       mcq_payload: payload,
-    }),
-  });
+    });
 
-if (!res.ok) {
-  console.error("❌ Start failed", res.status);
-  setIsStartingDiscussion(false);   // 🔑 IMPORTANT
-  return;
-}
+    const res = await fetch(`${API_BASE_URL}/ask-paragraph-mbbs/start`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        student_id: user.id,
+        mcq_id: currentPhase.phase_row_id,
+        mcq_payload: payload,
+      }),
+    });
 
-  const data = await res.json();
+    if (!res.ok) {
+      console.error("❌ Start failed", res.status);
+      setIsStartingDiscussion(false);
+      return;
+    }
 
-  setSessionId(data.session_id);
-  setActiveMcqId(currentPhase.phase_row_id);   // 🔑 REQUIRED
-  setConversation(data.final_dialogs || []);
-  setTutorMode("active");
-  setIsStartingDiscussion(false); // ✅ DONE
-};
+    const data = await res.json();
 
-
+    setSessionId(data.session_id);
+    setActiveMcqId(currentPhase.phase_row_id);
+    setConversation(data.final_dialogs || []);
+    setTutorMode("active");
+    setIsStartingDiscussion(false);
+  };
 
   const renderSelectionScreen = () => (
     <View style={styles.selectionContainer}>
@@ -362,10 +302,10 @@ if (!res.ok) {
                 selectedSubject === subject && styles.pillSelected,
               ]}
               onPress={() => {
-  setSelectedSubject(subject);
-  setChatStarted(false);
-  setShowSubjectProgress(true);
-}}
+                setSelectedSubject(subject);
+                setChatStarted(false);
+                setShowSubjectProgress(true);
+              }}
             >
               <Text
                 style={[
@@ -394,178 +334,164 @@ if (!res.ok) {
       )}
     </View>
   );
-const renderPhase = () => {
-  if (!currentPhase) return null;
+
+  const renderPhase = () => {
+    if (!currentPhase) return null;
+
+    return (
+      <View>
+        <CBMERenderer
+          cbmeMeta={{
+            chapter: currentPhase.chapter,
+            topic: currentPhase.topic,
+            chapter_order: currentPhase.chapter_order,
+            topic_order: currentPhase.topic_order,
+          }}
+        />
+
+        {currentPhase.phase_type === "concept" && (
+          <HighYieldFactSheetScreen
+            data={currentPhase.phase_json?.concept ?? ""}
+          />
+        )}
+
+        {currentPhase.phase_type === "mcq" && (
+          <MCQChatScreen
+            item={currentPhase.phase_json}
+            studentId={currentPhase.student_id}
+            mcqId={currentPhase.phase_row_id}
+            correctAnswer={currentPhase.phase_json?.correct_answer}
+            reactOrderFinal={currentPhase.react_order_final}
+            phaseUniqueId={currentPhase.phase_row_id}
+            subject={currentPhase.subject}
+            isBookmarked={false}
+            mode="practice"
+          />
+        )}
+      </View>
+    );
+  };
 
   return (
-    <View>
-      {/* ✅ CBME HEADER */}
-      <CBMERenderer
-        cbmeMeta={{
-          chapter: currentPhase.chapter,
-          topic: currentPhase.topic,
-          chapter_order: currentPhase.chapter_order,
-          topic_order: currentPhase.topic_order,
-        }}
-      />
+    <MainLayout>
+      <View style={styles.container}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <ScrollView
+            ref={scrollViewRef}
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingBottom: 120 }}
+            keyboardShouldPersistTaps="handled"
+          >
+            {!chatStarted && renderSelectionScreen()}
 
-      {/* 🔵 CONCEPT PHASE */}
-      {currentPhase.phase_type === "concept" && (
-        <HighYieldFactSheetScreen
-          data={currentPhase.phase_json?.concept ?? ""}
+            {!chatStarted && showSubjectProgress && selectedSubject && user?.id && (
+              <View style={{ marginTop: 16 }}>
+                <View style={{ height: 1, backgroundColor: '#1c2730', marginBottom: 12 }} />
+                <SubjectProgressDashboard
+                  student_id={user.id}
+                  subject={selectedSubject}
+                />
+              </View>
+            )}
+
+            {chatStarted && loadingPhase && (
+              <Text style={{ color: "#999", textAlign: "center", marginTop: 20 }}>
+                Loading…
+              </Text>
+            )}
+
+            {chatStarted && !loadingPhase && renderPhase()}
+
+            {currentPhase && !sessionId && !isStartingDiscussion && (
+              <View style={styles.discussContainer}>
+                <TouchableOpacity
+                  style={styles.discussButton}
+                  onPress={handleDiscussWithParagraph}
+                >
+                  <Text style={styles.discussButtonText}>
+                    💬 Discuss with Paragraph AI Tutor
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {isStartingDiscussion && (
+              <MentorBubbleReply markdownText="⏳ *Paragraph AI Mentor is starting discussion…*" />
+            )}
+
+            {conversation
+              .filter(msg => msg.role !== "system")
+              .map((msg, index) =>
+                msg.role === "student" ? (
+                  <StudentBubble key={index} text={msg.content} />
+                ) : (
+                  <MentorBubbleReply
+                    key={index}
+                    markdownText={
+                      typeof msg.content === "string"
+                        ? stripControlBlocks(msg.content)
+                        : ""
+                    }
+                  />
+                )
+              )
+            }
+
+            {sessionCompleted && (
+              <View style={styles.nextConceptContainer}>
+                <TouchableOpacity
+                  style={styles.nextConceptButton}
+                  onPress={() => {
+                    setConversation([]);
+                    setSessionCompleted(false);
+                    setShowConfetti(false);
+                    setTutorMode("idle");
+                    setSessionId(null);
+                    setActiveMcqId(null);
+                    setIsStartingDiscussion(false);
+                    setCurrentPhase(null);
+                    hasRetriedRef.current = false;
+                    handleStartChat();
+                  }}
+                >
+                  <Text style={styles.nextConceptText}>
+                    ▶ Next CBME Concept
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {isTyping && (
+              <MentorBubbleReply markdownText="💬 *Paragraph Mentor is typing…*" />
+            )}
+          </ScrollView>
+
+          {tutorMode === "active" && sessionId && !sessionCompleted && (
+            <View style={styles.inputContainer}>
+              <MessageInput
+                onSend={handleSendMessage}
+                disabled={isTyping}
+                placeholder="Answer or ask anything…"
+              />
+            </View>
+          )}
+        </KeyboardAvoidingView>
+      </View>
+
+      {showConfetti && (
+        <ConfettiCannon
+          count={180}
+          origin={{ x: -10, y: 0 }}
+          fadeOut
         />
       )}
-
-      {/* 🟣 MCQ PHASE */}
-      {currentPhase.phase_type === "mcq" && (
-        <MCQChatScreen
-          item={currentPhase.phase_json}
-          studentId={currentPhase.student_id}
-          mcqId={currentPhase.phase_row_id}
-          correctAnswer={currentPhase.phase_json?.correct_answer}
-          reactOrderFinal={currentPhase.react_order_final}
-          phaseUniqueId={currentPhase.phase_row_id}
-          subject={currentPhase.subject}
-          isBookmarked={false}
-          mode="practice"
-        />
-      )}
-
-     
-    </View>
+    </MainLayout>
   );
-};
-
-return (
-  <MainLayout>
-    <View style={styles.container}>
-
-
-      {/* ───────── CHAT SCROLL ───────── */}
-      <KeyboardAvoidingView
-  style={{ flex: 1 }}
-  behavior={Platform.OS === "ios" ? "padding" : undefined}
->
-
-<ScrollView
-  ref={scrollViewRef}
-  style={{ flex: 1 }}
-  contentContainerStyle={{ paddingBottom: 120 }}
-  keyboardShouldPersistTaps="handled"
->
-
-  {/* ───── Selection / Phase content scrolls ───── */}
-  {!chatStarted && renderSelectionScreen()}
- {/* 2️⃣ Analytics comes AFTER selection */}
-{!chatStarted && showSubjectProgress && selectedSubject && user?.id && (
-  <View style={{ marginTop: 16 }}>
-    <View style={{ height: 1, backgroundColor: '#1c2730', marginBottom: 12 }} />
-    <SubjectProgressDashboard
-      student_id={user.id}
-      subject={selectedSubject}
-    />
-  </View>
-)}
-
-  {chatStarted && loadingPhase && (
-    <Text style={{ color: "#999", textAlign: "center", marginTop: 20 }}>
-      Loading…
-    </Text>
-  )}
-
-  {chatStarted && !loadingPhase && renderPhase()}
-
-  {/* ───── Discuss CTA (VISIBLE AFTER SCROLL) ───── */}
-{currentPhase && !sessionId && !isStartingDiscussion && (
-  <View style={styles.discussContainer}>
-    <TouchableOpacity
-      style={styles.discussButton}
-      onPress={handleDiscussWithParagraph}
-    >
-        <Text style={styles.discussButtonText}>
-          💬 Discuss with Paragraph AI Tutor
-        </Text>
-      </TouchableOpacity>
-    </View>
-  )}
-{isStartingDiscussion && (
-  <MentorBubbleReply markdownText="⏳ *Paragraph AI Mentor is starting discussion…*" />
-)}
-  {/* ───── Chat messages (only after chat starts) ───── */}
-  {conversation
-    .filter(msg => msg.role !== "system")
-    .map((msg, index) =>
-      msg.role === "student" ? (
-        <StudentBubble key={index} text={msg.content} />
-      ) : (
-        <MentorBubbleReply
-          key={index}
-          markdownText={
-            typeof msg.content === "string"
-              ? stripControlBlocks(msg.content)
-              : ""
-          }
-        />
-      )
-    )
-  }
-{/* 🔴 NEXT CBME CTA — INSERT HERE */}
-{sessionCompleted && (
-  <View style={styles.nextConceptContainer}>
-    <TouchableOpacity
-      style={styles.nextConceptButton}
-      onPress={() => {
-        setConversation([]);
-        setSessionCompleted(false);
-        setShowConfetti(false); // ✅ RESET HERE
-        setTutorMode("idle");
-        setSessionId(null);
-        setActiveMcqId(null);
-setIsStartingDiscussion(false); // 🔑 ADD THIS
-        // 🔑 Load next CBME phase
-         // 🔑 ADD THIS LINE HERE
-  setCurrentPhase(null);
-        hasRetriedRef.current = false; // 🔄 reset retry for next concept
-        handleStartChat();
-      }}
-    >
-      <Text style={styles.nextConceptText}>
-        ▶ Next CBME Concept
-      </Text>
-    </TouchableOpacity>
-  </View>
-)}
-
-  {isTyping && (
-    <MentorBubbleReply markdownText="💬 *Paragraph Mentor is typing…*" />
-  )}
-
-</ScrollView>
-
-{/* ───────── INPUT BAR (ONLY AFTER CHAT STARTS) ───────── */}
-{tutorMode === "active" && sessionId && !sessionCompleted && (
-  <View style={styles.inputContainer}>
-    <MessageInput
-      onSend={handleSendMessage}
-      disabled={isTyping}
-      placeholder="Answer or ask anything…"
-    />
-  </View>
-)}
-</KeyboardAvoidingView>
-    </View>
-    {/* 🎉 CONFETTI ON SESSION COMPLETE */}
-{showConfetti && (
-  <ConfettiCannon
-    count={180}
-    origin={{ x: -10, y: 0 }}
-    fadeOut
-  />
-)}
-
-  </MainLayout>
-);
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -583,62 +509,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 8,
   },
-pill: {
-  paddingHorizontal: 16,
-  paddingVertical: 10,
-  borderRadius: 999,            // 👈 pill shape like Practice
-  backgroundColor: '#0b141a',   // dark canvas
-  marginRight: 8,
-
-  borderWidth: 2,
-  borderColor: '#10b981',
-},
-
-
-pillSelected: {
-  backgroundColor: '#0d2017',   // dark green inner fill
-  borderColor: '#10b981',
-  borderWidth: 2,
-
-  shadowColor: '#10b981',
-  shadowOffset: { width: 0, height: 0 },
-  shadowOpacity: 0.55,
-  shadowRadius: 8,
-
-  elevation: 6,                 // Android glow
-},
-
+  pill: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: '#0b141a',
+    marginRight: 8,
+    borderWidth: 2,
+    borderColor: '#10b981',
+  },
+  pillSelected: {
+    backgroundColor: '#0d2017',
+    borderColor: '#10b981',
+    borderWidth: 2,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.55,
+    shadowRadius: 8,
+    elevation: 6,
+  },
   pillYear: {
-  borderRadius: 999,
-  borderWidth: 1.8,
-  backgroundColor: 'transparent',
-  borderColor: '#10b981',
-},
+    borderRadius: 999,
+    borderWidth: 1.8,
+    backgroundColor: 'transparent',
+    borderColor: '#10b981',
+  },
   pillYearSelected: {
     backgroundColor: '#065f46',
     borderColor: '#10b981',
   },
   pillSubject: {
-  borderRadius: 999,
-  borderWidth: 1.8,
-  backgroundColor: 'transparent',
-  borderColor: '#10b981',
-},
-
+    borderRadius: 999,
+    borderWidth: 1.8,
+    backgroundColor: 'transparent',
+    borderColor: '#10b981',
+  },
   pillSubjectSelected: {
     backgroundColor: '#0d9668',
     borderColor: '#10b981',
   },
-pillText: {
-  fontSize: 14,
-  fontWeight: '600',
-  color: '#10b981',
-},
-
-
-pillTextSelected: {
-  color: '#ffffff',
-},
+  pillText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#10b981',
+  },
+  pillTextSelected: {
+    color: '#ffffff',
+  },
   startButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -737,43 +654,38 @@ pillTextSelected: {
     backgroundColor: '#1c2730',
   },
   discussContainer: {
-  paddingHorizontal: 16,
-  paddingVertical: 20,
-  borderTopWidth: 1,
-  borderTopColor: "#1c2730",
-  backgroundColor: "#0b141a",
-},
-
-discussButton: {
-  paddingVertical: 14,
-  borderRadius: 10,
-  borderWidth: 1.5,
-  borderColor: "#10b981",
-  backgroundColor: "#0d2017",
-  alignItems: "center",
-},
-
-discussButtonText: {
-  color: "#10b981",
-  fontSize: 15,
-  fontWeight: "700",
-},
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#1c2730",
+    backgroundColor: "#0b141a",
+  },
+  discussButton: {
+    paddingVertical: 14,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: "#10b981",
+    backgroundColor: "#0d2017",
+    alignItems: "center",
+  },
+  discussButtonText: {
+    color: "#10b981",
+    fontSize: 15,
+    fontWeight: "700",
+  },
   nextConceptContainer: {
-  paddingVertical: 24,
-  alignItems: "center",
-},
-
-nextConceptButton: {
-  paddingVertical: 14,
-  paddingHorizontal: 32,
-  borderRadius: 24,
-  backgroundColor: "#10b981",
-},
-
-nextConceptText: {
-  color: "#ffffff",
-  fontSize: 16,
-  fontWeight: "700",
-},
-
+    paddingVertical: 24,
+    alignItems: "center",
+  },
+  nextConceptButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 24,
+    backgroundColor: "#10b981",
+  },
+  nextConceptText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "700",
+  },
 });
