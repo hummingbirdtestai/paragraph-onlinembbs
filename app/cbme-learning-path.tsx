@@ -1,5 +1,7 @@
+
+
 // app/cbme-learning-path.tsx
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,20 +9,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  Platform,
 } from 'react-native';
-import MainLayout from "@/components/MainLayout";
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
-  interpolate,
-  Extrapolate,
-} from 'react-native-reanimated';
-import { BookOpen, Award, Star, MapPin, Trophy, Sparkles } from 'lucide-react-native';
-
-
+import { BookOpen, Award, Star, Trophy, Sparkles, ChevronRight } from 'lucide-react-native';
+import MainLayout from "@/components/MainLayout";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -30,27 +22,30 @@ const YEARS = [
     yearFull: "MBBS First Year",
     subjects: ["Anatomy", "Physiology", "Biochemistry"],
     color: "#3b82f6",
-    darkColor: "#1e40af",
+    lightColor: "#60a5fa",
+    bgColor: "rgba(59, 130, 246, 0.1)",
+    borderColor: "rgba(59, 130, 246, 0.3)",
     icon: "book",
-    milestone: "Foundation",
   },
   {
     year: "Second Year",
     yearFull: "MBBS Second Year",
     subjects: ["Pathology", "Pharmacology", "Microbiology"],
     color: "#8b5cf6",
-    darkColor: "#5b21b6",
+    lightColor: "#a78bfa",
+    bgColor: "rgba(139, 92, 246, 0.1)",
+    borderColor: "rgba(139, 92, 246, 0.3)",
     icon: "lab",
-    milestone: "Core Sciences",
   },
   {
     year: "Third Year",
     yearFull: "MBBS Third Year",
     subjects: ["Forensic Medicine", "Community Medicine"],
     color: "#ec4899",
-    darkColor: "#9f1239",
+    lightColor: "#f472b6",
+    bgColor: "rgba(236, 72, 153, 0.1)",
+    borderColor: "rgba(236, 72, 153, 0.3)",
     icon: "research",
-    milestone: "Clinical Foundation",
   },
   {
     year: "Final Year",
@@ -71,9 +66,10 @@ const YEARS = [
       "Ophthalmology",
     ],
     color: "#10b981",
-    darkColor: "#047857",
+    lightColor: "#34d399",
+    bgColor: "rgba(16, 185, 129, 0.1)",
+    borderColor: "rgba(16, 185, 129, 0.3)",
     icon: "trophy",
-    milestone: "Clinical Mastery",
   },
 ];
 
@@ -83,8 +79,6 @@ interface LearningPathProps {
 
 export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps) {
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [expandedYear, setExpandedYear] = useState<number | null>(null);
-  const scrollViewRef = useRef<ScrollView>(null);
 
   const handleSubjectPress = (subject: string) => {
     setSelectedSubject(subject);
@@ -93,230 +87,225 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
     }
   };
 
-  const toggleYear = (index: number) => {
-    setExpandedYear(expandedYear === index ? null : index);
-  };
-
   return (
-      <MainLayout>
+    <MainLayout>
     <View style={styles.container}>
-      {/* Animated Background */}
+      {/* Background Gradient */}
       <LinearGradient
         colors={['#0f172a', '#1e293b', '#0f172a']}
         style={StyleSheet.absoluteFillObject}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
       />
 
-      {/* Floating Stars Background */}
-      <View style={styles.starsContainer}>
-        {[...Array(20)].map((_, i) => (
-          <View
-            key={i}
-            style={[
-              styles.star,
-              {
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                opacity: Math.random() * 0.5 + 0.2,
-              },
-            ]}
-          />
-        ))}
-      </View>
-
       <ScrollView
-        ref={scrollViewRef}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header Section */}
+        {/* Header */}
         <View style={styles.header}>
-          <View style={styles.headerBadge}>
+          <View style={styles.journeyBadge}>
             <Sparkles size={16} color="#fbbf24" />
-            <Text style={styles.headerBadgeText}>Your Journey</Text>
+            <Text style={styles.journeyBadgeText}>YOUR JOURNEY</Text>
           </View>
           <Text style={styles.headerTitle}>MBBS Learning Path</Text>
           <Text style={styles.headerSubtitle}>
-            Navigate through 4 years of medical excellence
+            Follow the path through 4 years of medical excellence
           </Text>
+        </View>
 
-          {/* Progress Stats */}
-          <View style={styles.statsRow}>
-            <View style={styles.statCard}>
-              <BookOpen size={20} color="#3b82f6" />
-              <Text style={styles.statNumber}>4.5</Text>
-              <Text style={styles.statLabel}>Years</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Star size={20} color="#fbbf24" />
-              <Text style={styles.statNumber}>21</Text>
-              <Text style={styles.statLabel}>Subjects</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Trophy size={20} color="#10b981" />
-              <Text style={styles.statNumber}>0%</Text>
-              <Text style={styles.statLabel}>Complete</Text>
-            </View>
+        {/* Flowchart Container */}
+        <View style={styles.flowchartContainer}>
+          {/* Vertical Timeline Line (Right Side) */}
+          <View style={styles.timelineLineContainer}>
+            <LinearGradient
+              colors={['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#fbbf24']}
+              style={styles.timelineLine}
+            />
           </View>
-        </View>
 
-        {/* Journey Start Marker */}
-        <View style={styles.startMarker}>
-          <LinearGradient
-            colors={['#10b981', '#059669']}
-            style={styles.startMarkerGradient}
-          >
-            <MapPin size={24} color="#ffffff" />
-          </LinearGradient>
-          <View style={styles.startMarkerLine} />
-          <Text style={styles.startMarkerText}>Journey Begins</Text>
-        </View>
+          {/* Start Node */}
+          <View style={styles.startNode}>
+            <View style={styles.startNodeCircle}>
+              <LinearGradient
+                colors={['#10b981', '#059669']}
+                style={styles.startNodeGradient}
+              >
+                <Sparkles size={20} color="#ffffff" />
+              </LinearGradient>
+            </View>
+            <View style={styles.startNodeContent}>
+              <Text style={styles.startNodeText}>Start Your Journey</Text>
+            </View>
+            <View style={styles.connectionLine} />
+          </View>
 
-        {/* Years Timeline */}
-        <View style={styles.timeline}>
-          {YEARS.map((yearData, yearIndex) => {
-            const isExpanded = expandedYear === yearIndex;
-            const isLeft = yearIndex % 2 === 0;
-
-            return (
-              <View key={yearIndex} style={styles.yearContainer}>
-                {/* Connecting Path */}
-                <View style={[styles.pathConnector, isLeft ? styles.pathLeft : styles.pathRight]}>
-                  <View style={styles.pathDots}>
-                    {[...Array(8)].map((_, i) => (
-                      <View key={i} style={styles.pathDot} />
-                    ))}
-                  </View>
-                </View>
-
-                {/* Year Milestone Card */}
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={() => toggleYear(yearIndex)}
+          {/* Years and Subjects Flow */}
+          {YEARS.map((yearData, yearIndex) => (
+            <View key={yearIndex} style={styles.yearSection}>
+              {/* Year Block */}
+              <View style={styles.yearBlockWrapper}>
+                <View
                   style={[
-                    styles.milestoneCard,
-                    isLeft ? styles.milestoneLeft : styles.milestoneRight,
+                    styles.yearBlock,
+                    { backgroundColor: yearData.bgColor, borderColor: yearData.borderColor },
                   ]}
                 >
                   <LinearGradient
-                    colors={[yearData.color, yearData.darkColor]}
-                    style={styles.milestoneGradient}
+                    colors={[yearData.color, yearData.lightColor]}
                     start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  >
-                    {/* Year Badge */}
-                    <View style={styles.yearBadgeContainer}>
-                      <View style={styles.yearBadge}>
-                        <Text style={styles.yearBadgeText}>Year {yearIndex + 1}</Text>
-                      </View>
-                      <View style={styles.milestoneIconContainer}>
-                        {yearIndex === 0 && <BookOpen size={28} color="#ffffff" />}
-                        {yearIndex === 1 && <Star size={28} color="#ffffff" />}
-                        {yearIndex === 2 && <Award size={28} color="#ffffff" />}
-                        {yearIndex === 3 && <Trophy size={28} color="#ffffff" />}
-                      </View>
-                    </View>
-
-                    {/* Year Title */}
-                    <Text style={styles.milestoneTitle}>{yearData.year}</Text>
-                    <Text style={styles.milestoneMilestone}>{yearData.milestone}</Text>
-
-                    {/* Subject Count */}
-                    <View style={styles.subjectCount}>
-                      <View style={styles.subjectCountDot} />
-                      <Text style={styles.subjectCountText}>
-                        {yearData.subjects.length} Subjects
-                      </Text>
-                    </View>
-
-                    {/* Expand Indicator */}
-                    <View style={styles.expandIndicator}>
-                      <Text style={styles.expandText}>
-                        {isExpanded ? 'Tap to collapse' : 'Tap to explore'}
-                      </Text>
-                    </View>
-                  </LinearGradient>
-
-                  {/* Decorative Corner */}
-                  <View style={[styles.cardCorner, { backgroundColor: yearData.color }]} />
-                </TouchableOpacity>
-
-                {/* Subjects Grid - Expanded */}
-                {isExpanded && (
-                  <View style={[styles.subjectsGrid, isLeft ? styles.subjectsLeft : styles.subjectsRight]}>
-                    <View style={styles.subjectsHeader}>
-                      <Text style={styles.subjectsHeaderText}>Choose Your Path</Text>
-                    </View>
-                    {yearData.subjects.map((subject, subjectIndex) => (
-                      <TouchableOpacity
-                        key={subjectIndex}
-                        style={[
-                          styles.subjectPill,
-                          selectedSubject === subject && styles.subjectPillSelected,
-                        ]}
-                        onPress={() => handleSubjectPress(subject)}
-                        activeOpacity={0.8}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.yearBlockAccent}
+                  />
+                  <View style={styles.yearBlockContent}>
+                    <View style={styles.yearBlockHeader}>
+                      <View
+                        style={[styles.yearIconCircle, { backgroundColor: yearData.bgColor }]}
                       >
-                        <LinearGradient
-                          colors={
-                            selectedSubject === subject
-                              ? [yearData.color, yearData.darkColor]
-                              : ['#1e293b', '#0f172a']
-                          }
-                          style={styles.subjectPillGradient}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                        >
-                          <View style={styles.subjectPillIcon}>
-                            <BookOpen 
-                              size={16} 
-                              color={selectedSubject === subject ? '#ffffff' : yearData.color} 
-                            />
-                          </View>
+                        {yearIndex === 0 && <BookOpen size={20} color={yearData.color} />}
+                        {yearIndex === 1 && <Star size={20} color={yearData.color} />}
+                        {yearIndex === 2 && <Award size={20} color={yearData.color} />}
+                        {yearIndex === 3 && <Trophy size={20} color={yearData.color} />}
+                      </View>
+                      <View style={styles.yearBlockTextContainer}>
+                        <Text style={[styles.yearBlockTitle, { color: yearData.color }]}>
+                          {yearData.year}
+                        </Text>
+                        <Text style={styles.yearBlockSubjects}>
+                          {yearData.subjects.length} Subjects
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  {/* Connection Point */}
+                  <View
+                    style={[styles.yearConnectionPoint, { backgroundColor: yearData.color }]}
+                  />
+                </View>
+                <View style={[styles.horizontalConnector, { backgroundColor: yearData.color }]} />
+              </View>
+
+              {/* Subject Blocks */}
+              <View style={styles.subjectsContainer}>
+                {yearData.subjects.map((subject, subjectIndex) => {
+                  const isSelected = selectedSubject === subject;
+                  const isLast = subjectIndex === yearData.subjects.length - 1;
+
+                  return (
+                    <View key={subjectIndex} style={styles.subjectWrapper}>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => handleSubjectPress(subject)}
+                        style={[
+                          styles.subjectBlock,
+                          {
+                            backgroundColor: isSelected
+                              ? yearData.bgColor
+                              : 'rgba(30, 41, 59, 0.4)',
+                            borderColor: isSelected
+                              ? yearData.borderColor
+                              : 'rgba(51, 65, 85, 0.6)',
+                            borderWidth: isSelected ? 2 : 1,
+                          },
+                        ]}
+                      >
+                        {isSelected && (
+                          <LinearGradient
+                            colors={[yearData.color, yearData.lightColor]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.subjectBlockAccent}
+                          />
+                        )}
+                        <View style={styles.subjectBlockContent}>
+                          <View
+                            style={[
+                              styles.subjectDot,
+                              {
+                                backgroundColor: isSelected
+                                  ? yearData.color
+                                  : 'rgba(100, 116, 139, 0.6)',
+                              },
+                            ]}
+                          />
                           <Text
                             style={[
-                              styles.subjectPillText,
-                              selectedSubject === subject && styles.subjectPillTextSelected,
-                              { color: selectedSubject === subject ? '#ffffff' : yearData.color },
+                              styles.subjectText,
+                              { color: isSelected ? yearData.color : '#94a3b8' },
                             ]}
                           >
                             {subject}
                           </Text>
-                          {selectedSubject === subject && (
-                            <View style={styles.selectedIndicator}>
-                              <Star size={14} color="#fbbf24" fill="#fbbf24" />
+                          {isSelected && (
+                            <View style={styles.selectedBadge}>
+                              <ChevronRight size={16} color={yearData.color} />
                             </View>
                           )}
-                        </LinearGradient>
+                        </View>
+                        {/* Connection Point */}
+                        <View
+                          style={[
+                            styles.subjectConnectionPoint,
+                            {
+                              backgroundColor: isSelected
+                                ? yearData.color
+                                : 'rgba(51, 65, 85, 0.8)',
+                            },
+                          ]}
+                        />
                       </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
+                      {!isLast && (
+                        <View
+                          style={[
+                            styles.subjectConnector,
+                            { backgroundColor: yearData.color, opacity: 0.3 },
+                          ]}
+                        />
+                      )}
+                      <View
+                        style={[
+                          styles.horizontalConnectorSmall,
+                          { backgroundColor: yearData.color, opacity: 0.5 },
+                        ]}
+                      />
+                    </View>
+                  );
+                })}
               </View>
-            );
-          })}
-        </View>
 
-        {/* Journey End Marker */}
-        <View style={styles.endMarker}>
-          <View style={styles.endMarkerLine} />
-          <LinearGradient
-            colors={['#f59e0b', '#d97706']}
-            style={styles.endMarkerGradient}
-          >
-            <Trophy size={32} color="#ffffff" />
-          </LinearGradient>
-          <Text style={styles.endMarkerTitle}>MBBS Complete!</Text>
-          <Text style={styles.endMarkerSubtitle}>Your medical journey continues...</Text>
+              {/* Year to Year Connector */}
+              {yearIndex < YEARS.length - 1 && (
+                <View
+                  style={[
+                    styles.yearToYearConnector,
+                    { backgroundColor: YEARS[yearIndex + 1].color, opacity: 0.4 },
+                  ]}
+                />
+              )}
+            </View>
+          ))}
+
+          {/* End Node */}
+          <View style={styles.endNode}>
+            <View style={styles.endNodeCircle}>
+              <LinearGradient
+                colors={['#f59e0b', '#d97706']}
+                style={styles.endNodeGradient}
+              >
+                <Trophy size={24} color="#ffffff" />
+              </LinearGradient>
+            </View>
+            <View style={styles.endNodeContent}>
+              <Text style={styles.endNodeTitle}>Journey Complete!</Text>
+              <Text style={styles.endNodeSubtitle}>MBBS Mastery Achieved</Text>
+            </View>
+          </View>
         </View>
 
         {/* Bottom Spacer */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </View>
-          </MainLayout>
+      </MainLayout>
   );
 }
 
@@ -326,405 +315,343 @@ const styles = StyleSheet.create({
     backgroundColor: '#0f172a',
   },
 
-  starsContainer: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-  },
-
-  star: {
-    position: 'absolute',
-    width: 2,
-    height: 2,
-    backgroundColor: '#ffffff',
-    borderRadius: 1,
-  },
-
   scrollView: {
     flex: 1,
   },
 
   scrollContent: {
     paddingTop: 24,
-    paddingBottom: 60,
+    paddingBottom: 40,
   },
 
   // HEADER
   header: {
     paddingHorizontal: 24,
-    marginBottom: 40,
+    marginBottom: 32,
   },
 
-  headerBadge: {
+  journeyBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
     backgroundColor: 'rgba(251, 191, 36, 0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(251, 191, 36, 0.3)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(251, 191, 36, 0.4)',
     marginBottom: 16,
   },
 
-  headerBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
+  journeyBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
     color: '#fbbf24',
     marginLeft: 6,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
 
   headerTitle: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: '900',
     color: '#ffffff',
     marginBottom: 8,
-    letterSpacing: -1,
+    letterSpacing: -0.5,
   },
 
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#94a3b8',
-    lineHeight: 24,
+    lineHeight: 22,
+  },
+
+  // FLOWCHART
+  flowchartContainer: {
+    paddingLeft: 24,
+    paddingRight: 80,
+    position: 'relative',
+  },
+
+  // TIMELINE LINE (RIGHT SIDE)
+  timelineLineContainer: {
+    position: 'absolute',
+    right: 32,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    zIndex: 0,
+  },
+
+  timelineLine: {
+    flex: 1,
+    borderRadius: 2,
+  },
+
+  // START NODE
+  startNode: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 32,
+    position: 'relative',
+  },
+
+  startNodeCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+
+  startNodeGradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  startNodeContent: {
+    marginLeft: 16,
+    flex: 1,
+  },
+
+  startNodeText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#10b981',
+    letterSpacing: 0.5,
+  },
+
+  connectionLine: {
+    position: 'absolute',
+    right: -48,
+    width: 32,
+    height: 2,
+    backgroundColor: '#10b981',
+    opacity: 0.5,
+  },
+
+  // YEAR SECTION
+  yearSection: {
     marginBottom: 24,
   },
 
-  // STATS ROW
-  statsRow: {
-    flexDirection: 'row',
-    gap: 12,
+  yearBlockWrapper: {
+    position: 'relative',
+    marginBottom: 16,
   },
 
-  statCard: {
-    flex: 1,
-    backgroundColor: 'rgba(30, 41, 59, 0.5)',
+  yearBlock: {
     borderRadius: 16,
+    borderWidth: 2,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+
+  yearBlockAccent: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+  },
+
+  yearBlockContent: {
     padding: 16,
+    paddingLeft: 20,
+  },
+
+  yearBlockHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(51, 65, 85, 0.6)',
   },
 
-  statNumber: {
-    fontSize: 24,
+  yearIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  yearBlockTextContainer: {
+    marginLeft: 14,
+    flex: 1,
+  },
+
+  yearBlockTitle: {
+    fontSize: 20,
     fontWeight: '800',
-    color: '#ffffff',
-    marginTop: 8,
-    marginBottom: 4,
+    marginBottom: 2,
+    letterSpacing: -0.3,
   },
 
-  statLabel: {
-    fontSize: 12,
+  yearBlockSubjects: {
+    fontSize: 13,
     color: '#64748b',
     fontWeight: '600',
   },
 
-  // START MARKER
-  startMarker: {
-    alignItems: 'center',
-    marginBottom: 32,
-    paddingHorizontal: 24,
+  yearConnectionPoint: {
+    position: 'absolute',
+    right: -12,
+    top: '50%',
+    marginTop: -6,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 3,
+    borderColor: '#0f172a',
+    zIndex: 2,
   },
 
-  startMarkerGradient: {
+  horizontalConnector: {
+    position: 'absolute',
+    right: -48,
+    top: '50%',
+    marginTop: -1,
+    width: 36,
+    height: 2,
+    zIndex: 1,
+  },
+
+  // SUBJECTS
+  subjectsContainer: {
+    paddingLeft: 32,
+  },
+
+  subjectWrapper: {
+    position: 'relative',
+  },
+
+  subjectBlock: {
+    borderRadius: 12,
+    marginBottom: 2,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+
+  subjectBlockAccent: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+  },
+
+  subjectBlockContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    paddingLeft: 16,
+  },
+
+  subjectDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 12,
+  },
+
+  subjectText: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+
+  selectedBadge: {
+    marginLeft: 8,
+  },
+
+  subjectConnectionPoint: {
+    position: 'absolute',
+    right: -8,
+    top: '50%',
+    marginTop: -4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#0f172a',
+    zIndex: 2,
+  },
+
+  subjectConnector: {
+    position: 'absolute',
+    right: -8,
+    top: '50%',
+    width: 2,
+    height: '100%',
+    zIndex: 0,
+  },
+
+  horizontalConnectorSmall: {
+    position: 'absolute',
+    right: -48,
+    top: '50%',
+    marginTop: -0.5,
+    width: 40,
+    height: 1,
+    zIndex: 1,
+  },
+
+  yearToYearConnector: {
+    width: 2,
+    height: 24,
+    marginLeft: 21,
+    marginVertical: 8,
+  },
+
+  // END NODE
+  endNode: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 32,
+    paddingRight: 48,
+  },
+
+  endNodeCircle: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
+    overflow: 'hidden',
+    shadowColor: '#f59e0b',
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.5,
     shadowRadius: 12,
     elevation: 8,
   },
 
-  startMarkerLine: {
-    width: 3,
-    height: 40,
-    backgroundColor: '#334155',
-    marginVertical: 12,
-  },
-
-  startMarkerText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#10b981',
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-  },
-
-  // TIMELINE
-  timeline: {
-    paddingHorizontal: 24,
-  },
-
-  yearContainer: {
-    marginBottom: 40,
-    position: 'relative',
-  },
-
-  // PATH CONNECTOR
-  pathConnector: {
-    position: 'absolute',
-    top: 0,
-    width: SCREEN_WIDTH * 0.3,
-    height: 120,
-    zIndex: 0,
-  },
-
-  pathLeft: {
-    left: '10%',
-  },
-
-  pathRight: {
-    right: '10%',
-  },
-
-  pathDots: {
+  endNodeGradient: {
     flex: 1,
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-
-  pathDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#334155',
-  },
-
-  // MILESTONE CARD
-  milestoneCard: {
-    width: SCREEN_WIDTH - 48,
-    marginBottom: 16,
-    borderRadius: 24,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 10,
-  },
-
-  milestoneLeft: {
-    alignSelf: 'flex-start',
-  },
-
-  milestoneRight: {
-    alignSelf: 'flex-end',
-  },
-
-  milestoneGradient: {
-    padding: 24,
-  },
-
-  yearBadgeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-
-  yearBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-
-  yearBadgeText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#ffffff',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-
-  milestoneIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
 
-  milestoneTitle: {
-    fontSize: 28,
+  endNodeContent: {
+    marginLeft: 16,
+    flex: 1,
+  },
+
+  endNodeTitle: {
+    fontSize: 20,
     fontWeight: '900',
     color: '#ffffff',
     marginBottom: 4,
-    letterSpacing: -0.5,
+    letterSpacing: -0.3,
   },
 
-  milestoneMilestone: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontWeight: '600',
-    marginBottom: 16,
-  },
-
-  subjectCount: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-
-  subjectCountDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    marginRight: 8,
-  },
-
-  subjectCountText: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontWeight: '600',
-  },
-
-  expandIndicator: {
-    marginTop: 8,
-  },
-
-  expandText: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontWeight: '600',
-    fontStyle: 'italic',
-  },
-
-  cardCorner: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    width: 60,
-    height: 60,
-    opacity: 0.15,
-    borderBottomLeftRadius: 60,
-  },
-
-  // SUBJECTS GRID
-  subjectsGrid: {
-    backgroundColor: 'rgba(15, 23, 42, 0.6)',
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(51, 65, 85, 0.5)',
-  },
-
-  subjectsLeft: {
-    marginLeft: 8,
-  },
-
-  subjectsRight: {
-    marginRight: 8,
-  },
-
-  subjectsHeader: {
-    marginBottom: 12,
-  },
-
-  subjectsHeaderText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#94a3b8',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-
-  // SUBJECT PILLS
-  subjectPill: {
-    marginBottom: 10,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-
-  subjectPillGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(51, 65, 85, 0.8)',
-    borderRadius: 16,
-  },
-
-  subjectPillSelected: {
-    shadowColor: '#3b82f6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-
-  subjectPillIcon: {
-    marginRight: 12,
-  },
-
-  subjectPillText: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 0.2,
-  },
-
-  subjectPillTextSelected: {
-    color: '#ffffff',
-  },
-
-  selectedIndicator: {
-    marginLeft: 8,
-  },
-
-  // END MARKER
-  endMarker: {
-    alignItems: 'center',
-    marginTop: 40,
-    paddingHorizontal: 24,
-  },
-
-  endMarkerLine: {
-    width: 3,
-    height: 60,
-    backgroundColor: '#334155',
-    marginBottom: 16,
-  },
-
-  endMarkerGradient: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#f59e0b',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 12,
-  },
-
-  endMarkerTitle: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: '#ffffff',
-    marginBottom: 8,
-    letterSpacing: -0.5,
-  },
-
-  endMarkerSubtitle: {
-    fontSize: 14,
+  endNodeSubtitle: {
+    fontSize: 13,
     color: '#64748b',
-    fontStyle: 'italic',
+    fontWeight: '600',
   },
 
   bottomSpacer: {
-    height: 60,
+    height: 40,
   },
 });
