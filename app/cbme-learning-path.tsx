@@ -21,30 +21,27 @@ const YEARS = [
     year: "First Year",
     yearFull: "MBBS First Year",
     subjects: ["Anatomy", "Physiology", "Biochemistry"],
-    color: "#3b82f6",
-    lightColor: "#60a5fa",
-    bgColor: "rgba(59, 130, 246, 0.1)",
-    borderColor: "rgba(59, 130, 246, 0.3)",
+    color: "#4A90E2",
+    bgColor: "rgba(74, 144, 226, 0.08)",
+    borderColor: "rgba(74, 144, 226, 0.35)",
     icon: "book",
   },
   {
     year: "Second Year",
     yearFull: "MBBS Second Year",
     subjects: ["Pathology", "Pharmacology", "Microbiology"],
-    color: "#8b5cf6",
-    lightColor: "#a78bfa",
-    bgColor: "rgba(139, 92, 246, 0.1)",
-    borderColor: "rgba(139, 92, 246, 0.3)",
+    color: "#B8D4A8",
+    bgColor: "rgba(184, 212, 168, 0.08)",
+    borderColor: "rgba(184, 212, 168, 0.35)",
     icon: "lab",
   },
   {
     year: "Third Year",
     yearFull: "MBBS Third Year",
     subjects: ["Forensic Medicine", "Community Medicine"],
-    color: "#ec4899",
-    lightColor: "#f472b6",
-    bgColor: "rgba(236, 72, 153, 0.1)",
-    borderColor: "rgba(236, 72, 153, 0.3)",
+    color: "#E91E63",
+    bgColor: "rgba(233, 30, 99, 0.08)",
+    borderColor: "rgba(233, 30, 99, 0.35)",
     icon: "research",
   },
   {
@@ -65,62 +62,61 @@ const YEARS = [
       "ENT",
       "Ophthalmology",
     ],
-    color: "#10b981",
-    lightColor: "#34d399",
-    bgColor: "rgba(16, 185, 129, 0.1)",
-    borderColor: "rgba(16, 185, 129, 0.3)",
+    color: "#25D366",
+    bgColor: "rgba(37, 211, 102, 0.08)",
+    borderColor: "rgba(37, 211, 102, 0.35)",
     icon: "trophy",
   },
 ];
 
 const SUBJECT_COLORS: Record<string, any> = {
-  "Anatomy": { color: "#3b82f6", lightColor: "#60a5fa", bgColor: "rgba(59, 130, 246, 0.12)", borderColor: "rgba(59, 130, 246, 0.4)" },
-  "Physiology": { color: "#06b6d4", lightColor: "#22d3ee", bgColor: "rgba(6, 182, 212, 0.12)", borderColor: "rgba(6, 182, 212, 0.4)" },
-  "Biochemistry": { color: "#8b5cf6", lightColor: "#a78bfa", bgColor: "rgba(139, 92, 246, 0.12)", borderColor: "rgba(139, 92, 246, 0.4)" },
-  "Pathology": { color: "#ec4899", lightColor: "#f472b6", bgColor: "rgba(236, 72, 153, 0.12)", borderColor: "rgba(236, 72, 153, 0.4)" },
-  "Pharmacology": { color: "#f59e0b", lightColor: "#fbbf24", bgColor: "rgba(245, 158, 11, 0.12)", borderColor: "rgba(245, 158, 11, 0.4)" },
-  "Microbiology": { color: "#10b981", lightColor: "#34d399", bgColor: "rgba(16, 185, 129, 0.12)", borderColor: "rgba(16, 185, 129, 0.4)" },
-  "Forensic Medicine": { color: "#6366f1", lightColor: "#818cf8", bgColor: "rgba(99, 102, 241, 0.12)", borderColor: "rgba(99, 102, 241, 0.4)" },
-  "Community Medicine": { color: "#14b8a6", lightColor: "#2dd4bf", bgColor: "rgba(20, 184, 166, 0.12)", borderColor: "rgba(20, 184, 166, 0.4)" },
-  "General Medicine": { color: "#ef4444", lightColor: "#f87171", bgColor: "rgba(239, 68, 68, 0.12)", borderColor: "rgba(239, 68, 68, 0.4)" },
-  "Pediatrics": { color: "#8b5cf6", lightColor: "#a78bfa", bgColor: "rgba(139, 92, 246, 0.12)", borderColor: "rgba(139, 92, 246, 0.4)" },
-  "Psychiatry": { color: "#06b6d4", lightColor: "#22d3ee", bgColor: "rgba(6, 182, 212, 0.12)", borderColor: "rgba(6, 182, 212, 0.4)" },
-  "Radiodiagnosis": { color: "#ec4899", lightColor: "#f472b6", bgColor: "rgba(236, 72, 153, 0.12)", borderColor: "rgba(236, 72, 153, 0.4)" },
-  "Radiotherapy": { color: "#f59e0b", lightColor: "#fbbf24", bgColor: "rgba(245, 158, 11, 0.12)", borderColor: "rgba(245, 158, 11, 0.4)" },
-  "Dermatology": { color: "#10b981", lightColor: "#34d399", bgColor: "rgba(16, 185, 129, 0.12)", borderColor: "rgba(16, 185, 129, 0.4)" },
-  "Gynecology": { color: "#ec4899", lightColor: "#f472b6", bgColor: "rgba(236, 72, 153, 0.12)", borderColor: "rgba(236, 72, 153, 0.4)" },
-  "Obstetrics": { color: "#f472b6", lightColor: "#fbcfe8", bgColor: "rgba(244, 114, 182, 0.12)", borderColor: "rgba(244, 114, 182, 0.4)" },
-  "General Surgery": { color: "#ef4444", lightColor: "#f87171", bgColor: "rgba(239, 68, 68, 0.12)", borderColor: "rgba(239, 68, 68, 0.4)" },
-  "Anaesthesiology": { color: "#6366f1", lightColor: "#818cf8", bgColor: "rgba(99, 102, 241, 0.12)", borderColor: "rgba(99, 102, 241, 0.4)" },
-  "Orthopaedics": { color: "#f59e0b", lightColor: "#fbbf24", bgColor: "rgba(245, 158, 11, 0.12)", borderColor: "rgba(245, 158, 11, 0.4)" },
-  "ENT": { color: "#14b8a6", lightColor: "#2dd4bf", bgColor: "rgba(20, 184, 166, 0.12)", borderColor: "rgba(20, 184, 166, 0.4)" },
-  "Ophthalmology": { color: "#3b82f6", lightColor: "#60a5fa", bgColor: "rgba(59, 130, 246, 0.12)", borderColor: "rgba(59, 130, 246, 0.4)" },
+  "Anatomy": { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)", borderColor: "rgba(74, 144, 226, 0.35)" },
+  "Physiology": { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)", borderColor: "rgba(37, 211, 102, 0.35)" },
+  "Biochemistry": { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)", borderColor: "rgba(184, 212, 168, 0.35)" },
+  "Pathology": { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)", borderColor: "rgba(233, 30, 99, 0.35)" },
+  "Pharmacology": { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)", borderColor: "rgba(255, 152, 0, 0.35)" },
+  "Microbiology": { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)", borderColor: "rgba(37, 211, 102, 0.35)" },
+  "Forensic Medicine": { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)", borderColor: "rgba(74, 144, 226, 0.35)" },
+  "Community Medicine": { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)", borderColor: "rgba(184, 212, 168, 0.35)" },
+  "General Medicine": { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)", borderColor: "rgba(233, 30, 99, 0.35)" },
+  "Pediatrics": { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)", borderColor: "rgba(255, 215, 0, 0.35)" },
+  "Psychiatry": { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)", borderColor: "rgba(74, 144, 226, 0.35)" },
+  "Radiodiagnosis": { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)", borderColor: "rgba(255, 152, 0, 0.35)" },
+  "Radiotherapy": { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)", borderColor: "rgba(233, 30, 99, 0.35)" },
+  "Dermatology": { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)", borderColor: "rgba(37, 211, 102, 0.35)" },
+  "Gynecology": { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)", borderColor: "rgba(255, 215, 0, 0.35)" },
+  "Obstetrics": { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)", borderColor: "rgba(184, 212, 168, 0.35)" },
+  "General Surgery": { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)", borderColor: "rgba(233, 30, 99, 0.35)" },
+  "Anaesthesiology": { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)", borderColor: "rgba(74, 144, 226, 0.35)" },
+  "Orthopaedics": { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)", borderColor: "rgba(255, 152, 0, 0.35)" },
+  "ENT": { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)", borderColor: "rgba(37, 211, 102, 0.35)" },
+  "Ophthalmology": { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)", borderColor: "rgba(255, 215, 0, 0.35)" },
 };
 
 const CHAPTER_COLORS = [
-  { color: "#3b82f6", lightColor: "#60a5fa", glowColor: "rgba(59, 130, 246, 0.6)" },
-  { color: "#8b5cf6", lightColor: "#a78bfa", glowColor: "rgba(139, 92, 246, 0.6)" },
-  { color: "#ec4899", lightColor: "#f472b6", glowColor: "rgba(236, 72, 153, 0.6)" },
-  { color: "#f59e0b", lightColor: "#fbbf24", glowColor: "rgba(245, 158, 11, 0.6)" },
-  { color: "#10b981", lightColor: "#34d399", glowColor: "rgba(16, 185, 129, 0.6)" },
-  { color: "#06b6d4", lightColor: "#22d3ee", glowColor: "rgba(6, 182, 212, 0.6)" },
-  { color: "#6366f1", lightColor: "#818cf8", glowColor: "rgba(99, 102, 241, 0.6)" },
-  { color: "#ef4444", lightColor: "#f87171", glowColor: "rgba(239, 68, 68, 0.6)" },
-  { color: "#14b8a6", lightColor: "#2dd4bf", glowColor: "rgba(20, 184, 166, 0.6)" },
-  { color: "#f97316", lightColor: "#fb923c", glowColor: "rgba(249, 115, 22, 0.6)" },
+  { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)" },
+  { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)" },
+  { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)" },
+  { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)" },
+  { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)" },
+  { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)" },
+  { color: "#9C27B0", bgColor: "rgba(156, 39, 176, 0.08)" },
+  { color: "#00BCD4", bgColor: "rgba(0, 188, 212, 0.08)" },
+  { color: "#FF5722", bgColor: "rgba(255, 87, 34, 0.08)" },
+  { color: "#607D8B", bgColor: "rgba(96, 125, 139, 0.08)" },
 ];
 
 const TOPIC_COLORS = [
-  { color: "#60a5fa", lightColor: "#93c5fd", glowColor: "rgba(96, 165, 250, 0.8)", bgColor: "rgba(96, 165, 250, 0.15)" },
-  { color: "#a78bfa", lightColor: "#c4b5fd", glowColor: "rgba(167, 139, 250, 0.8)", bgColor: "rgba(167, 139, 250, 0.15)" },
-  { color: "#f472b6", lightColor: "#f9a8d4", glowColor: "rgba(244, 114, 182, 0.8)", bgColor: "rgba(244, 114, 182, 0.15)" },
-  { color: "#fbbf24", lightColor: "#fcd34d", glowColor: "rgba(251, 191, 36, 0.8)", bgColor: "rgba(251, 191, 36, 0.15)" },
-  { color: "#34d399", lightColor: "#6ee7b7", glowColor: "rgba(52, 211, 153, 0.8)", bgColor: "rgba(52, 211, 153, 0.15)" },
-  { color: "#22d3ee", lightColor: "#67e8f9", glowColor: "rgba(34, 211, 238, 0.8)", bgColor: "rgba(34, 211, 238, 0.15)" },
-  { color: "#818cf8", lightColor: "#a5b4fc", glowColor: "rgba(129, 140, 248, 0.8)", bgColor: "rgba(129, 140, 248, 0.15)" },
-  { color: "#fb923c", lightColor: "#fdba74", glowColor: "rgba(251, 146, 60, 0.8)", bgColor: "rgba(251, 146, 60, 0.15)" },
-  { color: "#2dd4bf", lightColor: "#5eead4", glowColor: "rgba(45, 212, 191, 0.8)", bgColor: "rgba(45, 212, 191, 0.15)" },
-  { color: "#f87171", lightColor: "#fca5a5", glowColor: "rgba(248, 113, 113, 0.8)", bgColor: "rgba(248, 113, 113, 0.15)" },
+  { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)" },
+  { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)" },
+  { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)" },
+  { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)" },
+  { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)" },
+  { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)" },
+  { color: "#9C27B0", bgColor: "rgba(156, 39, 176, 0.08)" },
+  { color: "#00BCD4", bgColor: "rgba(0, 188, 212, 0.08)" },
+  { color: "#FF5722", bgColor: "rgba(255, 87, 34, 0.08)" },
+  { color: "#607D8B", bgColor: "rgba(96, 125, 139, 0.08)" },
 ];
 
 interface LearningPathProps {
@@ -210,11 +206,6 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
 
     return (
       <View style={styles.container}>
-        <LinearGradient
-          colors={['#0a0f1e', '#0f172a', '#1e1b4b', '#0f172a']}
-          style={StyleSheet.absoluteFillObject}
-        />
-
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -227,19 +218,19 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
               style={styles.backButton}
               activeOpacity={0.7}
             >
-              <ArrowLeft size={20} color={subjectColor.color} />
+              <ArrowLeft size={18} color={subjectColor.color} />
               <Text style={[styles.backButtonText, { color: subjectColor.color }]}>
                 Back to Subjects
               </Text>
             </TouchableOpacity>
 
             <View style={[styles.journeyBadge, { backgroundColor: subjectColor.bgColor, borderColor: subjectColor.borderColor }]}>
-              <Sparkles size={16} color={subjectColor.color} />
+              <Sparkles size={14} color={subjectColor.color} />
               <Text style={[styles.journeyBadgeText, { color: subjectColor.color }]}>YOUR JOURNEY</Text>
             </View>
             <Text style={styles.headerTitle}>{selectedSubject}</Text>
             <Text style={styles.headerSubtitle}>
-              Follow your personalized learning path through vibrant chapters
+              Follow your personalized learning path through the curriculum
             </Text>
           </View>
 
@@ -261,73 +252,50 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
           {/* Subject Progress Flowchart */}
           {!loading && !error && subjectProgress && (
             <View style={styles.flowchartContainer}>
-              {/* Vertical Timeline Line (Right Side) - Multicolor */}
-              <View style={styles.timelineLineContainer}>
-                <LinearGradient
-                  colors={CHAPTER_COLORS.map(c => c.color)}
-                  style={styles.timelineLine}
-                />
+              {/* Vertical Timeline Line (Right Side) */}
+              <View style={[styles.timelineLineContainer]}>
+                <View style={[styles.timelineLine, { backgroundColor: subjectColor.borderColor }]} />
               </View>
 
               {/* Start Node */}
               <View style={styles.startNode}>
-                <View style={[styles.startNodeCircle, { shadowColor: subjectColor.color }]}>
-                  <LinearGradient
-                    colors={[subjectColor.color, subjectColor.lightColor]}
-                    style={styles.startNodeGradient}
-                  >
-                    <Sparkles size={20} color="#ffffff" />
-                  </LinearGradient>
+                <View style={[styles.startNodeCircle, { backgroundColor: subjectColor.color }]}>
+                  <Sparkles size={16} color="#ffffff" />
                 </View>
                 <View style={styles.startNodeContent}>
-                  <Text style={[styles.startNodeText, { color: subjectColor.lightColor }]}>
+                  <Text style={[styles.startNodeText, { color: subjectColor.color }]}>
                     Start Learning {selectedSubject}
                   </Text>
                 </View>
-                <View style={[styles.connectionLine, { backgroundColor: subjectColor.color }]} />
+                <View style={[styles.connectionLine, { backgroundColor: subjectColor.borderColor }]} />
               </View>
 
               {/* Textbook Chapters and Topics Flow */}
               {subjectProgress.map((tbChapter, tbIndex) => (
                 <View key={tbIndex} style={styles.yearSection}>
-                  {/* Textbook Chapter Block (like Year Block) */}
+                  {/* Textbook Chapter Block */}
                   <View style={styles.yearBlockWrapper}>
                     <View
                       style={[
                         styles.yearBlock,
                         { 
                           backgroundColor: subjectColor.bgColor, 
-                          borderColor: subjectColor.borderColor,
-                          shadowColor: subjectColor.color,
-                          shadowOffset: { width: 0, height: 8 },
-                          shadowOpacity: 0.3,
-                          shadowRadius: 16,
-                          elevation: 8,
+                          borderLeftColor: subjectColor.color,
                         },
                       ]}
                     >
-                      <LinearGradient
-                        colors={[subjectColor.color, subjectColor.lightColor]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.yearBlockAccent}
-                      />
                       <View style={styles.yearBlockContent}>
                         <View style={styles.yearBlockHeader}>
                           <View
                             style={[
                               styles.yearIconCircle, 
-                              { 
-                                backgroundColor: subjectColor.bgColor,
-                                borderWidth: 2,
-                                borderColor: subjectColor.borderColor,
-                              }
+                              { backgroundColor: 'rgba(255, 255, 255, 0.05)' }
                             ]}
                           >
-                            <BookOpen size={22} color={subjectColor.lightColor} strokeWidth={2.5} />
+                            <BookOpen size={18} color={subjectColor.color} strokeWidth={2} />
                           </View>
                           <View style={styles.yearBlockTextContainer}>
-                            <Text style={[styles.yearBlockTitle, { color: subjectColor.lightColor }]}>
+                            <Text style={[styles.yearBlockTitle, { color: subjectColor.color }]}>
                               {tbChapter.textbook_chapter}
                             </Text>
                             <Text style={styles.yearBlockSubjects}>
@@ -339,18 +307,11 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                       <View
                         style={[
                           styles.yearConnectionPoint, 
-                          { 
-                            backgroundColor: subjectColor.lightColor,
-                            shadowColor: subjectColor.color,
-                            shadowOffset: { width: 0, height: 4 },
-                            shadowOpacity: 0.6,
-                            shadowRadius: 8,
-                            elevation: 6,
-                          }
+                          { backgroundColor: subjectColor.color }
                         ]}
                       />
                     </View>
-                    <View style={[styles.horizontalConnector, { backgroundColor: subjectColor.lightColor }]} />
+                    <View style={[styles.horizontalConnector, { backgroundColor: subjectColor.borderColor }]} />
                   </View>
 
                   {/* Chapters and Topics */}
@@ -373,42 +334,23 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                               style={[
                                 styles.chapterBlock,
                                 {
-                                  backgroundColor: allTopicsComplete
-                                    ? `${chapterColor.color}20`
-                                    : 'rgba(30, 41, 59, 0.5)',
-                                  borderColor: allTopicsComplete || isCurrent
+                                  backgroundColor: allTopicsComplete || isCurrent
+                                    ? chapterColor.bgColor
+                                    : 'rgba(30, 30, 30, 0.4)',
+                                  borderLeftColor: allTopicsComplete || isCurrent
                                     ? chapterColor.color
-                                    : 'rgba(71, 85, 105, 0.6)',
-                                  borderWidth: 2,
-                                  shadowColor: chapterColor.color,
-                                  shadowOffset: { width: 0, height: 4 },
-                                  shadowOpacity: allTopicsComplete || isCurrent ? 0.4 : 0.1,
-                                  shadowRadius: 12,
-                                  elevation: allTopicsComplete || isCurrent ? 6 : 2,
+                                    : 'rgba(100, 100, 100, 0.4)',
                                 },
                               ]}
                             >
-                              {(allTopicsComplete || isCurrent) && (
-                                <LinearGradient
-                                  colors={[chapterColor.color, chapterColor.lightColor]}
-                                  start={{ x: 0, y: 0 }}
-                                  end={{ x: 1, y: 1 }}
-                                  style={styles.chapterBlockAccent}
-                                />
-                              )}
                               <View style={styles.chapterBlockContent}>
                                 <View
                                   style={[
                                     styles.chapterIconDot,
                                     {
                                       backgroundColor: allTopicsComplete || isCurrent
-                                        ? chapterColor.lightColor
-                                        : 'rgba(100, 116, 139, 0.6)',
-                                      shadowColor: chapterColor.color,
-                                      shadowOffset: { width: 0, height: 2 },
-                                      shadowOpacity: allTopicsComplete || isCurrent ? 0.6 : 0,
-                                      shadowRadius: 6,
-                                      elevation: 3,
+                                        ? chapterColor.color
+                                        : 'rgba(100, 100, 100, 0.5)',
                                     },
                                   ]}
                                 />
@@ -417,15 +359,15 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                     styles.chapterText,
                                     { 
                                       color: allTopicsComplete || isCurrent 
-                                        ? chapterColor.lightColor 
-                                        : '#94a3b8' 
+                                        ? chapterColor.color 
+                                        : '#999999' 
                                     },
                                   ]}
                                 >
                                   {chapter.chapter}
                                 </Text>
                                 {allTopicsComplete && (
-                                  <CheckCircle2 size={20} color={chapterColor.lightColor} strokeWidth={2.5} />
+                                  <CheckCircle2 size={16} color={chapterColor.color} strokeWidth={2} />
                                 )}
                               </View>
                               <View
@@ -433,13 +375,8 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                   styles.chapterConnectionPoint,
                                   {
                                     backgroundColor: allTopicsComplete || isCurrent
-                                      ? chapterColor.lightColor
-                                      : 'rgba(71, 85, 105, 0.8)',
-                                    shadowColor: chapterColor.color,
-                                    shadowOffset: { width: 0, height: 3 },
-                                    shadowOpacity: 0.5,
-                                    shadowRadius: 6,
-                                    elevation: 4,
+                                      ? chapterColor.color
+                                      : 'rgba(100, 100, 100, 0.6)',
                                   },
                                 ]}
                               />
@@ -448,14 +385,14 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                               style={[
                                 styles.horizontalConnectorChapter,
                                 { 
-                                  backgroundColor: chapterColor.lightColor,
-                                  opacity: allTopicsComplete || isCurrent ? 0.7 : 0.3,
+                                  backgroundColor: chapterColor.color,
+                                  opacity: allTopicsComplete || isCurrent ? 0.5 : 0.2,
                                 },
                               ]}
                             />
                           </View>
 
-                          {/* Topics (nested) - TAB STYLE WITH GLOWING SHADOWS */}
+                          {/* Topics (nested) - TAB STYLE */}
                           <View style={styles.topicsContainer}>
                             {chapter.topics.map((topic, topicIndex) => {
                               const topicColor = getTopicColor(topicIndex);
@@ -472,84 +409,62 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                       styles.topicTab,
                                       {
                                         backgroundColor: isComplete
-                                          ? 'rgba(16, 185, 129, 0.2)'
+                                          ? 'rgba(37, 211, 102, 0.08)'
                                           : isCurrentTopic
                                           ? topicColor.bgColor
-                                          : 'rgba(30, 41, 59, 0.4)',
-                                        borderColor: isComplete
-                                          ? '#10b981'
+                                          : 'rgba(30, 30, 30, 0.3)',
+                                        borderLeftColor: isComplete
+                                          ? '#25D366'
                                           : isCurrentTopic
                                           ? topicColor.color
-                                          : 'rgba(71, 85, 105, 0.5)',
-                                        borderWidth: isCurrentTopic || isComplete ? 2.5 : 1.5,
-                                        shadowColor: isComplete
-                                          ? '#10b981'
-                                          : isCurrentTopic
-                                          ? topicColor.glowColor
-                                          : 'transparent',
-                                        shadowOffset: { width: 0, height: 6 },
-                                        shadowOpacity: isComplete || isCurrentTopic ? 0.8 : 0,
-                                        shadowRadius: 15,
-                                        elevation: isComplete || isCurrentTopic ? 8 : 1,
+                                          : 'rgba(100, 100, 100, 0.3)',
                                         opacity: isFuture ? 0.5 : 1,
                                       },
                                     ]}
                                   >
-                                    {isCurrentTopic && (
-                                      <LinearGradient
-                                        colors={[topicColor.color, topicColor.lightColor]}
-                                        start={{ x: 0, y: 0 }}
-                                        end={{ x: 1, y: 1 }}
-                                        style={styles.topicTabGlow}
-                                      />
-                                    )}
-                                    <View style={styles.topicTabContent}>
-                                      <View style={styles.topicIconContainer}>
-                                        {isComplete ? (
-                                          <CheckCircle2 size={18} color="#10b981" strokeWidth={3} />
-                                        ) : isCurrentTopic ? (
-                                          <Zap size={18} color={topicColor.color} fill={topicColor.color} strokeWidth={2.5} />
-                                        ) : (
-                                          <Circle size={16} color="rgba(100, 116, 139, 0.6)" strokeWidth={2} />
-                                        )}
-                                      </View>
-                                      <Text
-                                        style={[
-                                          styles.topicTabText,
-                                          {
-                                            color: isComplete
-                                              ? '#34d399'
-                                              : isCurrentTopic
-                                              ? topicColor.color
-                                              : '#64748b',
-                                            fontWeight: isComplete || isCurrentTopic ? '800' : '600',
-                                          },
-                                        ]}
-                                      >
-                                        {topic.topic}
-                                      </Text>
-                                      {isCurrentTopic && (
-                                        <View style={[styles.currentBadge, { backgroundColor: topicColor.color }]}>
-                                          <Text style={styles.currentBadgeText}>ACTIVE</Text>
-                                        </View>
-                                      )}
-                                    </View>
+                                  <View style={styles.topicTabContent}>
+  {isCurrentTopic && (
+    <View style={[styles.currentBadgeTop, { backgroundColor: topicColor.color }]}>
+      <Text style={styles.currentBadgeText}>ACTIVE</Text>
+    </View>
+  )}
+
+  <View style={styles.topicMainRow}>
+    <View style={styles.topicIconContainer}>
+      {isComplete ? (
+        <CheckCircle2 size={14} color="#25D366" strokeWidth={2} />
+      ) : isCurrentTopic ? (
+        <Zap size={14} color={topicColor.color} fill={topicColor.color} strokeWidth={2} />
+      ) : (
+        <Circle size={12} color="rgba(100, 100, 100, 0.5)" strokeWidth={1.5} />
+      )}
+    </View>
+
+    <Text
+      style={[
+        styles.topicTabText,
+        {
+          color: isComplete
+            ? '#25D366'
+            : isCurrentTopic
+            ? topicColor.color
+            : '#808080',
+        },
+      ]}
+    >
+      {topic.topic}
+    </Text>
+  </View>
+</View>
                                     <View
                                       style={[
                                         styles.topicConnectionPoint,
                                         {
                                           backgroundColor: isComplete
-                                            ? '#10b981'
+                                            ? '#25D366'
                                             : isCurrentTopic
                                             ? topicColor.color
-                                            : 'rgba(71, 85, 105, 0.6)',
-                                          shadowColor: isComplete
-                                            ? '#10b981'
-                                            : topicColor.color,
-                                          shadowOffset: { width: 0, height: 2 },
-                                          shadowOpacity: isComplete || isCurrentTopic ? 0.7 : 0,
-                                          shadowRadius: 8,
-                                          elevation: 5,
+                                            : 'rgba(100, 100, 100, 0.5)',
                                         },
                                       ]}
                                     />
@@ -560,9 +475,9 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                         styles.topicConnector,
                                         {
                                           backgroundColor: isComplete
-                                            ? '#10b981'
+                                            ? '#25D366'
                                             : chapterColor.color,
-                                          opacity: 0.4,
+                                          opacity: 0.3,
                                         },
                                       ]}
                                     />
@@ -572,11 +487,11 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                       styles.horizontalConnectorTopic,
                                       {
                                         backgroundColor: isComplete
-                                          ? '#34d399'
+                                          ? '#25D366'
                                           : isCurrentTopic
                                           ? topicColor.color
                                           : chapterColor.color,
-                                        opacity: isComplete || isCurrentTopic ? 0.6 : 0.3,
+                                        opacity: isComplete || isCurrentTopic ? 0.4 : 0.2,
                                       },
                                     ]}
                                   />
@@ -590,8 +505,8 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                               style={[
                                 styles.chapterConnector,
                                 { 
-                                  backgroundColor: chapterColor.lightColor, 
-                                  opacity: 0.4,
+                                  backgroundColor: chapterColor.color, 
+                                  opacity: 0.3,
                                 },
                               ]}
                             />
@@ -606,7 +521,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                     <View
                       style={[
                         styles.yearToYearConnector,
-                        { backgroundColor: subjectColor.lightColor, opacity: 0.5 },
+                        { backgroundColor: subjectColor.borderColor, opacity: 0.4 },
                       ]}
                     />
                   )}
@@ -615,16 +530,11 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
 
               {/* End Node */}
               <View style={styles.endNode}>
-                <View style={[styles.endNodeCircle, { shadowColor: '#10b981' }]}>
-                  <LinearGradient
-                    colors={['#10b981', '#34d399', '#059669']}
-                    style={styles.endNodeGradient}
-                  >
-                    <Trophy size={28} color="#ffffff" strokeWidth={2.5} />
-                  </LinearGradient>
+                <View style={[styles.endNodeCircle, { backgroundColor: '#25D366' }]}>
+                  <Trophy size={20} color="#ffffff" strokeWidth={2} />
                 </View>
                 <View style={styles.endNodeContent}>
-                  <Text style={styles.endNodeTitle}>Journey Complete!</Text>
+                  <Text style={[styles.endNodeTitle, { color: '#25D366' }]}>Journey Complete!</Text>
                   <Text style={styles.endNodeSubtitle}>{selectedSubject} Mastered</Text>
                 </View>
               </View>
@@ -651,11 +561,6 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0a0f1e', '#0f172a', '#1e1b4b', '#0f172a']}
-        style={StyleSheet.absoluteFillObject}
-      />
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -664,8 +569,8 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.journeyBadge}>
-            <Sparkles size={16} color="#fbbf24" />
-            <Text style={styles.journeyBadgeText}>YOUR JOURNEY</Text>
+            <Sparkles size={14} color="#FFD700" />
+            <Text style={[styles.journeyBadgeText, { color: '#FFD700' }]}>YOUR JOURNEY</Text>
           </View>
           <Text style={styles.headerTitle}>MBBS Learning Path</Text>
           <Text style={styles.headerSubtitle}>
@@ -676,27 +581,42 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
         {/* Flowchart Container */}
         <View style={styles.flowchartContainer}>
           {/* Vertical Timeline Line (Right Side) */}
-          <View style={styles.timelineLineContainer}>
-            <LinearGradient
-              colors={['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#fbbf24']}
-              style={styles.timelineLine}
-            />
-          </View>
+        <View style={styles.timelineLineContainer}>
+  {Array.isArray(subjectProgress) &&
+    subjectProgress.map((tbChapter, tbIndex) =>
+      tbChapter.chapters.map((_, chapterIndex) => {
+        const globalIndex =
+          subjectProgress
+            .slice(0, tbIndex)
+            .reduce((acc, tb) => acc + tb.chapters.length, 0) +
+          chapterIndex;
+
+        const chapterColor = getChapterColor(globalIndex);
+
+        return (
+          <View
+            key={`line-${tbIndex}-${chapterIndex}`}
+            style={[
+              styles.timelineSegment,
+              { backgroundColor: chapterColor.color },
+            ]}
+          />
+        );
+      })
+    )}
+</View>
+
+
 
           {/* Start Node */}
           <View style={styles.startNode}>
-            <View style={styles.startNodeCircle}>
-              <LinearGradient
-                colors={['#10b981', '#059669']}
-                style={styles.startNodeGradient}
-              >
-                <Sparkles size={20} color="#ffffff" />
-              </LinearGradient>
+            <View style={[styles.startNodeCircle, { backgroundColor: '#25D366' }]}>
+              <Sparkles size={16} color="#ffffff" />
             </View>
             <View style={styles.startNodeContent}>
-              <Text style={styles.startNodeText}>Start Your Journey</Text>
+              <Text style={[styles.startNodeText, { color: '#25D366' }]}>Start Your Journey</Text>
             </View>
-            <View style={styles.connectionLine} />
+            <View style={[styles.connectionLine, { backgroundColor: 'rgba(255, 255, 255, 0.15)' }]} />
           </View>
 
           {/* Years and Subjects Flow */}
@@ -707,24 +627,18 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                 <View
                   style={[
                     styles.yearBlock,
-                    { backgroundColor: yearData.bgColor, borderColor: yearData.borderColor },
+                    { backgroundColor: yearData.bgColor, borderLeftColor: yearData.color },
                   ]}
                 >
-                  <LinearGradient
-                    colors={[yearData.color, yearData.lightColor]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.yearBlockAccent}
-                  />
                   <View style={styles.yearBlockContent}>
                     <View style={styles.yearBlockHeader}>
                       <View
-                        style={[styles.yearIconCircle, { backgroundColor: yearData.bgColor }]}
+                        style={[styles.yearIconCircle, { backgroundColor: 'rgba(255, 255, 255, 0.05)' }]}
                       >
-                        {yearIndex === 0 && <BookOpen size={20} color={yearData.color} />}
-                        {yearIndex === 1 && <Star size={20} color={yearData.color} />}
-                        {yearIndex === 2 && <Award size={20} color={yearData.color} />}
-                        {yearIndex === 3 && <Trophy size={20} color={yearData.color} />}
+                        {yearIndex === 0 && <BookOpen size={16} color={yearData.color} />}
+                        {yearIndex === 1 && <Star size={16} color={yearData.color} />}
+                        {yearIndex === 2 && <Award size={16} color={yearData.color} />}
+                        {yearIndex === 3 && <Trophy size={16} color={yearData.color} />}
                       </View>
                       <View style={styles.yearBlockTextContainer}>
                         <Text style={[styles.yearBlockTitle, { color: yearData.color }]}>
@@ -740,7 +654,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                     style={[styles.yearConnectionPoint, { backgroundColor: yearData.color }]}
                   />
                 </View>
-                <View style={[styles.horizontalConnector, { backgroundColor: yearData.color }]} />
+                <View style={[styles.horizontalConnector, { backgroundColor: yearData.borderColor }]} />
               </View>
 
               {/* Subject Blocks */}
@@ -756,9 +670,8 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                         style={[
                           styles.subjectBlock,
                           {
-                            backgroundColor: 'rgba(30, 41, 59, 0.4)',
-                            borderColor: 'rgba(51, 65, 85, 0.6)',
-                            borderWidth: 1,
+                            backgroundColor: 'rgba(30, 30, 30, 0.3)',
+                            borderLeftColor: 'rgba(100, 100, 100, 0.3)',
                           },
                         ]}
                       >
@@ -766,24 +679,20 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                           <View
                             style={[
                               styles.subjectDot,
-                              {
-                                backgroundColor: 'rgba(100, 116, 139, 0.6)',
-                              },
+                              { backgroundColor: 'rgba(100, 100, 100, 0.5)' },
                             ]}
                           />
-                          <Text style={[styles.subjectText, { color: '#94a3b8' }]}>
+                          <Text style={[styles.subjectText, { color: '#999999' }]}>
                             {subject}
                           </Text>
                           <View style={styles.selectedBadge}>
-                            <ChevronRight size={16} color="#64748b" />
+                            <ChevronRight size={14} color="#808080" />
                           </View>
                         </View>
                         <View
                           style={[
                             styles.subjectConnectionPoint,
-                            {
-                              backgroundColor: 'rgba(51, 65, 85, 0.8)',
-                            },
+                            { backgroundColor: 'rgba(100, 100, 100, 0.6)' },
                           ]}
                         />
                       </TouchableOpacity>
@@ -791,14 +700,14 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                         <View
                           style={[
                             styles.subjectConnector,
-                            { backgroundColor: yearData.color, opacity: 0.3 },
+                            { backgroundColor: yearData.color, opacity: 0.2 },
                           ]}
                         />
                       )}
                       <View
                         style={[
                           styles.horizontalConnectorSmall,
-                          { backgroundColor: yearData.color, opacity: 0.5 },
+                          { backgroundColor: yearData.color, opacity: 0.3 },
                         ]}
                       />
                     </View>
@@ -811,7 +720,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                 <View
                   style={[
                     styles.yearToYearConnector,
-                    { backgroundColor: YEARS[yearIndex + 1].color, opacity: 0.4 },
+                    { backgroundColor: YEARS[yearIndex + 1].color, opacity: 0.3 },
                   ]}
                 />
               )}
@@ -820,16 +729,11 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
 
           {/* End Node */}
           <View style={styles.endNode}>
-            <View style={styles.endNodeCircle}>
-              <LinearGradient
-                colors={['#f59e0b', '#d97706']}
-                style={styles.endNodeGradient}
-              >
-                <Trophy size={24} color="#ffffff" />
-              </LinearGradient>
+            <View style={[styles.endNodeCircle, { backgroundColor: '#FFD700' }]}>
+              <Trophy size={20} color="#ffffff" />
             </View>
             <View style={styles.endNodeContent}>
-              <Text style={styles.endNodeTitle}>Journey Complete!</Text>
+              <Text style={[styles.endNodeTitle, { color: '#FFD700' }]}>Journey Complete!</Text>
               <Text style={styles.endNodeSubtitle}>MBBS Mastery Achieved</Text>
             </View>
           </View>
@@ -844,7 +748,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0d0d0d',
   },
 
   scrollView: {
@@ -852,48 +756,45 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
-    paddingTop: 24,
+    paddingTop: 20,
     paddingBottom: 40,
   },
 
   // HEADER
   header: {
-    paddingHorizontal: 24,
-    marginBottom: 32,
+    paddingHorizontal: 20,
+    marginBottom: 28,
   },
 
   journeyBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(251, 191, 36, 0.1)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: 'rgba(251, 191, 36, 0.4)',
-    marginBottom: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 12,
   },
 
   journeyBadgeText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#fbbf24',
+    fontSize: 10,
+    fontWeight: '700',
     marginLeft: 6,
-    letterSpacing: 1.5,
+    letterSpacing: 1.2,
   },
 
   headerTitle: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: '#ffffff',
-    marginBottom: 8,
-    letterSpacing: -0.5,
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#e1e1e1',
+    marginBottom: 6,
+    letterSpacing: -0.3,
   },
 
   headerSubtitle: {
     fontSize: 15,
-    color: '#94a3b8',
+    color: '#999999',
     lineHeight: 22,
   },
 
@@ -902,15 +803,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    marginBottom: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+    marginBottom: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 2,
   },
 
   backButtonText: {
     fontSize: 15,
-    fontWeight: '700',
-    marginLeft: 8,
+    fontWeight: '600',
+    marginLeft: 6,
     letterSpacing: 0.2,
   },
 
@@ -923,35 +824,35 @@ const styles = StyleSheet.create({
 
   loadingText: {
     fontSize: 15,
-    color: '#94a3b8',
+    color: '#999999',
     marginTop: 16,
   },
 
   errorContainer: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingVertical: 32,
   },
 
   errorText: {
     fontSize: 15,
-    color: '#ef4444',
+    color: '#E91E63',
     textAlign: 'center',
   },
 
   emptyContainer: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingVertical: 60,
   },
 
   emptyText: {
     fontSize: 15,
-    color: '#64748b',
+    color: '#808080',
     textAlign: 'center',
   },
 
   // FLOWCHART
   flowchartContainer: {
-    paddingLeft: 24,
+    paddingLeft: 20,
     paddingRight: 80,
     position: 'relative',
   },
@@ -962,90 +863,68 @@ const styles = StyleSheet.create({
     right: 32,
     top: 0,
     bottom: 0,
-    width: 5,
+    width: 2,
     zIndex: 0,
   },
 
   timelineLine: {
     flex: 1,
-    borderRadius: 3,
+    borderRadius: 1,
   },
 
   // START NODE
   startNode: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 28,
     position: 'relative',
   },
 
   startNodeCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    overflow: 'hidden',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.6,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-
-  startNodeGradient: {
-    flex: 1,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   startNodeContent: {
-    marginLeft: 16,
+    marginLeft: 14,
     flex: 1,
   },
 
   startNodeText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#10b981',
-    letterSpacing: 0.5,
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
 
   connectionLine: {
     position: 'absolute',
     right: -48,
     width: 32,
-    height: 2,
-    backgroundColor: '#10b981',
-    opacity: 0.6,
+    height: 1,
   },
 
   // YEAR SECTION
   yearSection: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
 
   yearBlockWrapper: {
     position: 'relative',
-    marginBottom: 16,
+    marginBottom: 14,
   },
 
   yearBlock: {
-    borderRadius: 16,
-    borderWidth: 2,
+    borderRadius: 12,
+    borderLeftWidth: 3,
     overflow: 'hidden',
     position: 'relative',
   },
 
-  yearBlockAccent: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 5,
-  },
-
   yearBlockContent: {
-    padding: 16,
-    paddingLeft: 22,
+    padding: 14,
   },
 
   yearBlockHeader: {
@@ -1054,41 +933,41 @@ const styles = StyleSheet.create({
   },
 
   yearIconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   yearBlockTextContainer: {
-    marginLeft: 14,
+    marginLeft: 12,
     flex: 1,
   },
 
   yearBlockTitle: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 17,
+    fontWeight: '700',
     marginBottom: 2,
-    letterSpacing: -0.3,
+    letterSpacing: 0.3,
   },
 
   yearBlockSubjects: {
     fontSize: 13,
-    color: '#64748b',
+    color: '#808080',
     fontWeight: '600',
   },
 
   yearConnectionPoint: {
     position: 'absolute',
-    right: -12,
+    right: -8,
     top: '50%',
-    marginTop: -6,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    borderWidth: 3,
-    borderColor: '#0f172a',
+    marginTop: -4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#0d0d0d',
     zIndex: 2,
   },
 
@@ -1096,15 +975,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -48,
     top: '50%',
-    marginTop: -1,
-    width: 36,
-    height: 2,
+    marginTop: -0.5,
+    width: 40,
+    height: 1,
     zIndex: 1,
   },
 
   // SUBJECTS
   subjectsContainer: {
-    paddingLeft: 32,
+    paddingLeft: 28,
   },
 
   subjectWrapper: {
@@ -1112,32 +991,24 @@ const styles = StyleSheet.create({
   },
 
   subjectBlock: {
-    borderRadius: 12,
+    borderRadius: 10,
+    borderLeftWidth: 2,
     marginBottom: 2,
     position: 'relative',
     overflow: 'hidden',
   },
 
-  subjectBlockAccent: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 3,
-  },
-
   subjectBlockContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
-    paddingLeft: 16,
+    padding: 12,
   },
 
   subjectDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 12,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 10,
   },
 
   subjectText: {
@@ -1148,27 +1019,27 @@ const styles = StyleSheet.create({
   },
 
   selectedBadge: {
-    marginLeft: 8,
+    marginLeft: 6,
   },
 
   subjectConnectionPoint: {
     position: 'absolute',
-    right: -8,
+    right: -6,
     top: '50%',
-    marginTop: -4,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#0f172a',
+    marginTop: -3,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    borderWidth: 1.5,
+    borderColor: '#0d0d0d',
     zIndex: 2,
   },
 
   subjectConnector: {
     position: 'absolute',
-    right: -8,
+    right: -6,
     top: '50%',
-    width: 2,
+    width: 1,
     height: '100%',
     zIndex: 0,
   },
@@ -1178,148 +1049,52 @@ const styles = StyleSheet.create({
     right: -48,
     top: '50%',
     marginTop: -0.5,
-    width: 40,
+    width: 42,
     height: 1,
     zIndex: 1,
   },
 
   yearToYearConnector: {
-    width: 2,
-    height: 24,
-    marginLeft: 21,
-    marginVertical: 8,
+    width: 1,
+    height: 20,
+    marginLeft: 19,
+    marginVertical: 6,
   },
 
-  // CHAPTER SECTION (Enhanced with different colors per chapter)
+  // CHAPTER SECTION
   chapterSection: {
-    marginBottom: 12,
+    marginBottom: 10,
   },
 
   chapterBlock: {
-    borderRadius: 14,
-    marginBottom: 4,
+    borderRadius: 10,
+    borderLeftWidth: 2,
+    marginBottom: 3,
     position: 'relative',
     overflow: 'hidden',
-  },
-
-  chapterBlockAccent: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
   },
 
   chapterBlockContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    paddingLeft: 18,
+    padding: 12,
   },
 
   chapterIconDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 14,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 10,
   },
 
   chapterText: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '700',
     letterSpacing: 0.3,
   },
 
   chapterConnectionPoint: {
-    position: 'absolute',
-    right: -10,
-    top: '50%',
-    marginTop: -5,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 2.5,
-    borderColor: '#0f172a',
-    zIndex: 2,
-  },
-
-  horizontalConnectorChapter: {
-    position: 'absolute',
-    right: -48,
-    top: '50%',
-    marginTop: -1,
-    width: 38,
-    height: 2,
-    zIndex: 1,
-  },
-
-  chapterConnector: {
-    width: 2.5,
-    height: 20,
-    marginLeft: 6,
-    marginVertical: 6,
-  },
-
-  // TOPICS (TAB STYLE WITH GLOWING SHADOWS)
-  topicsContainer: {
-    paddingLeft: 40,
-    marginTop: 8,
-    marginBottom: 8,
-  },
-
-  topicWrapper: {
-    position: 'relative',
-    marginBottom: 6,
-  },
-
-  topicTab: {
-    borderRadius: 12,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-
-  topicTabGlow: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 3,
-  },
-
-  topicTabContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    paddingLeft: 18,
-  },
-
-  topicIconContainer: {
-    marginRight: 12,
-  },
-
-  topicTabText: {
-    flex: 1,
-    fontSize: 14,
-    letterSpacing: 0.3,
-  },
-
-  currentBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    marginLeft: 8,
-  },
-
-  currentBadgeText: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#ffffff',
-    letterSpacing: 1,
-  },
-
-  topicConnectionPoint: {
     position: 'absolute',
     right: -7,
     top: '50%',
@@ -1327,16 +1102,110 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 3.5,
-    borderWidth: 2,
-    borderColor: '#0f172a',
+    borderWidth: 1.5,
+    borderColor: '#0d0d0d',
+    zIndex: 2,
+  },
+
+  horizontalConnectorChapter: {
+    position: 'absolute',
+    right: -48,
+    top: '50%',
+    marginTop: -0.5,
+    width: 41,
+    height: 1,
+    zIndex: 1,
+  },
+
+  chapterConnector: {
+    width: 1,
+    height: 16,
+    marginLeft: 4,
+    marginVertical: 4,
+  },
+
+  // TOPICS (TAB STYLE)
+  topicsContainer: {
+    paddingLeft: 20,
+    marginTop: 6,
+    marginBottom: 6,
+  },
+
+  topicWrapper: {
+    position: 'relative',
+    marginBottom: 4,
+  },
+
+  topicTab: {
+    borderRadius: 8,
+    borderLeftWidth: 2,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+
+  topicTabContent: {
+  flexDirection: 'column',   // ✅ FIX
+  alignItems: 'flex-start',
+  paddingVertical: 8,        // ⬅️ slightly smaller height
+  paddingHorizontal: 12,
+},
+
+  topicIconContainer: {
+    marginRight: 10,
+  },
+
+  topicTabText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+    lineHeight: 20,
+  },
+topicMainRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  width: '100%',
+},
+
+currentBadgeTop: {
+  paddingHorizontal: 6,
+  paddingVertical: 2,
+  borderRadius: 4,
+  marginBottom: 4,
+},
+
+  currentBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 5,
+    marginLeft: 6,
+  },
+
+  currentBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#ffffff',
+    letterSpacing: 0.8,
+  },
+
+  topicConnectionPoint: {
+    position: 'absolute',
+    right: -5,
+    top: '50%',
+    marginTop: -2.5,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    borderWidth: 1.5,
+    borderColor: '#0d0d0d',
     zIndex: 2,
   },
 
   topicConnector: {
     position: 'absolute',
-    right: -7,
+    right: -5,
     top: '50%',
-    width: 2,
+    width: 1,
     height: '100%',
     zIndex: 0,
   },
@@ -1346,8 +1215,8 @@ const styles = StyleSheet.create({
     right: -48,
     top: '50%',
     marginTop: -0.5,
-    width: 41,
-    height: 1.5,
+    width: 43,
+    height: 1,
     zIndex: 1,
   },
 
@@ -1355,48 +1224,43 @@ const styles = StyleSheet.create({
   endNode: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 32,
+    marginTop: 28,
     paddingRight: 48,
   },
 
   endNodeCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    overflow: 'hidden',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.7,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-
-  endNodeGradient: {
-    flex: 1,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   endNodeContent: {
-    marginLeft: 16,
+    marginLeft: 14,
     flex: 1,
   },
 
   endNodeTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: '#ffffff',
-    marginBottom: 4,
-    letterSpacing: -0.3,
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 3,
+    letterSpacing: 0.3,
   },
 
   endNodeSubtitle: {
     fontSize: 13,
-    color: '#64748b',
+    color: '#808080',
     fontWeight: '600',
   },
 
   bottomSpacer: {
     height: 40,
   },
+  timelineSegment: {
+  flex: 1,
+  width: 2,
+  marginVertical: 2,
+  borderRadius: 1,
+},
 });
