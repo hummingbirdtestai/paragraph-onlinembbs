@@ -13,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BookOpen, Award, Star, Trophy, Sparkles, ChevronRight, ArrowLeft, CheckCircle2, Circle, Zap } from 'lucide-react-native';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
+import MainLayout from '@/components/MainLayout';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -205,352 +206,354 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
     let chapterGlobalIndex = 0;
 
     return (
-      <View style={styles.container}>
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header with Back Button */}
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={handleBackToSubjects}
-              style={styles.backButton}
-              activeOpacity={0.7}
-            >
-              <ArrowLeft size={18} color={subjectColor.color} />
-              <Text style={[styles.backButtonText, { color: subjectColor.color }]}>
-                Back to Subjects
+      <MainLayout>
+        <View style={styles.container}>
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Header with Back Button */}
+            <View style={styles.header}>
+              <TouchableOpacity
+                onPress={handleBackToSubjects}
+                style={styles.backButton}
+                activeOpacity={0.7}
+              >
+                <ArrowLeft size={18} color={subjectColor.color} />
+                <Text style={[styles.backButtonText, { color: subjectColor.color }]}>
+                  Back to Subjects
+                </Text>
+              </TouchableOpacity>
+
+              <View style={[styles.journeyBadge, { backgroundColor: subjectColor.bgColor, borderColor: subjectColor.borderColor }]}>
+                <Sparkles size={14} color={subjectColor.color} />
+                <Text style={[styles.journeyBadgeText, { color: subjectColor.color }]}>YOUR JOURNEY</Text>
+              </View>
+              <Text style={styles.headerTitle}>{selectedSubject}</Text>
+              <Text style={styles.headerSubtitle}>
+                Follow your personalized learning path through the curriculum
               </Text>
-            </TouchableOpacity>
-
-            <View style={[styles.journeyBadge, { backgroundColor: subjectColor.bgColor, borderColor: subjectColor.borderColor }]}>
-              <Sparkles size={14} color={subjectColor.color} />
-              <Text style={[styles.journeyBadgeText, { color: subjectColor.color }]}>YOUR JOURNEY</Text>
             </View>
-            <Text style={styles.headerTitle}>{selectedSubject}</Text>
-            <Text style={styles.headerSubtitle}>
-              Follow your personalized learning path through the curriculum
-            </Text>
-          </View>
 
-          {/* Loading State */}
-          {loading && (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={subjectColor.color} />
-              <Text style={styles.loadingText}>Loading your learning path...</Text>
-            </View>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          )}
-
-          {/* Subject Progress Flowchart */}
-          {!loading && !error && subjectProgress && (
-            <View style={styles.flowchartContainer}>
-              {/* Vertical Timeline Line (Right Side) */}
-              <View style={[styles.timelineLineContainer]}>
-                <View style={[styles.timelineLine, { backgroundColor: subjectColor.borderColor }]} />
+            {/* Loading State */}
+            {loading && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={subjectColor.color} />
+                <Text style={styles.loadingText}>Loading your learning path...</Text>
               </View>
+            )}
 
-              {/* Start Node */}
-              <View style={styles.startNode}>
-                <View style={[styles.startNodeCircle, { backgroundColor: subjectColor.color }]}>
-                  <Sparkles size={16} color="#ffffff" />
-                </View>
-                <View style={styles.startNodeContent}>
-                  <Text style={[styles.startNodeText, { color: subjectColor.color }]}>
-                    Start Learning {selectedSubject}
-                  </Text>
-                </View>
-                <View style={[styles.connectionLine, { backgroundColor: subjectColor.borderColor }]} />
+            {/* Error State */}
+            {error && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
               </View>
+            )}
 
-              {/* Textbook Chapters and Topics Flow */}
-              {subjectProgress.map((tbChapter, tbIndex) => (
-                <View key={tbIndex} style={styles.yearSection}>
-                  {/* Textbook Chapter Block */}
-                  <View style={styles.yearBlockWrapper}>
-                    <View
-                      style={[
-                        styles.yearBlock,
-                        { 
-                          backgroundColor: subjectColor.bgColor, 
-                          borderLeftColor: subjectColor.color,
-                        },
-                      ]}
-                    >
-                      <View style={styles.yearBlockContent}>
-                        <View style={styles.yearBlockHeader}>
-                          <View
-                            style={[
-                              styles.yearIconCircle, 
-                              { backgroundColor: 'rgba(255, 255, 255, 0.05)' }
-                            ]}
-                          >
-                            <BookOpen size={18} color={subjectColor.color} strokeWidth={2} />
-                          </View>
-                          <View style={styles.yearBlockTextContainer}>
-                            <Text style={[styles.yearBlockTitle, { color: subjectColor.color }]}>
-                              {tbChapter.textbook_chapter}
-                            </Text>
-                            <Text style={styles.yearBlockSubjects}>
-                              {tbChapter.chapters.length} Chapters
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
+            {/* Subject Progress Flowchart */}
+            {!loading && !error && subjectProgress && (
+              <View style={styles.flowchartContainer}>
+                {/* Vertical Timeline Line (Right Side) */}
+                <View style={[styles.timelineLineContainer]}>
+                  <View style={[styles.timelineLine, { backgroundColor: subjectColor.borderColor }]} />
+                </View>
+
+                {/* Start Node */}
+                <View style={styles.startNode}>
+                  <View style={[styles.startNodeCircle, { backgroundColor: subjectColor.color }]}>
+                    <Sparkles size={16} color="#ffffff" />
+                  </View>
+                  <View style={styles.startNodeContent}>
+                    <Text style={[styles.startNodeText, { color: subjectColor.color }]}>
+                      Start Learning {selectedSubject}
+                    </Text>
+                  </View>
+                  <View style={[styles.connectionLine, { backgroundColor: subjectColor.borderColor }]} />
+                </View>
+
+                {/* Textbook Chapters and Topics Flow */}
+                {subjectProgress.map((tbChapter, tbIndex) => (
+                  <View key={tbIndex} style={styles.yearSection}>
+                    {/* Textbook Chapter Block */}
+                    <View style={styles.yearBlockWrapper}>
                       <View
                         style={[
-                          styles.yearConnectionPoint, 
-                          { backgroundColor: subjectColor.color }
+                          styles.yearBlock,
+                          { 
+                            backgroundColor: subjectColor.bgColor, 
+                            borderLeftColor: subjectColor.color,
+                          },
                         ]}
-                      />
-                    </View>
-                    <View style={[styles.horizontalConnector, { backgroundColor: subjectColor.borderColor }]} />
-                  </View>
-
-                  {/* Chapters and Topics */}
-                  <View style={styles.subjectsContainer}>
-                    {tbChapter.chapters.map((chapter, chapterIndex) => {
-                      const chapterColor = getChapterColor(chapterGlobalIndex);
-                      const isLastChapter = chapterIndex === tbChapter.chapters.length - 1;
-                      const allTopicsComplete = chapter.topics.every(t => t.is_complete);
-                      const firstIncomplete = chapter.topics.findIndex(t => !t.is_complete);
-                      const isCurrent = firstIncomplete >= 0;
-                      
-                      const currentChapterIndex = chapterGlobalIndex;
-                      chapterGlobalIndex++;
-
-                      return (
-                        <View key={chapterIndex} style={styles.chapterSection}>
-                          {/* Chapter Block */}
-                          <View style={styles.subjectWrapper}>
+                      >
+                        <View style={styles.yearBlockContent}>
+                          <View style={styles.yearBlockHeader}>
                             <View
                               style={[
-                                styles.chapterBlock,
-                                {
-                                  backgroundColor: allTopicsComplete || isCurrent
-                                    ? chapterColor.bgColor
-                                    : 'rgba(30, 30, 30, 0.4)',
-                                  borderLeftColor: allTopicsComplete || isCurrent
-                                    ? chapterColor.color
-                                    : 'rgba(100, 100, 100, 0.4)',
-                                },
+                                styles.yearIconCircle, 
+                                { backgroundColor: 'rgba(255, 255, 255, 0.05)' }
                               ]}
                             >
-                              <View style={styles.chapterBlockContent}>
+                              <BookOpen size={18} color={subjectColor.color} strokeWidth={2} />
+                            </View>
+                            <View style={styles.yearBlockTextContainer}>
+                              <Text style={[styles.yearBlockTitle, { color: subjectColor.color }]}>
+                                {tbChapter.textbook_chapter}
+                              </Text>
+                              <Text style={styles.yearBlockSubjects}>
+                                {tbChapter.chapters.length} Chapters
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                        <View
+                          style={[
+                            styles.yearConnectionPoint, 
+                            { backgroundColor: subjectColor.color }
+                          ]}
+                        />
+                      </View>
+                      <View style={[styles.horizontalConnector, { backgroundColor: subjectColor.borderColor }]} />
+                    </View>
+
+                    {/* Chapters and Topics */}
+                    <View style={styles.subjectsContainer}>
+                      {tbChapter.chapters.map((chapter, chapterIndex) => {
+                        const chapterColor = getChapterColor(chapterGlobalIndex);
+                        const isLastChapter = chapterIndex === tbChapter.chapters.length - 1;
+                        const allTopicsComplete = chapter.topics.every(t => t.is_complete);
+                        const firstIncomplete = chapter.topics.findIndex(t => !t.is_complete);
+                        const isCurrent = firstIncomplete >= 0;
+                        
+                        const currentChapterIndex = chapterGlobalIndex;
+                        chapterGlobalIndex++;
+
+                        return (
+                          <View key={chapterIndex} style={styles.chapterSection}>
+                            {/* Chapter Block */}
+                            <View style={styles.subjectWrapper}>
+                              <View
+                                style={[
+                                  styles.chapterBlock,
+                                  {
+                                    backgroundColor: allTopicsComplete || isCurrent
+                                      ? chapterColor.bgColor
+                                      : 'rgba(30, 30, 30, 0.4)',
+                                    borderLeftColor: allTopicsComplete || isCurrent
+                                      ? chapterColor.color
+                                      : 'rgba(100, 100, 100, 0.4)',
+                                  },
+                                ]}
+                              >
+                                <View style={styles.chapterBlockContent}>
+                                  <View
+                                    style={[
+                                      styles.chapterIconDot,
+                                      {
+                                        backgroundColor: allTopicsComplete || isCurrent
+                                          ? chapterColor.color
+                                          : 'rgba(100, 100, 100, 0.5)',
+                                      },
+                                    ]}
+                                  />
+                                  <Text
+                                    style={[
+                                      styles.chapterText,
+                                      { 
+                                        color: allTopicsComplete || isCurrent 
+                                          ? chapterColor.color 
+                                          : '#999999' 
+                                      },
+                                    ]}
+                                  >
+                                    {chapter.chapter}
+                                  </Text>
+                                  {allTopicsComplete && (
+                                    <CheckCircle2 size={16} color={chapterColor.color} strokeWidth={2} />
+                                  )}
+                                </View>
                                 <View
                                   style={[
-                                    styles.chapterIconDot,
+                                    styles.chapterConnectionPoint,
                                     {
                                       backgroundColor: allTopicsComplete || isCurrent
                                         ? chapterColor.color
-                                        : 'rgba(100, 100, 100, 0.5)',
+                                        : 'rgba(100, 100, 100, 0.6)',
                                     },
                                   ]}
                                 />
-                                <Text
-                                  style={[
-                                    styles.chapterText,
-                                    { 
-                                      color: allTopicsComplete || isCurrent 
-                                        ? chapterColor.color 
-                                        : '#999999' 
-                                    },
-                                  ]}
-                                >
-                                  {chapter.chapter}
-                                </Text>
-                                {allTopicsComplete && (
-                                  <CheckCircle2 size={16} color={chapterColor.color} strokeWidth={2} />
-                                )}
                               </View>
                               <View
                                 style={[
-                                  styles.chapterConnectionPoint,
-                                  {
-                                    backgroundColor: allTopicsComplete || isCurrent
-                                      ? chapterColor.color
-                                      : 'rgba(100, 100, 100, 0.6)',
+                                  styles.horizontalConnectorChapter,
+                                  { 
+                                    backgroundColor: chapterColor.color,
+                                    opacity: allTopicsComplete || isCurrent ? 0.5 : 0.2,
                                   },
                                 ]}
                               />
                             </View>
-                            <View
-                              style={[
-                                styles.horizontalConnectorChapter,
-                                { 
-                                  backgroundColor: chapterColor.color,
-                                  opacity: allTopicsComplete || isCurrent ? 0.5 : 0.2,
-                                },
-                              ]}
-                            />
-                          </View>
 
-                          {/* Topics (nested) - TAB STYLE */}
-                          <View style={styles.topicsContainer}>
-                            {chapter.topics.map((topic, topicIndex) => {
-                              const topicColor = getTopicColor(topicIndex);
-                              const isComplete = topic.is_complete;
-                              const isCurrentTopic = topic.is_current;
-                              const isLastTopic = topicIndex === chapter.topics.length - 1;
-                              const isFuture = !isComplete && !isCurrentTopic;
+                            {/* Topics (nested) - TAB STYLE */}
+                            <View style={styles.topicsContainer}>
+                              {chapter.topics.map((topic, topicIndex) => {
+                                const topicColor = getTopicColor(topicIndex);
+                                const isComplete = topic.is_complete;
+                                const isCurrentTopic = topic.is_current;
+                                const isLastTopic = topicIndex === chapter.topics.length - 1;
+                                const isFuture = !isComplete && !isCurrentTopic;
 
-                              return (
-                                <View key={topicIndex} style={styles.topicWrapper}>
-                                  <TouchableOpacity
-                                    activeOpacity={0.8}
-                                    style={[
-                                      styles.topicTab,
-                                      {
-                                        backgroundColor: isComplete
-                                          ? 'rgba(37, 211, 102, 0.08)'
-                                          : isCurrentTopic
-                                          ? topicColor.bgColor
-                                          : 'rgba(30, 30, 30, 0.3)',
-                                        borderLeftColor: isComplete
-                                          ? '#25D366'
-                                          : isCurrentTopic
-                                          ? topicColor.color
-                                          : 'rgba(100, 100, 100, 0.3)',
-                                        opacity: isFuture ? 0.5 : 1,
-                                      },
-                                    ]}
-                                  >
-                                  <View style={styles.topicTabContent}>
-  {isCurrentTopic && (
-    <View style={[styles.currentBadgeTop, { backgroundColor: topicColor.color }]}>
-      <Text style={styles.currentBadgeText}>ACTIVE</Text>
+                                return (
+                                  <View key={topicIndex} style={styles.topicWrapper}>
+                                    <TouchableOpacity
+                                      activeOpacity={0.8}
+                                      style={[
+                                        styles.topicTab,
+                                        {
+                                          backgroundColor: isComplete
+                                            ? 'rgba(37, 211, 102, 0.08)'
+                                            : isCurrentTopic
+                                            ? topicColor.bgColor
+                                            : 'rgba(30, 30, 30, 0.3)',
+                                          borderLeftColor: isComplete
+                                            ? '#25D366'
+                                            : isCurrentTopic
+                                            ? topicColor.color
+                                            : 'rgba(100, 100, 100, 0.3)',
+                                          opacity: isFuture ? 0.5 : 1,
+                                        },
+                                      ]}
+                                    >
+                                    <View style={styles.topicTabContent}>
+    {isCurrentTopic && (
+      <View style={[styles.currentBadgeTop, { backgroundColor: topicColor.color }]}>
+        <Text style={styles.currentBadgeText}>ACTIVE</Text>
+      </View>
+    )}
+
+    <View style={styles.topicMainRow}>
+      <View style={styles.topicIconContainer}>
+        {isComplete ? (
+          <CheckCircle2 size={14} color="#25D366" strokeWidth={2} />
+        ) : isCurrentTopic ? (
+          <Zap size={14} color={topicColor.color} fill={topicColor.color} strokeWidth={2} />
+        ) : (
+          <Circle size={12} color="rgba(100, 100, 100, 0.5)" strokeWidth={1.5} />
+        )}
+      </View>
+
+      <Text
+        style={[
+          styles.topicTabText,
+          {
+            color: isComplete
+              ? '#25D366'
+              : isCurrentTopic
+              ? topicColor.color
+              : '#808080',
+          },
+        ]}
+      >
+        {topic.topic}
+      </Text>
     </View>
-  )}
-
-  <View style={styles.topicMainRow}>
-    <View style={styles.topicIconContainer}>
-      {isComplete ? (
-        <CheckCircle2 size={14} color="#25D366" strokeWidth={2} />
-      ) : isCurrentTopic ? (
-        <Zap size={14} color={topicColor.color} fill={topicColor.color} strokeWidth={2} />
-      ) : (
-        <Circle size={12} color="rgba(100, 100, 100, 0.5)" strokeWidth={1.5} />
-      )}
-    </View>
-
-    <Text
-      style={[
-        styles.topicTabText,
-        {
-          color: isComplete
-            ? '#25D366'
-            : isCurrentTopic
-            ? topicColor.color
-            : '#808080',
-        },
-      ]}
-    >
-      {topic.topic}
-    </Text>
   </View>
-</View>
+                                      <View
+                                        style={[
+                                          styles.topicConnectionPoint,
+                                          {
+                                            backgroundColor: isComplete
+                                              ? '#25D366'
+                                              : isCurrentTopic
+                                              ? topicColor.color
+                                              : 'rgba(100, 100, 100, 0.5)',
+                                          },
+                                        ]}
+                                      />
+                                    </TouchableOpacity>
+                                    {!isLastTopic && (
+                                      <View
+                                        style={[
+                                          styles.topicConnector,
+                                          {
+                                            backgroundColor: isComplete
+                                              ? '#25D366'
+                                              : chapterColor.color,
+                                            opacity: 0.3,
+                                          },
+                                        ]}
+                                      />
+                                    )}
                                     <View
                                       style={[
-                                        styles.topicConnectionPoint,
+                                        styles.horizontalConnectorTopic,
                                         {
                                           backgroundColor: isComplete
                                             ? '#25D366'
                                             : isCurrentTopic
                                             ? topicColor.color
-                                            : 'rgba(100, 100, 100, 0.5)',
-                                        },
-                                      ]}
-                                    />
-                                  </TouchableOpacity>
-                                  {!isLastTopic && (
-                                    <View
-                                      style={[
-                                        styles.topicConnector,
-                                        {
-                                          backgroundColor: isComplete
-                                            ? '#25D366'
                                             : chapterColor.color,
-                                          opacity: 0.3,
+                                          opacity: isComplete || isCurrentTopic ? 0.4 : 0.2,
                                         },
                                       ]}
                                     />
-                                  )}
-                                  <View
-                                    style={[
-                                      styles.horizontalConnectorTopic,
-                                      {
-                                        backgroundColor: isComplete
-                                          ? '#25D366'
-                                          : isCurrentTopic
-                                          ? topicColor.color
-                                          : chapterColor.color,
-                                        opacity: isComplete || isCurrentTopic ? 0.4 : 0.2,
-                                      },
-                                    ]}
-                                  />
-                                </View>
-                              );
-                            })}
+                                  </View>
+                                );
+                              })}
+                            </View>
+
+                            {!isLastChapter && (
+                              <View
+                                style={[
+                                  styles.chapterConnector,
+                                  { 
+                                    backgroundColor: chapterColor.color, 
+                                    opacity: 0.3,
+                                  },
+                                ]}
+                              />
+                            )}
                           </View>
+                        );
+                      })}
+                    </View>
 
-                          {!isLastChapter && (
-                            <View
-                              style={[
-                                styles.chapterConnector,
-                                { 
-                                  backgroundColor: chapterColor.color, 
-                                  opacity: 0.3,
-                                },
-                              ]}
-                            />
-                          )}
-                        </View>
-                      );
-                    })}
+                    {/* Textbook Chapter to Chapter Connector */}
+                    {tbIndex < subjectProgress.length - 1 && (
+                      <View
+                        style={[
+                          styles.yearToYearConnector,
+                          { backgroundColor: subjectColor.borderColor, opacity: 0.4 },
+                        ]}
+                      />
+                    )}
                   </View>
+                ))}
 
-                  {/* Textbook Chapter to Chapter Connector */}
-                  {tbIndex < subjectProgress.length - 1 && (
-                    <View
-                      style={[
-                        styles.yearToYearConnector,
-                        { backgroundColor: subjectColor.borderColor, opacity: 0.4 },
-                      ]}
-                    />
-                  )}
-                </View>
-              ))}
-
-              {/* End Node */}
-              <View style={styles.endNode}>
-                <View style={[styles.endNodeCircle, { backgroundColor: '#25D366' }]}>
-                  <Trophy size={20} color="#ffffff" strokeWidth={2} />
-                </View>
-                <View style={styles.endNodeContent}>
-                  <Text style={[styles.endNodeTitle, { color: '#25D366' }]}>Journey Complete!</Text>
-                  <Text style={styles.endNodeSubtitle}>{selectedSubject} Mastered</Text>
+                {/* End Node */}
+                <View style={styles.endNode}>
+                  <View style={[styles.endNodeCircle, { backgroundColor: '#25D366' }]}>
+                    <Trophy size={20} color="#ffffff" strokeWidth={2} />
+                  </View>
+                  <View style={styles.endNodeContent}>
+                    <Text style={[styles.endNodeTitle, { color: '#25D366' }]}>Journey Complete!</Text>
+                    <Text style={styles.endNodeSubtitle}>{selectedSubject} Mastered</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          )}
+            )}
 
-          {/* Empty State */}
-          {!loading && !error && subjectProgress && subjectProgress.length === 0 && (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No learning path data available yet</Text>
-            </View>
-          )}
+            {/* Empty State */}
+            {!loading && !error && subjectProgress && subjectProgress.length === 0 && (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No learning path data available yet</Text>
+              </View>
+            )}
 
-          <View style={styles.bottomSpacer} />
-        </ScrollView>
-      </View>
+            <View style={styles.bottomSpacer} />
+          </ScrollView>
+        </View>
+      </MainLayout>
     );
   };
 
@@ -560,188 +563,188 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.journeyBadge}>
-            <Sparkles size={14} color="#FFD700" />
-            <Text style={[styles.journeyBadgeText, { color: '#FFD700' }]}>YOUR JOURNEY</Text>
-          </View>
-          <Text style={styles.headerTitle}>MBBS Learning Path</Text>
-          <Text style={styles.headerSubtitle}>
-            Follow the path through 4 years of medical excellence
-          </Text>
-        </View>
-
-        {/* Flowchart Container */}
-        <View style={styles.flowchartContainer}>
-          {/* Vertical Timeline Line (Right Side) */}
-        <View style={styles.timelineLineContainer}>
-  {Array.isArray(subjectProgress) &&
-    subjectProgress.map((tbChapter, tbIndex) =>
-      tbChapter.chapters.map((_, chapterIndex) => {
-        const globalIndex =
-          subjectProgress
-            .slice(0, tbIndex)
-            .reduce((acc, tb) => acc + tb.chapters.length, 0) +
-          chapterIndex;
-
-        const chapterColor = getChapterColor(globalIndex);
-
-        return (
-          <View
-            key={`line-${tbIndex}-${chapterIndex}`}
-            style={[
-              styles.timelineSegment,
-              { backgroundColor: chapterColor.color },
-            ]}
-          />
-        );
-      })
-    )}
-</View>
-
-
-
-          {/* Start Node */}
-          <View style={styles.startNode}>
-            <View style={[styles.startNodeCircle, { backgroundColor: '#25D366' }]}>
-              <Sparkles size={16} color="#ffffff" />
+    <MainLayout>
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.journeyBadge}>
+              <Sparkles size={14} color="#FFD700" />
+              <Text style={[styles.journeyBadgeText, { color: '#FFD700' }]}>YOUR JOURNEY</Text>
             </View>
-            <View style={styles.startNodeContent}>
-              <Text style={[styles.startNodeText, { color: '#25D366' }]}>Start Your Journey</Text>
-            </View>
-            <View style={[styles.connectionLine, { backgroundColor: 'rgba(255, 255, 255, 0.15)' }]} />
+            <Text style={styles.headerTitle}>MBBS Learning Path</Text>
+            <Text style={styles.headerSubtitle}>
+              Follow the path through 4 years of medical excellence
+            </Text>
           </View>
 
-          {/* Years and Subjects Flow */}
-          {YEARS.map((yearData, yearIndex) => (
-            <View key={yearIndex} style={styles.yearSection}>
-              {/* Year Block */}
-              <View style={styles.yearBlockWrapper}>
-                <View
-                  style={[
-                    styles.yearBlock,
-                    { backgroundColor: yearData.bgColor, borderLeftColor: yearData.color },
-                  ]}
-                >
-                  <View style={styles.yearBlockContent}>
-                    <View style={styles.yearBlockHeader}>
-                      <View
-                        style={[styles.yearIconCircle, { backgroundColor: 'rgba(255, 255, 255, 0.05)' }]}
-                      >
-                        {yearIndex === 0 && <BookOpen size={16} color={yearData.color} />}
-                        {yearIndex === 1 && <Star size={16} color={yearData.color} />}
-                        {yearIndex === 2 && <Award size={16} color={yearData.color} />}
-                        {yearIndex === 3 && <Trophy size={16} color={yearData.color} />}
-                      </View>
-                      <View style={styles.yearBlockTextContainer}>
-                        <Text style={[styles.yearBlockTitle, { color: yearData.color }]}>
-                          {yearData.year}
-                        </Text>
-                        <Text style={styles.yearBlockSubjects}>
-                          {yearData.subjects.length} Subjects
-                        </Text>
+          {/* Flowchart Container */}
+          <View style={styles.flowchartContainer}>
+            {/* Vertical Timeline Line (Right Side) */}
+          <View style={styles.timelineLineContainer}>
+    {Array.isArray(subjectProgress) &&
+      subjectProgress.map((tbChapter, tbIndex) =>
+        tbChapter.chapters.map((_, chapterIndex) => {
+          const globalIndex =
+            subjectProgress
+              .slice(0, tbIndex)
+              .reduce((acc, tb) => acc + tb.chapters.length, 0) +
+            chapterIndex;
+
+          const chapterColor = getChapterColor(globalIndex);
+
+          return (
+            <View
+              key={`line-${tbIndex}-${chapterIndex}`}
+              style={[
+                styles.timelineSegment,
+                { backgroundColor: chapterColor.color },
+              ]}
+            />
+          );
+        })
+      )}
+  </View>
+
+            {/* Start Node */}
+            <View style={styles.startNode}>
+              <View style={[styles.startNodeCircle, { backgroundColor: '#25D366' }]}>
+                <Sparkles size={16} color="#ffffff" />
+              </View>
+              <View style={styles.startNodeContent}>
+                <Text style={[styles.startNodeText, { color: '#25D366' }]}>Start Your Journey</Text>
+              </View>
+              <View style={[styles.connectionLine, { backgroundColor: 'rgba(255, 255, 255, 0.15)' }]} />
+            </View>
+
+            {/* Years and Subjects Flow */}
+            {YEARS.map((yearData, yearIndex) => (
+              <View key={yearIndex} style={styles.yearSection}>
+                {/* Year Block */}
+                <View style={styles.yearBlockWrapper}>
+                  <View
+                    style={[
+                      styles.yearBlock,
+                      { backgroundColor: yearData.bgColor, borderLeftColor: yearData.color },
+                    ]}
+                  >
+                    <View style={styles.yearBlockContent}>
+                      <View style={styles.yearBlockHeader}>
+                        <View
+                          style={[styles.yearIconCircle, { backgroundColor: 'rgba(255, 255, 255, 0.05)' }]}
+                        >
+                          {yearIndex === 0 && <BookOpen size={16} color={yearData.color} />}
+                          {yearIndex === 1 && <Star size={16} color={yearData.color} />}
+                          {yearIndex === 2 && <Award size={16} color={yearData.color} />}
+                          {yearIndex === 3 && <Trophy size={16} color={yearData.color} />}
+                        </View>
+                        <View style={styles.yearBlockTextContainer}>
+                          <Text style={[styles.yearBlockTitle, { color: yearData.color }]}>
+                            {yearData.year}
+                          </Text>
+                          <Text style={styles.yearBlockSubjects}>
+                            {yearData.subjects.length} Subjects
+                          </Text>
+                        </View>
                       </View>
                     </View>
+                    <View
+                      style={[styles.yearConnectionPoint, { backgroundColor: yearData.color }]}
+                    />
                   </View>
-                  <View
-                    style={[styles.yearConnectionPoint, { backgroundColor: yearData.color }]}
-                  />
+                  <View style={[styles.horizontalConnector, { backgroundColor: yearData.borderColor }]} />
                 </View>
-                <View style={[styles.horizontalConnector, { backgroundColor: yearData.borderColor }]} />
-              </View>
 
-              {/* Subject Blocks */}
-              <View style={styles.subjectsContainer}>
-                {yearData.subjects.map((subject, subjectIndex) => {
-                  const isLast = subjectIndex === yearData.subjects.length - 1;
+                {/* Subject Blocks */}
+                <View style={styles.subjectsContainer}>
+                  {yearData.subjects.map((subject, subjectIndex) => {
+                    const isLast = subjectIndex === yearData.subjects.length - 1;
 
-                  return (
-                    <View key={subjectIndex} style={styles.subjectWrapper}>
-                      <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={() => handleSubjectPress(subject)}
-                        style={[
-                          styles.subjectBlock,
-                          {
-                            backgroundColor: 'rgba(30, 30, 30, 0.3)',
-                            borderLeftColor: 'rgba(100, 100, 100, 0.3)',
-                          },
-                        ]}
-                      >
-                        <View style={styles.subjectBlockContent}>
+                    return (
+                      <View key={subjectIndex} style={styles.subjectWrapper}>
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          onPress={() => handleSubjectPress(subject)}
+                          style={[
+                            styles.subjectBlock,
+                            {
+                              backgroundColor: 'rgba(30, 30, 30, 0.3)',
+                              borderLeftColor: 'rgba(100, 100, 100, 0.3)',
+                            },
+                          ]}
+                        >
+                          <View style={styles.subjectBlockContent}>
+                            <View
+                              style={[
+                                styles.subjectDot,
+                                { backgroundColor: 'rgba(100, 100, 100, 0.5)' },
+                              ]}
+                            />
+                            <Text style={[styles.subjectText, { color: '#999999' }]}>
+                              {subject}
+                            </Text>
+                            <View style={styles.selectedBadge}>
+                              <ChevronRight size={14} color="#808080" />
+                            </View>
+                          </View>
                           <View
                             style={[
-                              styles.subjectDot,
-                              { backgroundColor: 'rgba(100, 100, 100, 0.5)' },
+                              styles.subjectConnectionPoint,
+                              { backgroundColor: 'rgba(100, 100, 100, 0.6)' },
                             ]}
                           />
-                          <Text style={[styles.subjectText, { color: '#999999' }]}>
-                            {subject}
-                          </Text>
-                          <View style={styles.selectedBadge}>
-                            <ChevronRight size={14} color="#808080" />
-                          </View>
-                        </View>
+                        </TouchableOpacity>
+                        {!isLast && (
+                          <View
+                            style={[
+                              styles.subjectConnector,
+                              { backgroundColor: yearData.color, opacity: 0.2 },
+                            ]}
+                          />
+                        )}
                         <View
                           style={[
-                            styles.subjectConnectionPoint,
-                            { backgroundColor: 'rgba(100, 100, 100, 0.6)' },
+                            styles.horizontalConnectorSmall,
+                            { backgroundColor: yearData.color, opacity: 0.3 },
                           ]}
                         />
-                      </TouchableOpacity>
-                      {!isLast && (
-                        <View
-                          style={[
-                            styles.subjectConnector,
-                            { backgroundColor: yearData.color, opacity: 0.2 },
-                          ]}
-                        />
-                      )}
-                      <View
-                        style={[
-                          styles.horizontalConnectorSmall,
-                          { backgroundColor: yearData.color, opacity: 0.3 },
-                        ]}
-                      />
-                    </View>
-                  );
-                })}
+                      </View>
+                    );
+                  })}
+                </View>
+
+                {/* Year to Year Connector */}
+                {yearIndex < YEARS.length - 1 && (
+                  <View
+                    style={[
+                      styles.yearToYearConnector,
+                      { backgroundColor: YEARS[yearIndex + 1].color, opacity: 0.3 },
+                    ]}
+                  />
+                )}
               </View>
+            ))}
 
-              {/* Year to Year Connector */}
-              {yearIndex < YEARS.length - 1 && (
-                <View
-                  style={[
-                    styles.yearToYearConnector,
-                    { backgroundColor: YEARS[yearIndex + 1].color, opacity: 0.3 },
-                  ]}
-                />
-              )}
-            </View>
-          ))}
-
-          {/* End Node */}
-          <View style={styles.endNode}>
-            <View style={[styles.endNodeCircle, { backgroundColor: '#FFD700' }]}>
-              <Trophy size={20} color="#ffffff" />
-            </View>
-            <View style={styles.endNodeContent}>
-              <Text style={[styles.endNodeTitle, { color: '#FFD700' }]}>Journey Complete!</Text>
-              <Text style={styles.endNodeSubtitle}>MBBS Mastery Achieved</Text>
+            {/* End Node */}
+            <View style={styles.endNode}>
+              <View style={[styles.endNodeCircle, { backgroundColor: '#FFD700' }]}>
+                <Trophy size={20} color="#ffffff" />
+              </View>
+              <View style={styles.endNodeContent}>
+                <Text style={[styles.endNodeTitle, { color: '#FFD700' }]}>Journey Complete!</Text>
+                <Text style={styles.endNodeSubtitle}>MBBS Mastery Achieved</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
-    </View>
+          <View style={styles.bottomSpacer} />
+        </ScrollView>
+      </View>
+    </MainLayout>
   );
 }
 
@@ -1144,11 +1147,11 @@ const styles = StyleSheet.create({
   },
 
   topicTabContent: {
-  flexDirection: 'column',   // ✅ FIX
-  alignItems: 'flex-start',
-  paddingVertical: 8,        // ⬅️ slightly smaller height
-  paddingHorizontal: 12,
-},
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
 
   topicIconContainer: {
     marginRight: 10,
@@ -1258,9 +1261,9 @@ currentBadgeTop: {
     height: 40,
   },
   timelineSegment: {
-  flex: 1,
-  width: 2,
-  marginVertical: 2,
-  borderRadius: 1,
-},
+    flex: 1,
+    width: 2,
+    marginVertical: 2,
+    borderRadius: 1,
+  },
 });
