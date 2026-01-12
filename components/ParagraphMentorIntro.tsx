@@ -1,6 +1,6 @@
 //components/ParagraphMentorIntro.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 
 const HERO_IMAGES = [
   'https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM1.webp',
@@ -12,6 +12,8 @@ const HERO_IMAGES = [
 
 export default function ParagraphMentorIntro() {
   const [heroImage, setHeroImage] = useState<string>('');
+  const { width } = useWindowDimensions();
+  const isWeb = width >= 768;
 
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * HERO_IMAGES.length);
@@ -23,8 +25,11 @@ export default function ParagraphMentorIntro() {
       {heroImage && (
         <Image
           source={{ uri: heroImage }}
-          style={styles.heroImage}
-          resizeMode="cover"
+          style={[
+            styles.heroImage,
+            isWeb && styles.heroImageWeb
+          ]}
+          resizeMode={isWeb ? 'contain' : 'cover'}
         />
       )}
 
@@ -161,12 +166,18 @@ const styles = StyleSheet.create({
     height: 240,
     backgroundColor: '#1c2730',
   },
+  heroImageWeb: {
+    height: 360,
+    maxHeight: 420,
+    objectFit: 'contain',
+  },
   content: {
     paddingHorizontal: 16,
     paddingVertical: 20,
   },
   section: {
     marginBottom: 16,
+    alignItems: 'center',
   },
   mainHeading: {
     fontSize: 24,
@@ -186,12 +197,14 @@ const styles = StyleSheet.create({
     color: '#10b981',
     marginBottom: 12,
     lineHeight: 26,
+    textAlign: 'center',
   },
   bodyText: {
     fontSize: 15,
     color: '#e5e7eb',
     lineHeight: 24,
     marginBottom: 4,
+    textAlign: 'center',
   },
   bodyTextBold: {
     fontSize: 15,
@@ -199,10 +212,13 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontWeight: '600',
     marginBottom: 4,
+    textAlign: 'center',
   },
   flowItem: {
     marginTop: 12,
     paddingLeft: 8,
+    alignItems: 'flex-start',
+    width: '100%',
   },
   flowNumber: {
     fontSize: 16,
@@ -210,6 +226,7 @@ const styles = StyleSheet.create({
     color: '#34d399',
     marginBottom: 6,
     lineHeight: 24,
+    textAlign: 'left',
   },
   flowDetail: {
     fontSize: 14,
@@ -217,6 +234,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 3,
     paddingLeft: 8,
+    textAlign: 'left',
   },
   divider: {
     height: 1,
