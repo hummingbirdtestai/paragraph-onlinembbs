@@ -55,8 +55,8 @@ type Message = {
 };
 
 export default function AskParagraphChat() {
-  const [selectedYear, setSelectedYear] = useState<Year | null>(null);
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<Year>('first');
+  const [selectedSubject, setSelectedSubject] = useState<string>('Anatomy');
   const [chatStarted, setChatStarted] = useState(false);
   const [sessionCompleted, setSessionCompleted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -65,7 +65,7 @@ export default function AskParagraphChat() {
   const { user } = useAuth();
   const router = useRouter();
   const conversationRef = useRef<any[]>([]);
-  const [showSubjectProgress, setShowSubjectProgress] = useState(false);
+  const [showSubjectProgress, setShowSubjectProgress] = useState(true);
   const yearOptions: { key: Year; label: string }[] = [
     { key: 'first', label: 'First Year' },
     { key: 'second', label: 'Second Year' },
@@ -128,23 +128,19 @@ export default function AskParagraphChat() {
 
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
-      // 🔥 Read full response atomically (no streaming)
       const text = await res.text();
 
-      // 1️⃣ Append mentor reply ONCE
       setConversation(prev => [
         ...prev,
         { role: "mentor", content: text }
       ]);
 
-      // 2️⃣ Handle session completion
       if (text.includes("[SESSION_COMPLETED]")) {
         setSessionCompleted(true);
         setTutorMode("idle");
         setShowConfetti(true);
       }
 
-      // 3️⃣ Unlock UI
       setIsTyping(false);
       sendingLockRef.current = false;
 
@@ -292,6 +288,10 @@ export default function AskParagraphChat() {
 
   const renderSelectionScreen = () => (
     <View style={styles.selectionContainer}>
+      <Text style={styles.instructionText}>
+        Choose a Year and Subject to start learning and mastering CBME competencies
+      </Text>
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -309,6 +309,7 @@ export default function AskParagraphChat() {
             onPress={() => {
               setSelectedYear(year.key);
               setSelectedSubject(null);
+              setShowSubjectProgress(false);
             }}
           >
             <Text
@@ -424,20 +425,18 @@ export default function AskParagraphChat() {
           >
             {!chatStarted && renderSelectionScreen()}
 
-            {/* 🔽 Paragraph Mentor Intro — always visible on entry */}
-            {!chatStarted && (
-              <View style={{ marginTop: 12 }}>
-                <ParagraphMentorIntro />
-              </View>
-            )}
-
             {!chatStarted && showSubjectProgress && selectedSubject && user?.id && (
-              <View style={{ marginTop: 16 }}>
-                <View style={{ height: 1, backgroundColor: '#1c2730', marginBottom: 12 }} />
+              <View style={{ marginTop: 12 }}>
                 <SubjectProgressDashboard
                   student_id={user.id}
                   subject={selectedSubject}
                 />
+              </View>
+            )}
+
+            {!chatStarted && (
+              <View style={{ marginTop: 16 }}>
+                <ParagraphMentorIntro />
               </View>
             )}
 
@@ -545,6 +544,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 8,
     gap: 12,
+  },
+  instructionText: {
+    color: '#9ca3af',
+    fontSize: 14,
+    textAlign: 'center',
+    marginHorizontal: 24,
+    marginBottom: 8,
   },
   pillContainer: {
     flexGrow: 0,
