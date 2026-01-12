@@ -307,7 +307,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                               <BookOpen size={18} color={subjectColor.color} strokeWidth={2} />
                             </View>
                             <View style={styles.yearBlockTextContainer}>
-                              <Text style={[styles.yearBlockTitle, { color: subjectColor.color }]}>
+                              <Text style={styles.textbookChapterTitle}>
                                 {tbChapter.textbook_chapter}
                               </Text>
                               <Text style={styles.yearBlockSubjects}>
@@ -366,16 +366,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                       },
                                     ]}
                                   />
-                                  <Text
-                                    style={[
-                                      styles.chapterText,
-                                      { 
-                                        color: allTopicsComplete || isCurrent 
-                                          ? chapterColor.color 
-                                          : '#999999' 
-                                      },
-                                    ]}
-                                  >
+                                  <Text style={styles.chapterTextFixed}>
                                     {chapter.chapter}
                                   </Text>
                                   {allTopicsComplete && (
@@ -422,15 +413,11 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                         {
                                           backgroundColor: isComplete
                                             ? 'rgba(37, 211, 102, 0.08)'
-                                            : isCurrentTopic
-                                            ? topicColor.bgColor
                                             : 'rgba(30, 30, 30, 0.3)',
                                           borderLeftColor: isComplete
                                             ? '#25D366'
-                                            : isCurrentTopic
-                                            ? topicColor.color
-                                            : 'rgba(100, 100, 100, 0.3)',
-                                          opacity: isFuture ? 0.5 : 1,
+                                            : '#E91E63',
+                                    
                                         },
                                       ]}
                                     >
@@ -446,9 +433,9 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                             {isComplete ? (
                                               <CheckCircle2 size={14} color="#25D366" strokeWidth={2} />
                                             ) : isCurrentTopic ? (
-                                              <Zap size={14} color={topicColor.color} fill={topicColor.color} strokeWidth={2} />
+                                              <Circle size={12} color="#E91E63" strokeWidth={2} fill="#E91E63" />
                                             ) : (
-                                              <Circle size={12} color="rgba(100, 100, 100, 0.5)" strokeWidth={1.5} />
+                                              <Circle size={12} color="#E91E63" strokeWidth={1.5} />
                                             )}
                                           </View>
 
@@ -456,11 +443,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                             style={[
                                               styles.topicTabText,
                                               {
-                                                color: isComplete
-                                                  ? '#25D366'
-                                                  : isCurrentTopic
-                                                  ? topicColor.color
-                                                  : '#808080',
+                                                color: isComplete ? '#25D366' : '#E91E63',
                                               },
                                             ]}
                                           >
@@ -472,11 +455,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
                                         style={[
                                           styles.topicConnectionPoint,
                                           {
-                                            backgroundColor: isComplete
-                                              ? '#25D366'
-                                              : isCurrentTopic
-                                              ? topicColor.color
-                                              : 'rgba(100, 100, 100, 0.5)',
+                                            backgroundColor: isComplete ? '#25D366' : '#E91E63',
                                           },
                                         ]}
                                       />
@@ -965,6 +944,14 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
+  textbookChapterTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 2,
+    letterSpacing: 0.3,
+    color: '#e1e1e1',
+  },
+
   yearBlockSubjects: {
     fontSize: 13,
     color: '#808080',
@@ -1105,6 +1092,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.3,
+  },
+
+  chapterTextFixed: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+    color: '#e1e1e1',
   },
 
   chapterConnectionPoint: {
