@@ -1086,18 +1086,19 @@ const PersonalMentorMobile = memo(() => {
       <View style={styles.mobilePadding}>
         <Text style={styles.mobileHeading}>Feels Like a Personal Mentor</Text>
 
-        <Text style={styles.mobileCheck}>✔ 24×7 AI doubt-clearing</Text>
-        <Text style={styles.mobileCheck}>✔ Instant explanations</Text>
-        <Text style={styles.mobileCheck}>✔ No waiting for faculty</Text>
-        <Text style={styles.mobileCheck}>✔ No batch dependency</Text>
+        <Text style={[styles.mobileCheck, { textAlign: 'center' }]}>✔ 24×7 AI doubt-clearing</Text>
+        <Text style={[styles.mobileCheck, { textAlign: 'center' }]}>✔ Instant explanations</Text>
+        <Text style={[styles.mobileCheck, { textAlign: 'center' }]}>✔ No waiting for faculty</Text>
+        <Text style={[styles.mobileCheck, { textAlign: 'center' }]}>✔ No batch dependency</Text>
 
-        <Text style={[styles.mobileBody, styles.emphasis, { marginTop: 16 }]}>
+        <Text style={[styles.mobileBody, styles.emphasis, { marginTop: 16, textAlign: 'center' }]}>
           Reassuring, supportive, personal.
         </Text>
       </View>
     </View>
   );
 });
+
 
 const PersonalMentorWeb = memo(() => {
   return (
@@ -1106,10 +1107,10 @@ const PersonalMentorWeb = memo(() => {
         <Text style={styles.webHeading}>Feels Like a Personal Mentor</Text>
 
         <View style={styles.webCheckList}>
-          <Text style={styles.webCheck}>✔ 24×7 AI doubt-clearing</Text>
-          <Text style={styles.webCheck}>✔ Instant explanations</Text>
-          <Text style={styles.webCheck}>✔ No waiting for faculty</Text>
-          <Text style={styles.webCheck}>✔ No batch dependency</Text>
+          <Text style={[styles.webCheck, { textAlign: 'center' }]}>✔ 24×7 AI doubt-clearing</Text>
+          <Text style={[styles.webCheck, { textAlign: 'center' }]}>✔ Instant explanations</Text>
+          <Text style={[styles.webCheck, { textAlign: 'center' }]}>✔ No waiting for faculty</Text>
+          <Text style={[styles.webCheck, { textAlign: 'center' }]}>✔ No batch dependency</Text>
         </View>
 
         <Text style={[styles.webBody, styles.emphasis, { textAlign: 'center', marginTop: 24 }]}>
@@ -1119,6 +1120,7 @@ const PersonalMentorWeb = memo(() => {
     </View>
   );
 });
+
 
 const Section9Mobile = memo(({ onOpenAuth, isLoggedIn }) => {
   if (isLoggedIn) return null;
