@@ -21,6 +21,10 @@ export function PracticeCard({ phase }) {
 const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
   const subjectName = phase.subject ?? phase.textbook_chapter;
 
+  const hasDiscussion =
+    Boolean(phase.phase_json?.discussion) ||
+    Boolean(phase.phase_json?.mentor_discussion);
+
   React.useEffect(() => {
     if (phase.phase_type === "concept") {
       console.log("📗 [PracticeCard] Concept Loaded", {
@@ -36,6 +40,32 @@ const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
       });
     }
   }, [phase]);
+
+  const ViewNotesButton = ({ label }: { label: string }) => (
+    <TouchableOpacity
+      style={{
+        marginTop: 12,
+        paddingVertical: 10,
+        borderRadius: 8,
+        backgroundColor: "#0d2017",
+        borderWidth: 1,
+        borderColor: "#10b981",
+        alignItems: "center",
+      }}
+      onPress={() =>
+        router.push({
+          pathname: "/notes-popup",
+          params: {
+            phase_id: phase.id,
+          },
+        })
+      }
+    >
+      <Text style={{ color: "#10b981", fontWeight: "700", textAlign: "center" }}>
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={[styles.card, isConcept && styles.cardConcept]}>
@@ -99,6 +129,12 @@ console.log("🔖 Toggle practice bookmark", {
     <HighYieldFactSheetScreen
       data={phase.phase_json?.concept ?? ""}
     />
+
+    {hasDiscussion ? (
+      <ViewNotesButton label="📒 View Notes from AI Discussion" />
+    ) : (
+      <ViewNotesButton label="💬 You have not yet discussed this Concept with AI Mentor" />
+    )}
   </>
 )}
 
@@ -117,29 +153,11 @@ console.log("🔖 Toggle practice bookmark", {
   mode="practice"
 />
 
-<TouchableOpacity
-  style={{
-    marginTop: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
-    backgroundColor: "#0d2017",
-    borderWidth: 1,
-    borderColor: "#10b981",
-    alignItems: "center",
-  }}
-  onPress={() =>
-    router.push({
-      pathname: "/notes-popup",
-      params: {
-        phase_id: phase.id,
-      },
-    })
-  }
->
-  <Text style={{ color: "#10b981", fontWeight: "700" }}>
-    📒 View Notes from AI Discussion
-  </Text>
-</TouchableOpacity>
+{hasDiscussion ? (
+  <ViewNotesButton label="📒 View Notes from AI Discussion" />
+) : (
+  <ViewNotesButton label="💬 You have not yet discussed this MCQ with AI Mentor" />
+)}
 
   </View>
 )}
