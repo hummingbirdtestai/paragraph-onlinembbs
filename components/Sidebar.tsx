@@ -23,28 +23,43 @@ interface SidebarProps {
 }
 
 const navItems: NavItem[] = [
-  { id: "home", label: "Master NMC CBME Syllabus with AI", href: "/", icon: Brain },
   { 
-  id: "mentor", 
-  label: "Paragraph Mentor (AI Tutor)", 
-  href: "/ask-paragraph-mbbs", 
-  icon: Bot 
-},
-   {
+    id: "home", 
+    label: "Master NMC CBME Syllabus with AI", 
+    href: "/", 
+    icon: Brain 
+  },
+
+  {
     id: "cbme-path",
     label: "CBME Learning Path",
     href: "/cbme-learning-path",
     icon: Map,
   },
-  { id: "practice", label: "5000 NMC CBME Syllabus Topics", href: "/practice", icon: BookOpen },
-  { id: "flash", label: "45000 Flash Cards", href: "/flashcard-feed-demo", icon: CreditCard },
-  { id: "videos", label: "Daily 20 NEETPG Reels", href: "/videos", icon: Video },
-  { id: "image", label: "Daily 50 Image Based MCQs", href: "/image", icon: ImageIcon },
-  { id: "mocktests", label: "100 Bi-Weekly NEETPG Mock Tests", href: "/mocktests", icon: FileText },
-  { id: "battle", label: "Daily 15 Live Group Quiz Battles", href: "/battle", icon: Swords },
-  { id: "analytics", label: "1000 Hours NEETPG Study Progress", href: "/analyticspage", icon: BarChart3 },
-  { id: "planner", label: "NEETPG Daily Study Planner", href: "/planner", icon: Calendar },
+
+  { 
+    id: "mentor", 
+    label: "Paragraph Mentor (AI Tutor)", 
+    href: "/ask-paragraph-mbbs", 
+    icon: Bot 
+  },
+
+  { 
+    id: "practice", 
+    label: "5000 NMC CBME Syllabus Topics", 
+    href: "/practice", 
+    icon: BookOpen 
+  },
+
+  { 
+    id: "flash", 
+    label: "45000 Flash Cards", 
+    href: "/flashcard-feed-demo", 
+    icon: CreditCard 
+  },
 ];
+
+
 
 export default function Sidebar({
   isOpen = true,
