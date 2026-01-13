@@ -566,8 +566,8 @@ export default function TermsScreen() {
           </Text>
 
           <Text style={styles.paragraph}>
-            <Text style={styles.bold}>neetpg.app is NOT affiliated with, endorsed by, sponsored by, or connected to</Text>{" "}
-            the National Medical Commission (NMC), NBEMS, NBE, or any Government body.
+            <Text style={styles.bold}>mbbsclass.com is NOT affiliated with, endorsed by, sponsored by, or connected to</Text>{" "}
+            the National Medical Commission (NMC), NBEMS, NBE,CBME or any Government body.
           </Text>
 
           <Text style={styles.paragraph}>
@@ -638,12 +638,12 @@ export default function TermsScreen() {
             30. 🏢 Ownership & Entity Declaration
           </Text>
           <Text style={styles.paragraph}>
-            The Platform <Text style={styles.bold}>neetpg.app</Text> is owned and operated by:
+            The Platform <Text style={styles.bold}>mbbsclass.com</Text> is owned and operated by:
           </Text>
 
           <Text style={styles.paragraph}>
             <Text style={styles.bold}>Paragraph</Text> — a <Text style={styles.bold}>Sole Proprietorship</Text> entity
-            {"\n"}Owner: <Text style={styles.bold}>Manu Bharadwaj Yadavalli</Text>
+            {"\n"}Owner: <Text style={styles.bold}>Manu Bharadwaz Yadavalli</Text>
           </Text>
         </View>
 
@@ -656,7 +656,7 @@ export default function TermsScreen() {
           </Text>
 
           <Text style={styles.paragraph}>
-            <Text style={styles.bold}>Email:</Text> support@neetpg.app
+            <Text style={styles.bold}>Email:</Text> support@mbbsclass.com
           </Text>
 
           <Text style={styles.paragraph}>

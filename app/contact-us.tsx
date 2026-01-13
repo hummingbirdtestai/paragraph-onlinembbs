@@ -12,7 +12,7 @@ export default function ContactUsScreen() {
   };
 
   const handleEmailPress = () => {
-    Linking.openURL('mailto:support@neetpg.app');
+    Linking.openURL('mailto:support@mbbsclass.com');
   };
 
   return (
@@ -53,7 +53,7 @@ export default function ContactUsScreen() {
             </View>
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Email</Text>
-              <Text style={styles.contactValue}>support@neetpg.app</Text>
+              <Text style={styles.contactValue}>support@mbbsclass.com</Text>
             </View>
           </TouchableOpacity>
         </View>

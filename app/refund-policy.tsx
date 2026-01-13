@@ -45,7 +45,7 @@ export default function RefundPolicyScreen() {
           <Text style={styles.heading}>2. ❌ No Cancellation & No Refund Policy</Text>
           <Text style={styles.paragraph}>
             <Text style={styles.bold}>
-              ALL SUBSCRIPTION PAYMENTS MADE ON neetpg.app ARE FINAL AND NON-REFUNDABLE.
+              ALL SUBSCRIPTION PAYMENTS MADE ON mbbsclass.com ARE FINAL AND NON-REFUNDABLE.
             </Text>
           </Text>
           <Text style={styles.paragraph}>
@@ -146,7 +146,7 @@ export default function RefundPolicyScreen() {
           </Text>
           <Text style={styles.paragraph}>
             If the amount is not reversed after 19 days, Users may contact{" "}
-            <Text style={styles.bold}>support@neetpg.app</Text> with valid transaction proof for
+            <Text style={styles.bold}>support@mbbsclass.com</Text> with valid transaction proof for
             assistance.
           </Text>
         </View>
@@ -181,7 +181,7 @@ export default function RefundPolicyScreen() {
             failed-transaction requests must be <Text style={styles.bold}>initiated via email</Text>.
           </Text>
           <Text style={styles.paragraph}>
-            <Text style={styles.bold}>Email:</Text> support@neetpg.app
+            <Text style={styles.bold}>Email:</Text> support@mbbsclass.com
           </Text>
           <Text style={styles.paragraph}>
             Other support channels, if available, may not be able to assist with refund-related
@@ -205,7 +205,7 @@ export default function RefundPolicyScreen() {
         <View style={styles.section}>
           <Text style={styles.heading}>14. 📜 Final Provisions</Text>
           <Text style={styles.paragraph}>
-            By purchasing a subscription on neetpg.app, you acknowledge that you have read,
+            By purchasing a subscription on mbbsclass.com, you acknowledge that you have read,
             understood, and agreed to this Policy in full.
           </Text>
         </View>

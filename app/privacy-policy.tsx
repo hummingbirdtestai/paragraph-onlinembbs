@@ -29,7 +29,7 @@ export default function PrivacyPolicyScreen() {
   <Text style={styles.paragraph}>
     This Privacy Policy governs the collection, use, processing, storage, disclosure,
     and protection of information by <Text style={styles.bold}>Paragraph</Text> through
-    the platform <Text style={styles.bold}>neetpg.app</Text>, including its mobile
+    the platform <Text style={styles.bold}>mbbsclass.com</Text>, including its mobile
     applications, websites, dashboards, APIs, and related services
     (collectively, the <Text style={styles.boldItalic}>Platform</Text>).
   </Text>
@@ -246,7 +246,7 @@ export default function PrivacyPolicyScreen() {
 <View style={styles.section}>
   <Text style={styles.heading}>24. 🏛️ NEET-PG Disclaimer</Text>
   <Text style={styles.paragraph}>
-    <Text style={styles.bold}>neetpg.app is NOT affiliated</Text> with the Government of India,
+    <Text style={styles.bold}>mbbsclass.com is NOT affiliated</Text> with the Government of India,
     NMC, NBEMS, or NBE. NEET-PG is a national examination conducted by authorities.
   </Text>
 </View>
@@ -310,8 +310,8 @@ export default function PrivacyPolicyScreen() {
 <View style={styles.section}>
   <Text style={styles.heading}>32. 📮 Grievance Redressal Officer</Text>
   <Text style={styles.paragraph}>
-    <Text style={styles.bold}>Grievance Officer:</Text> Manu Bharadwaj Yadavalli
-    {"\n"}<Text style={styles.bold}>Email:</Text> support@neetpg.app
+    <Text style={styles.bold}>Grievance Officer:</Text> Manu Bharadwaz Yadavalli
+    {"\n"}<Text style={styles.bold}>Email:</Text> support@mbbsclass.com
   </Text>
 </View>
 
