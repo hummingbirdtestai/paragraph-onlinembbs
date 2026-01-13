@@ -121,8 +121,13 @@ function WebLayout({ images, onOpenAuth, isLoggedIn }: HomeScreenProps & {
 const Section1Mobile = memo(({ image }: { image: string }) => {
   console.log('Section1Mobile mounted');
   return (
-    <View style={styles.mobileSection}>
-      <Image source={{ uri: image }} style={styles.mobileImageSection1} resizeMode="cover" progressiveRenderingEnabled />
+<View style={[styles.mobileSection, { marginBottom: 20 }]}>
+      <Image
+  source={{ uri: image }}
+  style={styles.mobileImageSection1}
+  resizeMode="cover"
+  progressiveRenderingEnabled
+/>
       <View style={styles.mobilePadding}>
 <Text style={styles.mobileHeading}>MBBS Learning Became Complicated. You Didn’t Fail.</Text>
 
@@ -1197,13 +1202,15 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 16,
   },
-  mobileImageSection1: {
-    width: '100%',
-    height: 380,
-    backgroundColor: '#161b22',
-    borderRadius: 16,
-    marginBottom: 16,
-  },
+ mobileImageSection1: {
+  width: '100%',
+  height: 260,   // 👈 explicit hero height
+  backgroundColor: '#161b22',
+  borderRadius: 16,
+  marginBottom: 16,
+},
+
+
   mobileImageSection6: {
     width: '100%',
     height: 340,

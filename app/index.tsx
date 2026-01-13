@@ -5,7 +5,7 @@ import MainLayout from '@/components/MainLayout';
 
 export default function Index() {
   const images = {
-    img1: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img1.webp",
+    img1: "https://paragraph.b-cdn.net/Hero%20webp.webp",
     img2: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img2.webp",
     img3: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img3.webp",
     img4: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img4.webp",
