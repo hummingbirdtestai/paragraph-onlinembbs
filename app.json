@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "AI Powered NEET PG PREP",
-    "slug": "AI-Powered-NEET-PG-PREP",
+    "name": "AI-Tutored CBME Curriculum",
+    "slug": "AI-Tutored-CBME-Curriculum",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
