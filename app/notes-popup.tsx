@@ -56,8 +56,20 @@ export default function NotesPopupScreen() {
         }
       );
 
-      if (!error && data?.length === 1) {
-        setConversation(data[0].dialogs || []);
+      if (!error && data?.length === 1 && data[0].dialogs?.length > 0) {
+        setConversation(data[0].dialogs);
+      } else {
+        // No notes → redirect to mentor flow
+        console.log("➡️ Redirecting to ask-paragraph-mbbs", {
+    phase_id,
+    student_id: user.id,
+  });
+
+        router.replace({
+          pathname: "/ask-paragraph-mbbs",
+          params: { phase_id },
+        });
+        return;
       }
 
       setLoading(false);

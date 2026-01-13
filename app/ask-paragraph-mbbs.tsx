@@ -19,7 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import HighYieldFactSheetScreen from "@/components/types/HighYieldFactSheetScreen";
 import MCQChatScreen from "@/components/types/MCQScreen";
 import CBMERenderer from "@/components/types/CBMERenderer";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { theme } from '@/constants/theme';
 import { StudentBubble } from '@/components/chat/StudentBubble';
 import MentorBubbleReply from '@/components/types/MentorBubbleReply';
@@ -64,6 +64,7 @@ export default function AskParagraphChat() {
   const [loadingPhase, setLoadingPhase] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
+  const { phase_id } = useLocalSearchParams<{ phase_id?: string }>();
   const conversationRef = useRef<any[]>([]);
   const [showSubjectProgress, setShowSubjectProgress] = useState(true);
   const yearOptions: { key: Year; label: string }[] = [
@@ -96,6 +97,37 @@ export default function AskParagraphChat() {
 
     return () => clearTimeout(timeout);
   }, [conversation, isTyping, chatStarted]);
+
+  // 🔹 NEW: Load phase from redirect (notes-popup)
+  useEffect(() => {
+  if (!phase_id || !user?.id || chatStarted) return;
+
+  const loadVisitedPhase = async () => {
+    setLoadingPhase(true);
+
+    const { data, error } = await supabase.rpc(
+      "visit_phase_pointer",
+      { p_phase_id: phase_id }
+    );
+
+    if (error || !data) {
+      console.error("❌ visit_phase_pointer failed", error);
+      setLoadingPhase(false);
+      return;
+    }
+
+    setCurrentPhase(data);
+
+    // 🔑 THESE TWO LINES MAKE IT IDENTICAL TO START BUTTON
+    setShowSubjectProgress(false);
+    setChatStarted(true);
+
+    setLoadingPhase(false);
+  };
+
+  loadVisitedPhase();
+}, [phase_id, user?.id]);
+
 
   const [nextSuggestions, setNextSuggestions] = useState<any[]>([]);
 

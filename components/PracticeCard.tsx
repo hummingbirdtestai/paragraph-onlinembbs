@@ -21,10 +21,6 @@ export function PracticeCard({ phase }) {
 const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
   const subjectName = phase.subject ?? phase.textbook_chapter;
 
-  const hasDiscussion =
-    Boolean(phase.phase_json?.discussion) ||
-    Boolean(phase.phase_json?.mentor_discussion);
-
   React.useEffect(() => {
     if (phase.phase_type === "concept") {
       console.log("📗 [PracticeCard] Concept Loaded", {
@@ -130,11 +126,7 @@ console.log("🔖 Toggle practice bookmark", {
       data={phase.phase_json?.concept ?? ""}
     />
 
-    {hasDiscussion ? (
-      <ViewNotesButton label="📒 View Notes from AI Discussion" />
-    ) : (
-      <ViewNotesButton label="💬 You have not yet discussed this Concept with AI Mentor" />
-    )}
+    <ViewNotesButton label="📒 View AI Mentor Notes" />
   </>
 )}
 
@@ -153,11 +145,7 @@ console.log("🔖 Toggle practice bookmark", {
   mode="practice"
 />
 
-{hasDiscussion ? (
-  <ViewNotesButton label="📒 View Notes from AI Discussion" />
-) : (
-  <ViewNotesButton label="💬 You have not yet discussed this MCQ with AI Mentor" />
-)}
+<ViewNotesButton label="📒 View AI Mentor Notes" />
 
   </View>
 )}
