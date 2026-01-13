@@ -12,7 +12,7 @@ export default function Index() {
   img2: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM1.webp", // Section2 – CBME mastery that works
   img3: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM5.webp", // Section3 – Daily AI support
   img4: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM2.webp", // Section4 – Mistakes → Mastery
-  img6: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM6.webp", // Section6 – 24×7 AI Mentor
+  img6: "https://paragraph.b-cdn.net/final%20image.webp", // Section6 – 24×7 AI Mentor
 
   // ⛔ UNCHANGED (as per your instruction)
   img5: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img5.webp",

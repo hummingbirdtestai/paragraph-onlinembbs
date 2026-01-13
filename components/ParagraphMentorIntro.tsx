@@ -7,7 +7,7 @@ const HERO_IMAGES = [
   'https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM2.webp',
   'https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM3.webp',
   'https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM5.webp',
-  'https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM6.webp',
+  'https://paragraph.b-cdn.net/final%20image.webp',
 ];
 
 export default function ParagraphMentorIntro() {
