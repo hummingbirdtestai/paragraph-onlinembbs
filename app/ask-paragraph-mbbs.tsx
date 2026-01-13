@@ -55,6 +55,8 @@ type Message = {
 };
 
 export default function AskParagraphChat() {
+  console.log("🧨 AskParagraphChat MOUNTED");
+
   const [selectedYear, setSelectedYear] = useState<Year>('first');
   const [selectedSubject, setSelectedSubject] = useState<string>('Anatomy');
   const [chatStarted, setChatStarted] = useState(false);
@@ -65,6 +67,9 @@ export default function AskParagraphChat() {
   const { user } = useAuth();
   const router = useRouter();
   const { phase_id } = useLocalSearchParams<{ phase_id?: string }>();
+  
+  console.log("🔎 route params:", { phase_id });
+
   const conversationRef = useRef<any[]>([]);
   const [showSubjectProgress, setShowSubjectProgress] = useState(true);
   const yearOptions: { key: Year; label: string }[] = [
@@ -100,34 +105,48 @@ export default function AskParagraphChat() {
 
   // 🔹 NEW: Load phase from redirect (notes-popup)
   useEffect(() => {
-  if (!phase_id || !user?.id || chatStarted) return;
+    console.log("⚡ visit useEffect fired", {
+      phase_id,
+      user_id: user?.id,
+      chatStarted,
+    });
 
-  const loadVisitedPhase = async () => {
-    setLoadingPhase(true);
+    if (!phase_id || !user?.id || chatStarted) return;
 
-    const { data, error } = await supabase.rpc(
-      "visit_phase_pointer",
-      { p_phase_id: phase_id }
-    );
+    const loadVisitedPhase = async () => {
+      setLoadingPhase(true);
 
-    if (error || !data) {
-      console.error("❌ visit_phase_pointer failed", error);
+      const { data, error } = await supabase.rpc(
+  "visit_phase_pointer",
+  {
+    p_student_id: user.id,
+    p_phase_row_id: phase_id,
+  }
+);
+
+
+      if (error || !data) {
+        console.error("❌ visit_phase_pointer failed", error);
+        setLoadingPhase(false);
+        return;
+      }
+
+      console.log("✅ visit_phase_pointer SUCCESS", {
+        phase_type: data.phase_type,
+        react_order_final: data.react_order_final,
+      });
+
+      setCurrentPhase(data);
+
+      // 🔑 THESE TWO LINES MAKE IT IDENTICAL TO START BUTTON
+      setShowSubjectProgress(false);
+      setChatStarted(true);
+
       setLoadingPhase(false);
-      return;
-    }
+    };
 
-    setCurrentPhase(data);
-
-    // 🔑 THESE TWO LINES MAKE IT IDENTICAL TO START BUTTON
-    setShowSubjectProgress(false);
-    setChatStarted(true);
-
-    setLoadingPhase(false);
-  };
-
-  loadVisitedPhase();
-}, [phase_id, user?.id]);
-
+    loadVisitedPhase();
+  }, [phase_id, user?.id]);
 
   const [nextSuggestions, setNextSuggestions] = useState<any[]>([]);
 
@@ -460,6 +479,12 @@ export default function AskParagraphChat() {
       </View>
     );
   };
+
+  console.log("🧠 render state", {
+    chatStarted,
+    showSubjectProgress,
+    hasCurrentPhase: !!currentPhase,
+  });
 
   return (
     <MainLayout>
