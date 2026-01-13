@@ -16,11 +16,10 @@ import { useAuth } from '@/contexts/AuthContext';
 interface SubscribeModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubscribe: (plan: '3' | '6' | '12', finalPrice: number, promoCode?: string) => void;
+  onSubscribe: (plan: '12' | '24' | '36' | '48', finalPrice: number, promoCode?: string) => void;
 }
 
 const API_BASE = 'https://paragraph-pg-production.up.railway.app';
-
 
 export default function SubscribeModal({ visible, onClose, onSubscribe }: SubscribeModalProps) {
   const { width } = useWindowDimensions();
@@ -31,7 +30,6 @@ export default function SubscribeModal({ visible, onClose, onSubscribe }: Subscr
   
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
-  // ✅ Proper React guard
   if (!user?.id) {
     return (
       <Modal visible={visible} animationType="slide">
@@ -67,7 +65,7 @@ export default function SubscribeModal({ visible, onClose, onSubscribe }: Subscr
 
   
 async function handleSubscribe(
-  plan: '3' | '6' | '12',
+  plan: '12' | '24' | '36' | '48',
   _uiPrice: number,
   promoCode?: string
 ) {
@@ -116,7 +114,6 @@ async function handleSubscribe(
   }
 }
 
-
   return (
     <Modal
       visible={visible}
@@ -138,115 +135,50 @@ async function handleSubscribe(
           showsVerticalScrollIndicator={false}
         >
           <View style={[styles.header, isDesktop && styles.headerDesktop]}>
-            <Text style={[styles.headline, isDesktop && styles.headlineDesktop]}>Unlock Your Rank.{'\n'}Not Just Content.</Text>
+            <Text style={[styles.headline, isDesktop && styles.headlineDesktop]}>Master MBBS with a System — Not Random Content</Text>
             <Text style={[styles.subHeadline, isDesktop && styles.subHeadlineDesktop]}>
-              Paragraph Pro is not a course.{'\n'}
-              It's a 12-month NEET-PG winning system designed for daily progress, not binge watching.
-            </Text>
-            <Text style={[styles.tagline, isDesktop && styles.taglineDesktop]}>
-              Everything you need to crack NEET-PG — structured, adaptive, and distraction-free.
+              Paragraph is an AI-driven CBME learning system{'\n'}
+              built to guide you through MBBS — concept by concept, year by year.
             </Text>
           </View>
 
-
           <View style={styles.featuresSection}>
-            <Text style={styles.sectionTitle}>What You Get</Text>
+            <Text style={styles.sectionTitle}>What Paragraph Actually Is</Text>
 
             <View style={[styles.featuresGrid, isDesktop && styles.featuresGridDesktop]}>
               <FeatureBlock
-                icon={<FileText size={24} color="#10b981" />}
-                title="10,000 NEET-PG PYQs"
-                time="150 hours of focused revision"
-                description="Every PYQ mapped to concepts, mistakes, and exam patterns."
-                isDesktop={isDesktop}
-              />
-
-              <FeatureBlock
-                icon={<Brain size={24} color="#10b981" />}
-                title="10,000 High-Yield Concepts"
-                time="300 hours of structured learning"
-                description="Concepts that matter — no fluff, no duplication."
-                isDesktop={isDesktop}
-              />
-
-              <FeatureBlock
-                icon={<BookOpen size={24} color="#10b981" />}
-                title="45,000 Flash Cards"
-                time="200 hours of rapid recall"
-                description="Designed for last-minute revision and long-term memory."
-                isDesktop={isDesktop}
-              />
-
-              <FeatureBlock
-                icon={<Video size={24} color="#10b981" />}
-                title="Daily Short Videos"
-                subtitle="3-Minute Reels"
-                time="100 hours of visual revision"
+                icon={<BookOpen size={26} color="#10b981" />}
+                title="CBME Curriculum Mastery Engine"
                 bullets={[
-                  '20 videos every day',
-                  '6,000 reels total',
-                  '60,000 high-yield facts',
-                  '6,000 MCQs for instant testing',
-                ]}
-                description="Learn anywhere. Revise anytime. Zero burnout."
-                isDesktop={isDesktop}
-              />
-
-              <FeatureBlock
-                icon={<ImageIcon size={24} color="#10b981" />}
-                title="Daily Image-Based Learning"
-                time="100 hours of image-based mastery"
-                bullets={[
-                  '4,500 clinical images',
-                  '4,500 case-based vignettes',
-                  '50 images daily',
+                  '4,577 NMC-mapped CBME concepts',
+                  'Competency-wise & year-wise structure',
+                  'Concept → Recall → Application flow',
+                  'Zero syllabus gaps',
                 ]}
                 isDesktop={isDesktop}
               />
 
               <FeatureBlock
-                icon={<FileText size={24} color="#10b981" />}
-                title="Full-Scale NEET-PG Mock Tests"
+                icon={<Brain size={26} color="#10b981" />}
+                title="Flashcard Memory System"
                 bullets={[
-                  'Bi-weekly (Thursday & Sunday)',
-                  '100 Grand Tests in 12 months',
-                  'Exam-level difficulty',
-                  'Rank prediction & analysis',
+                  '50,000 high-yield flashcards',
+                  'Spaced repetition across MBBS years',
+                  'Automatic revision planning',
+                  'Exam-oriented recall',
                 ]}
                 isDesktop={isDesktop}
               />
 
               <FeatureBlock
-                icon={<Users size={24} color="#10b981" />}
-                title="Daily Group Quizzes"
-                time="450 MCQs daily"
+                icon={<MessageSquare size={26} color="#10b981" />}
+                title="24×7 AI Tutor"
                 bullets={[
-                  '15 group quizzes every day (9 AM – 10 PM)',
-                  'Each quiz has 30 MCQs',
-                  'Covers all 19 NEET-PG subjects',
-                  '20 seconds per MCQ',
-                  'Compete live with other aspirants',
+                  'Instant doubt clearing',
+                  'Explains based on your mistakes',
+                  'Adapts daily study plan',
+                  'Feels like a personal mentor',
                 ]}
-                description="Build exam temperament. Stay competitive every single day."
-                isDesktop={isDesktop}
-              />
-
-              <FeatureBlock
-                icon={<Zap size={24} color="#10b981" />}
-                title="Hyper-Personalised Adaptive Learning"
-                bullets={[
-                  'AI adjusts content based on:',
-                  '• Your mistakes',
-                  '• Your speed',
-                  '• Your weak subjects',
-                ]}
-                isDesktop={isDesktop}
-              />
-
-              <FeatureBlock
-                icon={<MessageSquare size={24} color="#10b981" />}
-                title="24×7 AI Chat"
-                description="Clear doubts instantly. No waiting. No teachers' availability issues."
                 isDesktop={isDesktop}
               />
             </View>
@@ -265,51 +197,55 @@ async function handleSubscribe(
 
             <View style={[styles.plansGrid, isDesktop && styles.plansGridDesktop]}>
               <PlanCard
-                duration="3 Months"
+                duration="1 Year"
                 basePrice={12000}
                 color="#10b981"
                 features={[
-                  'Ideal for focused revision phase',
-                  'PYQs + Concepts + Flashcards',
-                  'Videos, Images & AI Chat',
-                  'Mock tests included',
+                  'Access to full CBME curriculum',
+                  'Flashcards + AI Tutor',
+                  'Ideal for single MBBS year',
                 ]}
-                onSubscribe={(finalPrice, promoCode) => {
-                  handleSubscribe('3', finalPrice, promoCode);
-                }}
+                onSubscribe={(price, code) => handleSubscribe('12', price, code)}
                 isDesktop={isDesktop}
               />
 
               <PlanCard
-                duration="6 Months"
+                duration="2 Years"
                 basePrice={20000}
                 color="#3b82f6"
                 features={[
-                  'Strong foundation + revision',
-                  'Full adaptive learning',
-                  'All mock tests during period',
-                  'Best value for serious aspirants',
+                  'Deeper AI personalisation',
+                  'Long-term flashcard memory',
+                  'Best value per year',
                 ]}
-                onSubscribe={(finalPrice, promoCode) => {
-                  handleSubscribe('6', finalPrice, promoCode);
-                }}
+                onSubscribe={(price, code) => handleSubscribe('24', price, code)}
                 isDesktop={isDesktop}
               />
 
               <PlanCard
-                duration="12 Months"
-                basePrice={36000}
+                duration="3 Years"
+                basePrice={28000}
                 color="#8b5cf6"
+                features={[
+                  'Pre-final to internship coverage',
+                  'Stronger adaptive learning',
+                  'Highly cost-effective',
+                ]}
+                onSubscribe={(price, code) => handleSubscribe('36', price, code)}
+                isDesktop={isDesktop}
+              />
+
+              <PlanCard
+                duration="4 Years"
+                basePrice={36000}
+                color="#f59e0b"
                 recommended
                 features={[
-                  'Complete NEET-PG preparation cycle',
-                  '100 Grand Tests included',
-                  'Daily videos, images & revisions',
-                  'Maximum rank optimisation',
+                  'Complete MBBS journey',
+                  'Maximum AI adaptation',
+                  'Lowest cost per year',
                 ]}
-                onSubscribe={(finalPrice, promoCode) => {
-                  handleSubscribe('12', finalPrice, promoCode);
-                }}
+                onSubscribe={(price, code) => handleSubscribe('48', price, code)}
                 isDesktop={isDesktop}
               />
             </View>
@@ -325,10 +261,10 @@ async function handleSubscribe(
           </View>
 
           <View style={styles.finalCta}>
-            <Text style={styles.ctaTitle}>Start Your NEET-PG Winning Journey Now</Text>
+            <Text style={styles.ctaTitle}>Start Your MBBS Journey Now</Text>
             <Text style={styles.ctaSubtitle}>
-              Your rank will not improve by scrolling.{'\n'}
-              It improves by structured daily learning.
+              Learn systematically. Master your curriculum.{'\n'}
+              Build a strong foundation for your medical career.
             </Text>
           </View>
 
@@ -411,8 +347,9 @@ function PlanCard({
   const [isCheckingCoupon, setIsCheckingCoupon] = useState(false);
 
   const plan =
-    duration.startsWith('3') ? '3' :
-    duration.startsWith('6') ? '6' : '12';
+    duration.startsWith('1') ? '12' :
+    duration.startsWith('2') ? '24' :
+    duration.startsWith('3') ? '36' : '48';
 
   const applyPromoCode = async () => {
     if (!promoCode.trim()) {
@@ -664,14 +601,14 @@ const styles = StyleSheet.create({
     borderColor: '#1f2937',
   },
   planCardRecommended: {
-    borderColor: '#8b5cf6',
-    backgroundColor: '#1a1332',
+    borderColor: '#f59e0b',
+    backgroundColor: '#1a1108',
   },
   recommendedBadge: {
     position: 'absolute',
     top: -12,
     left: 20,
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#f59e0b',
     paddingVertical: 4,
     paddingHorizontal: 12,
     borderRadius: 12,
@@ -809,7 +746,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   planCardDesktop: {
-    width: '32%',
+    width: '24%',
     marginBottom: 16,
   },
   headerDesktop: {
@@ -911,4 +848,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
