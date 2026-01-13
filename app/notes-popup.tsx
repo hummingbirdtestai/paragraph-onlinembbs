@@ -132,3 +132,25 @@ export default function NotesPopupScreen() {
     </MainLayout>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0b141a',
+  },
+  webCenterWrapper: {
+    alignItems: 'center',
+  },
+  webContent: {
+    width: '100%',
+    maxWidth: 820,
+  },
+  backButtonContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  backButtonText: {
+    color: '#10b981',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+});

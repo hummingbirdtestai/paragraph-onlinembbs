@@ -11,22 +11,16 @@ import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import CBMERenderer from "@/components/types/CBMERenderer";
 
-
-
 export function PracticeCard({ phase }) {
-   const { width } = useWindowDimensions();   // ✅ ADD
-  const isWeb = width >= 1024;               // ✅ ADD
+   const { width } = useWindowDimensions();
+  const isWeb = width >= 1024;
   const isConcept = phase.phase_type === "concept";
   const isMCQ = phase.phase_type === "mcq";
   const { user } = useAuth();
   const router = useRouter();
-  // Local bookmark state (like FlashcardCard)
 const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
   const subjectName = phase.subject ?? phase.textbook_chapter;
 
-
-
-  // 🔵 DEBUG: Log concept/mcq IDs when card loads
   React.useEffect(() => {
     if (phase.phase_type === "concept") {
       console.log("📗 [PracticeCard] Concept Loaded", {
@@ -45,11 +39,9 @@ const [isBookmarked, setIsBookmarked] = React.useState(phase.is_bookmarked);
 
   return (
     <View style={[styles.card, isConcept && styles.cardConcept]}>
-      {/* SUBJECT NAME */}
 <Text style={[styles.subject, isConcept && styles.subjectConcept]}>
   {subjectName}
 </Text>
-      {/* 🔖 Inline bookmark icon (same as flashcards) */}
 <View style={[styles.bookmarkRow, isConcept && styles.bookmarkRowConcept]}>
   <TouchableOpacity
     onPress={async () => {
@@ -59,7 +51,6 @@ console.log("🔖 Toggle practice bookmark", {
   practicecard_id: phase.id,
   subject: subjectName,
 });
-
 
      const { data, error } = await supabase.rpc(
   "toggle_practice_bookmark_v1",
@@ -88,15 +79,12 @@ console.log("🔖 Toggle practice bookmark", {
   </TouchableOpacity>
 </View>
 
-
-      {/* 🔥 NEW — Progress Counter */}
       <View style={[styles.progressRow, isConcept && styles.progressRowConcept]}>
         <Text style={styles.progressText}>
           {isMCQ ? "🧩 MCQ" : "🧠 Concept"} {phase.react_order_final} / {phase.total_count}
         </Text>
       </View>
 
-      {/* FULL VIEW RENDER */}
 {isConcept && (
   <>
     <CBMERenderer
@@ -114,8 +102,6 @@ console.log("🔖 Toggle practice bookmark", {
   </>
 )}
 
-
-
 {isMCQ && (
   <View style={isWeb ? styles.webConstrained : undefined}>
 <MCQChatScreen
@@ -131,15 +117,29 @@ console.log("🔖 Toggle practice bookmark", {
   mode="practice"
 />
 
-
-<AskParagraphButton
-  studentId={user?.id}
-  mcqId={phase.id}
-  subjectName={subjectName}
-  phaseJson={phase.phase_json}
-  reactOrder={phase.react_order_final}
-/>
-
+<TouchableOpacity
+  style={{
+    marginTop: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: "#0d2017",
+    borderWidth: 1,
+    borderColor: "#10b981",
+    alignItems: "center",
+  }}
+  onPress={() =>
+    router.push({
+      pathname: "/notes-popup",
+      params: {
+        phase_id: phase.id,
+      },
+    })
+  }
+>
+  <Text style={{ color: "#10b981", fontWeight: "700" }}>
+    📒 View Notes from AI Discussion
+  </Text>
+</TouchableOpacity>
 
   </View>
 )}
@@ -150,88 +150,6 @@ console.log("🔖 Toggle practice bookmark", {
       )}
    
     </View>
-  );
-}
-
-function AskParagraphButton({
-  studentId,
-  mcqId,
-  subjectName,
-  phaseJson,
-  reactOrder,
-}: {
-  studentId: string | undefined;
-  mcqId: string;
-  subjectName: string;
-  phaseJson: any;
-  reactOrder: number;
-}) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = React.useState(false);
-
-  const handleAskParagraph = async () => {
-  if (!studentId) return;
-
-  setIsLoading(true);
-
-  try {
-    const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL!;
-
-    const response = await fetch(`${API_BASE_URL}/ask-paragraph-mbbs/start`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        student_id: studentId,
-        mcq_id: mcqId,
-       mcq_payload: phaseJson,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    router.push({
-      pathname: "/ask-paragraph-mbbs",
-      params: {
-        session_id: data.session_id,
-        student_id: studentId,
-        mcq_id: mcqId,
-         mcq_json: JSON.stringify(phaseJson),   // ✅ ADD THIS
-      },
-    });
-  } catch (err) {
-    console.error(err);
-    alert("Failed to start discussion");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
-  return (
-    <TouchableOpacity
-      style={{
-        marginTop: 12,
-        paddingVertical: 10,
-        borderRadius: 8,
-        backgroundColor: "#0d2017",
-        borderWidth: 1,
-        borderColor: "#10b981",
-        alignItems: "center",
-        opacity: isLoading ? 0.6 : 1,
-      }}
-      onPress={handleAskParagraph}
-      disabled={isLoading}
-    >
-      <Text style={{ color: "#10b981", fontWeight: "700" }}>
-        {isLoading ? 'Starting discussion...' : 'Ask Paragraph about this MCQ'}
-      </Text>
-    </TouchableOpacity>
   );
 }
 
@@ -287,7 +205,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
   },
-  webConstrained: {          // 👈 ADD HERE
+  webConstrained: {
   maxWidth: 860,
   alignSelf: "center",
   width: "100%",
