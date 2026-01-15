@@ -85,7 +85,7 @@ const verifyOrderStatus = async () => {
 
   try {
     const res = await fetch(
-      `https://paragraph-pg-production.up.railway.app/api/payments/status?order_id=${orderId}`
+      `https://mainonlinembbspy-production.up.railway.app/api/payments/status?order_id=${orderId}`
     );
 
     const data = await res.json();
