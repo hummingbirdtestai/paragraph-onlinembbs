@@ -19,7 +19,7 @@ interface SubscribeModalProps {
   onSubscribe: (plan: '12' | '24' | '36' | '48', finalPrice: number, promoCode?: string) => void;
 }
 
-const API_BASE = 'https://paragraph-pg-production.up.railway.app';
+const API_BASE = 'https://mainonlinembbspy-production.up.railway.app';
 
 export default function SubscribeModal({ visible, onClose, onSubscribe }: SubscribeModalProps) {
   const { width } = useWindowDimensions();
