@@ -30,11 +30,11 @@ const navItems: NavItem[] = [
     icon: Brain 
   },
 
-  {
-    id: "cbme-path",
-    label: "CBME Learning Path",
-    href: "/cbme-learning-path",
-    icon: Map,
+  { 
+    id: "practice", 
+    label: "5000 NMC CBME Syllabus Topics", 
+    href: "/practice", 
+    icon: BookOpen 
   },
 
   { 
@@ -45,19 +45,20 @@ const navItems: NavItem[] = [
   },
 
   { 
-    id: "practice", 
-    label: "5000 NMC CBME Syllabus Topics", 
-    href: "/practice", 
-    icon: BookOpen 
-  },
-
-  { 
     id: "flash", 
     label: "45000 Flash Cards", 
     href: "/flashcard-feed-demo", 
     icon: CreditCard 
   },
+
+  {
+    id: "cbme-path",
+    label: "CBME Learning Path",
+    href: "/cbme-learning-path",
+    icon: Map,
+  },
 ];
+
 
 
 

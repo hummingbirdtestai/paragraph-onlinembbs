@@ -16,7 +16,7 @@ export const SUBJECTS_BY_YEAR: Record<
 
   third: [
     "PSM",
-    "Forensic Medicine",
+    "Forensic",
   ],
 
   final: [
