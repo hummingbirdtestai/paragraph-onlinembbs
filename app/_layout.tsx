@@ -17,8 +17,8 @@ export default function RootLayout() {
           id="cashfree-sdk"
           src="https://sdk.cashfree.com/js/v3/cashfree.js"
           type="text/javascript"
-          defer
         />
+
       </Helmet>
 
       <AuthProvider>

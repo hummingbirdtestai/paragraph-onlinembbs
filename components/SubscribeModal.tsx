@@ -99,8 +99,8 @@ async function handleSubscribe(
     console.log("Cashfree SDK:", CashfreeSDK);
     console.log("Payment Session ID:", data.payment_session_id);
 
-    const cashfree = CashfreeSDK({
-      mode: "production",
+    const cashfree = new CashfreeSDK({
+      mode: "production", // or "sandbox"
     });
 
     cashfree.checkout({
