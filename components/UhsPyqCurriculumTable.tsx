@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const CBME_TABLE_DATA = [
+const UHS_PYQ_TABLE_DATA = [
   { subject: "Anatomy", topics: 461, hours: 231, year: "Pre-Clinical" },
   { subject: "Biochemistry", topics: 98, hours: 49, year: "Pre-Clinical" },
   { subject: "Physiology", topics: 168, hours: 84, year: "Pre-Clinical" },
@@ -29,18 +29,16 @@ const CBME_TABLE_DATA = [
   { subject: "Radiotherapy", topics: 17, hours: 4, year: "Final-Year" },
 ];
 
+export function UhsPyqCurriculumTableMobile() {
+ const firstYear = UHS_PYQ_TABLE_DATA.filter(item => item.year === "Pre-Clinical");
+const secondYear = UHS_PYQ_TABLE_DATA.filter(item => item.year === "Second-Year");
+const thirdYear = UHS_PYQ_TABLE_DATA.filter(item => item.year === "Third-Year");
+const finalYear = UHS_PYQ_TABLE_DATA.filter(item => item.year === "Final-Year");
 
-export function CBMECurriculumTableMobile() {
- const firstYear = CBME_TABLE_DATA.filter(item => item.year === "Pre-Clinical");
-const secondYear = CBME_TABLE_DATA.filter(item => item.year === "Second-Year");
-const thirdYear = CBME_TABLE_DATA.filter(item => item.year === "Third-Year");
-const finalYear = CBME_TABLE_DATA.filter(item => item.year === "Final-Year");
+  const totalTopics = UHS_PYQ_TABLE_DATA.reduce((sum, item) => sum + item.topics, 0);
+  const totalHours = UHS_PYQ_TABLE_DATA.reduce((sum, item) => sum + item.hours, 0);
 
-
-  const totalTopics = CBME_TABLE_DATA.reduce((sum, item) => sum + item.topics, 0);
-  const totalHours = CBME_TABLE_DATA.reduce((sum, item) => sum + item.hours, 0);
-
-  const renderYearSection = (title: string, data: typeof CBME_TABLE_DATA) => (
+  const renderYearSection = (title: string, data: typeof UHS_PYQ_TABLE_DATA) => (
     <View style={styles.yearSection}>
       <Text style={styles.yearTitle}>{title}</Text>
       {data.map((item, index) => (
@@ -100,17 +98,16 @@ const finalYear = CBME_TABLE_DATA.filter(item => item.year === "Final-Year");
   );
 }
 
-export function CBMECurriculumTableWeb() {
-const firstYear = CBME_TABLE_DATA.filter(item => item.year === "Pre-Clinical");
-const secondYear = CBME_TABLE_DATA.filter(item => item.year === "Second-Year");
-const thirdYear = CBME_TABLE_DATA.filter(item => item.year === "Third-Year");
-const finalYear = CBME_TABLE_DATA.filter(item => item.year === "Final-Year");
+export function UhsPyqCurriculumTableWeb() {
+const firstYear = UHS_PYQ_TABLE_DATA.filter(item => item.year === "Pre-Clinical");
+const secondYear = UHS_PYQ_TABLE_DATA.filter(item => item.year === "Second-Year");
+const thirdYear = UHS_PYQ_TABLE_DATA.filter(item => item.year === "Third-Year");
+const finalYear = UHS_PYQ_TABLE_DATA.filter(item => item.year === "Final-Year");
 
+  const totalTopics = UHS_PYQ_TABLE_DATA.reduce((sum, item) => sum + item.topics, 0);
+  const totalHours = UHS_PYQ_TABLE_DATA.reduce((sum, item) => sum + item.hours, 0);
 
-  const totalTopics = CBME_TABLE_DATA.reduce((sum, item) => sum + item.topics, 0);
-  const totalHours = CBME_TABLE_DATA.reduce((sum, item) => sum + item.hours, 0);
-
-  const renderYearSection = (title: string, data: typeof CBME_TABLE_DATA) => (
+  const renderYearSection = (title: string, data: typeof UHS_PYQ_TABLE_DATA) => (
     <View style={webStyles.yearSection}>
       <Text style={webStyles.yearTitle}>{title}</Text>
       <View style={webStyles.gridContainer}>
@@ -148,7 +145,6 @@ const finalYear = CBME_TABLE_DATA.filter(item => item.year === "Final-Year");
 {renderYearSection("MBBS Second Year", secondYear)}
 {renderYearSection("MBBS Third Year", thirdYear)}
 {renderYearSection("MBBS Final Year", finalYear)}
-
 
         <View style={webStyles.totalSection}>
           <Text style={webStyles.totalHeading}>Total Coverage Across All Years</Text>
