@@ -66,7 +66,7 @@ const YEARS = [
       "Radiodiagnosis",
       "Radiotherapy",
       "Dermatology",
-      "Gynecology",
+      "Gynaecology",
       "Obstetrics",
       "General Surgery",
       "Anaesthesiology",
@@ -96,7 +96,7 @@ const SUBJECT_COLORS: Record<string, any> = {
   "Radiodiagnosis": { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)", borderColor: "rgba(255, 152, 0, 0.35)" },
   "Radiotherapy": { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)", borderColor: "rgba(233, 30, 99, 0.35)" },
   "Dermatology": { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)", borderColor: "rgba(37, 211, 102, 0.35)" },
-  "Gynecology": { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)", borderColor: "rgba(255, 215, 0, 0.35)" },
+  "Gynaecology": { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)", borderColor: "rgba(255, 215, 0, 0.35)" },
   "Obstetrics": { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)", borderColor: "rgba(184, 212, 168, 0.35)" },
   "General Surgery": { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)", borderColor: "rgba(233, 30, 99, 0.35)" },
   "Anaesthesiology": { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)", borderColor: "rgba(74, 144, 226, 0.35)" },
@@ -153,32 +153,34 @@ interface GroupedProgress {
 }
 
 export default function UhsPyqCurriculumTable({ onSubjectSelect }: LearningPathProps) {
-  const { user } = useAuth();
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [subjectProgress, setSubjectProgress] = useState<GroupedProgress[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubjectPress = async (subject: string) => {
-    if (!user?.id) {
-      setError("Please log in to view your progress");
-      return;
-    }
 
     setSelectedSubject(subject);
     setLoading(true);
     setError(null);
 
     try {
-      const { data, error: rpcError } = await supabase.rpc('get_student_subject_curriculum_tree_orchestra', {
-        p_student_id: user.id,
-        p_subject: subject
-      });
+const { data, error: rpcError } = await supabase.rpc(
+  'get_subject_curriculum_tree_pyq',
+  {
+    p_subject: subject,
+  }
+);
 
       if (rpcError) throw rpcError;
 
-      const normalized = Array.isArray(data) ? data : [];
-      setSubjectProgress(normalized);
+     const normalized =
+  Array.isArray(data) && data.length > 0
+    ? data[0].curriculum_tree ?? []
+    : [];
+
+setSubjectProgress(normalized);
+
 
       if (onSubjectSelect) {
         onSubjectSelect(subject);
