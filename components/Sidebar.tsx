@@ -3,7 +3,23 @@ import React, { useState, useEffect } from 'react';
 
 import { View, Text, StyleSheet, Pressable, ScrollView, Image } from 'react-native';
 import { Link, usePathname } from 'expo-router';
-import { Brain, BookOpen, CreditCard, FileText, Swords, ChartBar as BarChart3, Settings, X, Video, Crown, Image as ImageIcon, Calendar, Bot, Map,} from 'lucide-react-native';
+import {
+  Brain,
+  BookOpen,
+  CreditCard,
+  FileText,
+  Swords,
+  ChartBar as BarChart3,
+  Settings,
+  X,
+  Video,
+  Crown,
+  Image as ImageIcon,
+  Calendar,
+  Bot,
+  Map,
+  Target,
+} from 'lucide-react-native';
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from './NotificationBell';
 import SubscribeModal from './SubscribeModal';
@@ -37,27 +53,21 @@ const navItems: NavItem[] = [
     icon: BookOpen 
   },
 
+  {
+    id: "uhs-pyq",
+    label: "MBBS UHS PYQ Question Bank",
+    href: "/uhs-pyq-question-bank",
+    icon: Target,
+  },
+
   { 
     id: "mentor", 
     label: "Paragraph Mentor (AI Tutor)", 
     href: "/ask-paragraph-mbbs", 
     icon: Bot 
   },
-
-  { 
-    id: "flash", 
-    label: "45000 Flash Cards", 
-    href: "/flashcard-feed-demo", 
-    icon: CreditCard 
-  },
-
-  {
-    id: "cbme-path",
-    label: "CBME Learning Path",
-    href: "/cbme-learning-path",
-    icon: Map,
-  },
 ];
+
 
 
 
