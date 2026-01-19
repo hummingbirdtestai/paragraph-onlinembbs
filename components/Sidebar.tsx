@@ -54,10 +54,24 @@ const navItems: NavItem[] = [
   },
 
   {
+    id: "cbme-path",
+    label: "CBME Learning Path",
+    href: "/cbme-learning-path",
+    icon: Map,
+  },
+
+  {
     id: "uhs-pyq",
     label: "MBBS UHS PYQ Question Bank",
     href: "/uhs-pyq-question-bank",
     icon: Target,
+  },
+
+  { 
+    id: "flash", 
+    label: "45000 Flash Cards", 
+    href: "/flashcard-feed-demo", 
+    icon: CreditCard 
   },
 
   { 
@@ -67,6 +81,7 @@ const navItems: NavItem[] = [
     icon: Bot 
   },
 ];
+
 
 
 
