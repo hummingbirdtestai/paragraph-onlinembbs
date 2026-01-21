@@ -127,25 +127,49 @@ const Section1Mobile = memo(({ image }: { image: string }) => {
   progressiveRenderingEnabled
 />
       <View style={styles.mobilePadding}>
-<Text style={styles.mobileHeading}>MBBS Learning Became Complicated. You Didn’t Fail.</Text>
+<Text style={styles.mobileHeading}>
+The Real Problem Is Cracking MBBS University Exams.
+You Didn’t Fail.
+</Text>
 
 <Text style={styles.mobileBody}>
-  You’re Not a Poor Student — The System Is Broken.
+You’re Not a Weak Student — The Exam System Is Brutal.
 </Text>
-<Text style={styles.mobileBody}>Most MBBS students today are stuck in a cycle of:</Text>
 
-<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Fragmented CBME topics</Text> that feel disconnected and hard to revise</Text>
-<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Competency lists</Text> that sound important but lack exam clarity</Text>
-<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Practical postings</Text> where you observe a lot but learn very little</Text>
-<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Internal assessments</Text> that test memory instead of understanding</Text>
-<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>University exams</Text> that feel unpredictable and unfair</Text>
-<Text style={styles.mobileBullet}>• <Text style={styles.highlight}>Notes and manuals</Text> that grow heavier every year</Text>
+<Text style={styles.mobileBody}>
+Most MBBS students struggle with university exams because of:
+</Text>
+
+<Text style={styles.mobileBullet}>
+• <Text style={styles.highlight}>Very short preparation time</Text> between postings and exams
+</Text>
+
+<Text style={styles.mobileBullet}>
+• <Text style={styles.highlight}>Little to no personalised coaching</Text> on what to study and what to skip
+</Text>
+
+<Text style={styles.mobileBullet}>
+• <Text style={styles.highlight}>Massive textbooks</Text> with no clear exam boundaries
+</Text>
+
+<Text style={styles.mobileBullet}>
+• <Text style={styles.highlight}>Minimal clinical correlation</Text> in routine medical college classes
+</Text>
+
+<Text style={styles.mobileBullet}>
+• <Text style={styles.highlight}>Unclear exam expectations</Text> — what actually fetches marks
+</Text>
+
+<Text style={styles.mobileBullet}>
+• <Text style={styles.highlight}>Last-minute panic</Text> instead of structured revision
+</Text>
 
 <Text style={[styles.mobileBody, styles.emphasis]}>
-  This isn’t learning.{'\n'}
-  This is confusion.{'\n'}
-  And confusion kills the joy of learning medicine.
+This isn’t preparation.{'\n'}
+This is survival.{'\n'}
+And survival mode destroys confidence before exams.
 </Text>
+
       </View>
     </View>
   );
@@ -157,26 +181,41 @@ const Section1Web = memo(({ image }: { image: string }) => {
     <View style={styles.webSection}>
       <View style={styles.webHero}>
         <View style={styles.webHeroText}>
-          <Text style={styles.webHeading}>MBBS Learning Became Complicated. You Didn’t Fail.</Text>
+          <Text style={styles.webHeading}>
+The Real Problem Is Cracking MBBS University Exams.
+You Didn’t Fail.
+</Text>
 
 <Text style={styles.webSubheading}>
-  You’re Not a Poor Student — The System Is Broken.
+You’re Not a Weak Student — The Exam System Is Brutal.
 </Text>
 
 <View style={styles.webBulletList}>
-  <Text style={styles.webBullet}>• <Text style={styles.highlight}>Fragmented CBME topics</Text> that feel disconnected and hard to revise</Text>
-  <Text style={styles.webBullet}>• <Text style={styles.highlight}>Competency lists</Text> that sound important but lack exam clarity</Text>
-  <Text style={styles.webBullet}>• <Text style={styles.highlight}>Practical postings</Text> where you observe a lot but learn very little</Text>
-  <Text style={styles.webBullet}>• <Text style={styles.highlight}>Internal assessments</Text> that test memory instead of understanding</Text>
-  <Text style={styles.webBullet}>• <Text style={styles.highlight}>University exams</Text> that feel unpredictable and unfair</Text>
-  <Text style={styles.webBullet}>• <Text style={styles.highlight}>Notes and manuals</Text> that grow heavier every year</Text>
+  <Text style={styles.webBullet}>
+    • <Text style={styles.highlight}>Very short preparation time</Text> between postings and exams
+  </Text>
+  <Text style={styles.webBullet}>
+    • <Text style={styles.highlight}>Little to no personalised coaching</Text> on what actually fetches marks
+  </Text>
+  <Text style={styles.webBullet}>
+    • <Text style={styles.highlight}>Huge textbooks</Text> with no exam-oriented filtering
+  </Text>
+  <Text style={styles.webBullet}>
+    • <Text style={styles.highlight}>Poor clinical correlation</Text> in routine medical college teaching
+  </Text>
+  <Text style={styles.webBullet}>
+    • <Text style={styles.highlight}>Unpredictable question patterns</Text> year after year
+  </Text>
+  <Text style={styles.webBullet}>
+    • <Text style={styles.highlight}>Last-minute revision chaos</Text> instead of structured preparation
+  </Text>
 </View>
 
 <Text style={[styles.webBody, styles.emphasis]}>
-  This isn’t learning. This is confusion.{'\n'}
-  And confusion kills the joy of learning medicine.
+This isn’t preparation. This is survival.{'\n'}
+And survival mode kills confidence in university exams.
 </Text>
-        </View>
+ </View>
         <Image source={{ uri: image }} style={styles.webHeroImage} resizeMode="contain" progressiveRenderingEnabled />
       </View>
     </View>
