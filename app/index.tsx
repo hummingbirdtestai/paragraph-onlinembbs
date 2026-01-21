@@ -9,7 +9,7 @@ export default function Index() {
   img1: "https://paragraph.b-cdn.net/battle/Home%20page%20images/HP1.webp",
 
   // 🔁 REPLACED AS REQUESTED
-  img2: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM1.webp", // Section2 – CBME mastery that works
+  img2: "https://paragraph.b-cdn.net/ChatGPT%20Image%20Jan%2021%2C%202026%2C%2010_22_19%20PM.webp", // Section2 – CBME mastery that works
   img3: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM5.webp", // Section3 – Daily AI support
   img4: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM2.webp", // Section4 – Mistakes → Mastery
   img6: "https://paragraph.b-cdn.net/final%20image.webp", // Section6 – 24×7 AI Mentor
