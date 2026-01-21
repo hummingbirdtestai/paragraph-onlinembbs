@@ -108,8 +108,8 @@ function WebLayout({ images, onOpenAuth, isLoggedIn }: HomeScreenProps & {
 <Section6Web image={images.img6} />
 <Block5Web image={images.img11} />
       <Section9Web onOpenAuth={onOpenAuth} isLoggedIn={isLoggedIn} />
-     
-     
+
+
       <Footer />
     </ScrollView>
   );
@@ -129,11 +129,11 @@ const Section1Mobile = memo(({ image }: { image: string }) => {
       <View style={styles.mobilePadding}>
 <Text style={styles.mobileHeading}>
 The Real Problem Is Cracking MBBS University Exams.
-You Didn’t Fail.
+You Didn't Fail.
 </Text>
 
 <Text style={styles.mobileBody}>
-You’re Not a Weak Student — The Exam System Is Brutal.
+You're Not a Weak Student — The Exam System Is Brutal.
 </Text>
 
 <Text style={styles.mobileBody}>
@@ -165,7 +165,7 @@ Most MBBS students struggle with university exams because of:
 </Text>
 
 <Text style={[styles.mobileBody, styles.emphasis]}>
-This isn’t preparation.{'\n'}
+This isn't preparation.{'\n'}
 This is survival.{'\n'}
 And survival mode destroys confidence before exams.
 </Text>
@@ -183,12 +183,12 @@ const Section1Web = memo(({ image }: { image: string }) => {
         <View style={styles.webHeroText}>
           <Text style={styles.webHeading}>
 The Real Problem Is Cracking MBBS University Exams.
-You Didn’t Fail.
+You Didn't Fail.
 </Text>
 
 
 <Text style={styles.webSubheading}>
-You’re Not a Weak Student — The Exam System Is Brutal.
+You're Not a Weak Student — The Exam System Is Brutal.
 </Text>
 
 <View style={styles.webBulletList}>
@@ -213,7 +213,7 @@ You’re Not a Weak Student — The Exam System Is Brutal.
 </View>
 
 <Text style={[styles.webBody, styles.emphasis]}>
-This isn’t preparation. This is survival.{'\n'}
+This isn't preparation. This is survival.{'\n'}
 And survival mode kills confidence in university exams.
 </Text>
  </View>
@@ -553,132 +553,6 @@ const Section6Web = memo(({ image }: { image: string }) => {
             You learn with confidence — not confusion.
           </Text>
         </View>
-      </View>
-    </View>
-  );
-});
-
-const Section7Mobile = memo(() => {
-  console.log('Section7Mobile mounted');
-  return (
-    <View style={styles.mobileQuoteSection}>
-      <Text style={styles.mobileQuoteHeading}>The Real NEETPG Strategy</Text>
-      <Text style={styles.mobileQuote}>
-        Toppers don't crack NEETPG with:{'\n'}
-        ✘ 1,000-hour videos{'\n'}
-        ✘ Mega batches{'\n'}
-        ✘ Hype or marketing
-      </Text>
-      <Text style={styles.mobileQuote}>They crack it with:</Text>
-      <Text style={styles.mobileQuoteCheck}>✔ Structured learning</Text>
-      <Text style={styles.mobileQuoteCheck}>✔ Practice with feedback</Text>
-      <Text style={styles.mobileQuoteCheck}>✔ Disciplined revision</Text>
-      <Text style={styles.mobileQuoteCheck}>✔ Self-paced momentum</Text>
-      <Text style={[styles.mobileQuote, styles.emphasis]}>
-        Paragraph gives you exactly that.
-      </Text>
-    </View>
-  );
-});
-
-const Section7Web = memo(() => {
-  console.log('Section7Web mounted');
-  return (
-    <View style={styles.webQuoteSection}>
-      <View style={styles.webQuoteContent}>
-        <Text style={styles.webQuoteHeading}>The Real NEETPG Strategy</Text>
-        <View style={styles.webQuoteGrid}>
-          <View style={styles.webQuoteColumn}>
-            <Text style={styles.webQuoteSubtitle}>Toppers don't crack NEETPG with:</Text>
-            <Text style={styles.webQuoteItem}>✘ 1,000-hour videos</Text>
-            <Text style={styles.webQuoteItem}>✘ Mega batches</Text>
-            <Text style={styles.webQuoteItem}>✘ Hype or marketing</Text>
-          </View>
-          <View style={styles.webQuoteColumn}>
-            <Text style={styles.webQuoteSubtitle}>They crack it with:</Text>
-            <Text style={styles.webQuoteCheck}>✔ Structured learning</Text>
-            <Text style={styles.webQuoteCheck}>✔ Practice with feedback</Text>
-            <Text style={styles.webQuoteCheck}>✔ Disciplined revision</Text>
-            <Text style={styles.webQuoteCheck}>✔ Self-paced momentum</Text>
-          </View>
-        </View>
-        <Text style={[styles.webQuoteFooter, styles.emphasis]}>
-          Paragraph gives you exactly that.
-        </Text>
-      </View>
-    </View>
-  );
-});
-
-const Section8Mobile = memo(() => {
-  console.log('Section8Mobile mounted');
-  return (
-    <View style={styles.mobileSection}>
-      <View style={styles.mobilePadding}>
-        <Text style={styles.mobileHeading}>Your 1000-Hour Plan to a Top 1000 Rank</Text>
-        <View style={styles.planItem}>
-          <Text style={styles.planText}>10,000 High-Yield Concepts</Text>
-          <Text style={styles.planHours}>150 hours</Text>
-        </View>
-        <View style={styles.planItem}>
-          <Text style={styles.planText}>10,000 PYQs</Text>
-          <Text style={styles.planHours}>150 hours</Text>
-        </View>
-        <View style={styles.planItem}>
-          <Text style={styles.planText}>50 Grand Tests</Text>
-          <Text style={styles.planHours}>250 hours</Text>
-        </View>
-        <View style={styles.planItem}>
-          <Text style={styles.planText}>45,000 Flashcards</Text>
-          <Text style={styles.planHours}>400 hours</Text>
-        </View>
-        <View style={styles.planTotal}>
-          <Text style={styles.planTotalText}>Your Total: 1000 hours</Text>
-          <Text style={styles.planSubtext}>A complete NEETPG journey.</Text>
-        </View>
-        <Text style={[styles.mobileBody, styles.emphasis]}>
-          No noise.{'\n'}No overwhelm.{'\n'}Just dependable progress — every single day.
-        </Text>
-      </View>
-    </View>
-  );
-});
-
-const Section8Web = memo(() => {
-  console.log('Section8Web mounted');
-  return (
-    <View style={styles.webSection}>
-      <View style={styles.webPlanContent}>
-        <Text style={styles.webHeading}>Your 1000-Hour Plan to a Top 1000 Rank</Text>
-        <View style={styles.webPlanGrid}>
-          <View style={styles.webPlanCard}>
-            <Text style={styles.webPlanNumber}>10,000</Text>
-            <Text style={styles.webPlanLabel}>High-Yield Concepts</Text>
-            <Text style={styles.webPlanHours}>150 hours</Text>
-          </View>
-          <View style={styles.webPlanCard}>
-            <Text style={styles.webPlanNumber}>10,000</Text>
-            <Text style={styles.webPlanLabel}>PYQs</Text>
-            <Text style={styles.webPlanHours}>150 hours</Text>
-          </View>
-          <View style={styles.webPlanCard}>
-            <Text style={styles.webPlanNumber}>50</Text>
-            <Text style={styles.webPlanLabel}>Grand Tests</Text>
-            <Text style={styles.webPlanHours}>250 hours</Text>
-          </View>
-          <View style={styles.webPlanCard}>
-            <Text style={styles.webPlanNumber}>45,000</Text>
-            <Text style={styles.webPlanLabel}>Flashcards</Text>
-            <Text style={styles.webPlanHours}>400 hours</Text>
-          </View>
-        </View>
-        <View style={styles.webPlanTotal}>
-          <Text style={styles.webPlanTotalText}>Your Total: 1000 hours</Text>
-          <Text style={styles.webPlanSubtext}>A complete NEETPG journey.</Text>
-        </View>
-        <Text style={[styles.webBody, styles.emphasis]}>
-          No noise. No overwhelm. Just dependable progress — every single day.
-        </Text>
       </View>
     </View>
   );
@@ -1258,7 +1132,7 @@ const styles = StyleSheet.create({
   },
  mobileImageSection1: {
   width: '100%',
-  height: 260,   // 👈 explicit hero height
+  height: 260,
   backgroundColor: '#161b22',
   borderRadius: 16,
   marginBottom: 16,
@@ -1335,73 +1209,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 6,
     fontStyle: 'italic',
-  },
-  mobileQuoteSection: {
-    backgroundColor: '#161b22',
-    paddingVertical: 48,
-    paddingHorizontal: 20,
-    marginBottom: 32,
-    marginHorizontal: 16,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  mobileQuoteHeading: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#f4e4c1',
-    marginBottom: 24,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  mobileQuote: {
-    fontSize: 16,
-    color: '#c9d1d9',
-    lineHeight: 24,
-    marginBottom: 12,
-  },
-  mobileQuoteCheck: {
-    fontSize: 16,
-    color: '#3fb950',
-    lineHeight: 24,
-    marginBottom: 8,
-  },
-  planItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#21262d',
-  },
-  planText: {
-    fontSize: 16,
-    color: '#c9d1d9',
-    fontWeight: '500',
-  },
-  planHours: {
-    fontSize: 16,
-    color: '#3fb950',
-    fontWeight: '700',
-  },
-  planTotal: {
-    marginTop: 20,
-    paddingTop: 20,
-    borderTopWidth: 2,
-    borderTopColor: '#30363d',
-  },
-  planTotalText: {
-    fontSize: 20,
-    color: '#f4e4c1',
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  planSubtext: {
-    fontSize: 14,
-    color: '#8b949e',
   },
   mobileCTASection: {
     paddingHorizontal: 20,
@@ -1609,123 +1416,6 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     marginBottom: 8,
     fontStyle: 'italic',
-  },
-  webQuoteSection: {
-    maxWidth: 1200,
-    width: '100%',
-    alignSelf: 'center',
-    paddingVertical: 64,
-    paddingHorizontal: 48,
-    borderRadius: 20,
-    marginVertical: 24,
-    backgroundColor: '#161b22',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 12,
-  },
-  webQuoteContent: {
-    maxWidth: 1000,
-    alignSelf: 'center',
-  },
-  webQuoteHeading: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#f4e4c1',
-    marginBottom: 48,
-    textAlign: 'center',
-    lineHeight: 34,
-  },
-  webQuoteGrid: {
-    flexDirection: 'row',
-    marginBottom: 32,
-    justifyContent: 'space-between',
-  },
-  webQuoteColumn: {
-    flex: 1,
-    marginHorizontal: 32,
-  },
-  webQuoteSubtitle: {
-    fontSize: 20,
-    color: '#f4e4c1',
-    marginBottom: 20,
-    fontWeight: '600',
-  },
-  webQuoteItem: {
-    fontSize: 18,
-    color: '#8b949e',
-    lineHeight: 28,
-    marginBottom: 12,
-  },
-  webQuoteCheck: {
-    fontSize: 18,
-    color: '#3fb950',
-    lineHeight: 28,
-    marginBottom: 12,
-  },
-  webQuoteFooter: {
-    fontSize: 22,
-    color: '#58a6ff',
-    fontWeight: '600',
-    textAlign: 'center',
-    marginTop: 24,
-  },
-  webPlanContent: {
-    maxWidth: 1100,
-    alignSelf: 'center',
-  },
-  webPlanGrid: {
-    flexDirection: 'row',
-    marginVertical: 32,
-    marginHorizontal: -12,
-  },
-  webPlanCard: {
-    flex: 1,
-    backgroundColor: '#1c2128',
-    padding: 28,
-    margin: 12,
-    borderRadius: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 6,
-  },
-  webPlanNumber: {
-    fontSize: 40,
-    fontWeight: '700',
-    color: '#fbbf24',
-    marginBottom: 8,
-  },
-  webPlanLabel: {
-    fontSize: 16,
-    color: '#c9d1d9',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  webPlanHours: {
-    fontSize: 18,
-    color: '#58a6ff',
-    fontWeight: '700',
-  },
-  webPlanTotal: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    borderTopWidth: 2,
-    borderTopColor: '#30363d',
-    marginBottom: 24,
-  },
-  webPlanTotalText: {
-    fontSize: 28,
-    color: '#f4e4c1',
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  webPlanSubtext: {
-    fontSize: 16,
-    color: '#8b949e',
   },
   webCTASection: {
     maxWidth: 1200,
