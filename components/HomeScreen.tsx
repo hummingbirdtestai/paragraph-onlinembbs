@@ -861,10 +861,11 @@ const Section9Mobile = memo(({ onOpenAuth, isLoggedIn }) => {
   return (
     <View style={styles.mobileCTASection}>
       <Text style={styles.mobileCTAHeading}>Start Your Journey</Text>
-      <Text style={styles.mobileCTAText}>
-        This is the NEETPG preparation model built for 2026 —
-        efficient, adaptive, personalised, unstoppable.
-      </Text>
+<Text style={styles.mobileCTAText}>
+  This is a university-exam–focused MBBS preparation system —
+  efficient, adaptive, personalised, unstoppable.
+</Text>
+
 
       <Pressable
         style={styles.mobileCTAButton}
