@@ -131,7 +131,9 @@ const Section1Mobile = memo(({ image }: { image: string }) => {
 The Real Problem Is Cracking MBBS University Exams.
 You Didn’t Fail.
 </Text>
-
+<Text style={styles.mobileBody}>
+AI-powered MBBS UHS University PYQ Question Bank — built strictly for Indian medical colleges.
+</Text>
 <Text style={styles.mobileBody}>
 You’re Not a Weak Student — The Exam System Is Brutal.
 </Text>
@@ -184,6 +186,9 @@ const Section1Web = memo(({ image }: { image: string }) => {
           <Text style={styles.webHeading}>
 The Real Problem Is Cracking MBBS University Exams.
 You Didn’t Fail.
+</Text>
+<Text style={styles.webBody}>
+AI-powered MBBS UHS University PYQ Question Bank designed for UHS & Indian medical universities.
 </Text>
 
 <Text style={styles.webSubheading}>
