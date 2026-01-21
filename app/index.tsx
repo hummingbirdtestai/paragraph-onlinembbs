@@ -6,7 +6,7 @@ import MainLayout from '@/components/MainLayout';
 export default function Index() {
   const images = {
   // HERO
-  img1: "https://paragraph.b-cdn.net/Hero%20webp.webp",
+  img1: "https://paragraph.b-cdn.net/battle/Home%20page%20images/HP1.webp",
 
   // 🔁 REPLACED AS REQUESTED
   img2: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM1.webp", // Section2 – CBME mastery that works
