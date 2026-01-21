@@ -15,7 +15,7 @@ export default function Index() {
   img6: "https://paragraph.b-cdn.net/final%20image.webp", // Section6 – 24×7 AI Mentor
 
   // ⛔ UNCHANGED (as per your instruction)
-  img5: "https://paragraph.b-cdn.net/ChatGPT%20Image%20Jan%2021%2C%202026%2C%2010_22_19%20PM.webp",
+  img5: "https://paragraph.b-cdn.net/ChatGPT%20Image%20Jan%2021%2C%202026%2C%2010_35_27%20PM.webp",
   img7: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img7.webp",
   img8: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img8.webp",
   img9: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img9.webp",
