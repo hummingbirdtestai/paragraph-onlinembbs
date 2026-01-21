@@ -131,9 +131,7 @@ const Section1Mobile = memo(({ image }: { image: string }) => {
 The Real Problem Is Cracking MBBS University Exams.
 You Didn’t Fail.
 </Text>
-<Text style={styles.mobileBody}>
-AI-powered MBBS UHS University PYQ Question Bank — built strictly for Indian medical colleges.
-</Text>
+
 <Text style={styles.mobileBody}>
 You’re Not a Weak Student — The Exam System Is Brutal.
 </Text>
@@ -187,9 +185,7 @@ const Section1Web = memo(({ image }: { image: string }) => {
 The Real Problem Is Cracking MBBS University Exams.
 You Didn’t Fail.
 </Text>
-<Text style={styles.webBody}>
-AI-powered MBBS UHS University PYQ Question Bank designed for UHS & Indian medical universities.
-</Text>
+
 
 <Text style={styles.webSubheading}>
 You’re Not a Weak Student — The Exam System Is Brutal.
@@ -397,7 +393,9 @@ const Section5Mobile = memo(({ image }: { image: string }) => {
         <Text style={styles.mobileHeading}>
 14 MBBS University Exams. 19 Subjects. One Proven System.
 </Text>
-
+<Text style={styles.mobileBody}>
+AI-powered MBBS UHS University PYQ Question Bank — built strictly for Indian medical colleges.
+</Text>
 <Text style={styles.mobileBody}>
 MBBS university exams are not about reading everything.
 They are about writing what examiners repeatedly ask.
@@ -446,7 +444,9 @@ const Section5Web = memo(({ image }: { image: string }) => {
  <Text style={styles.webHeading}>
 14 MBBS University Exams. 19 Subjects. One Proven System.
 </Text>
-
+<Text style={styles.webBody}>
+AI-powered MBBS UHS University PYQ Question Bank designed for UHS & Indian medical universities.
+</Text>
 <Text style={styles.webSubheading}>
 University exams reward precision — not volume.
 Paragraph trains you exactly for that.
