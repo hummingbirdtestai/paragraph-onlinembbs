@@ -862,8 +862,7 @@ const Section9Mobile = memo(({ onOpenAuth, isLoggedIn }) => {
     <View style={styles.mobileCTASection}>
       <Text style={styles.mobileCTAHeading}>Start Your Journey</Text>
 <Text style={styles.mobileCTAText}>
-  This is a university-exam–focused MBBS preparation system —
-  efficient, adaptive, personalised, unstoppable.
+  Master MBBS university exams with a hyper-personalised conversational AI mentor.
 </Text>
 
 
