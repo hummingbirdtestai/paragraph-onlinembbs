@@ -390,36 +390,42 @@ const Section5Mobile = memo(({ image }: { image: string }) => {
       <Image source={{ uri: image }} style={styles.mobileImage} resizeMode="cover" progressiveRenderingEnabled />
       <View style={styles.mobilePadding}>
         <Text style={styles.mobileHeading}>
-  Your 5-Year MBBS Journey to Master 5,000 Concepts and Competencies
-  Based on the NMC CBME Curriculum, Simplified
+14 MBBS University Exams. 19 Subjects. One Proven System.
 </Text>
 
 <Text style={styles.mobileBody}>
-  University MBBS exam preparation every year looks overwhelming
-  only if you walk it blindly.
+MBBS university exams are not about reading everything.
+They are about writing what examiners repeatedly ask.
 </Text>
+
 <Text style={styles.mobileBody}>
-          Paragraph breaks your preparation into a clear 4-step roadmap:
-        </Text>
-        <Text style={styles.mobileStep}>1️⃣ 4577 CBME Concepts</Text>
-        <Text style={styles.mobileStep}>2️⃣ 50000 Flash Cards</Text>
-        <Text style={styles.mobileStep}>3️⃣ 22885 Practice MCQs</Text>
-        <Text style={styles.mobileStep}>4️⃣ 22885 Clinical Cases</Text>
-        <Text style={[styles.mobileBody, styles.emphasis]}>
-          Every day you move forward.{'\n'}
-          Every gap gets fixed automatically.{'\n'}
-          Every milestone is visible.
-        </Text>
-       <Text style={styles.mobileBody}>
-  No costly tuitions.{'\n'}
-  No books or voluminous notes to buy.{'\n'}
-  No overhyped faculty needed.
+Paragraph is built from AI analysis of the last 15 years —
+30 UHS MBBS question papers per subject.
+</Text>
+
+<Text style={styles.mobileBody}>
+For each of the 15 MBBS subjects, we identify:
+</Text>
+
+<Text style={styles.mobileStep}>1️⃣ 200 Most Repeated University Questions</Text>
+<Text style={styles.mobileStep}>2️⃣ 25 High-Yield Conceptual Facts per Topic</Text>
+<Text style={styles.mobileStep}>3️⃣ 10-Minute Rapid Revision per Topic</Text>
+<Text style={styles.mobileStep}>4️⃣ Clinically Framed Answers Examiners Expect</Text>
+
+<Text style={[styles.mobileBody, styles.emphasis]}>
+40 hours of focused preparation per paper{'\n'}
+is enough to score Distinction — and even Gold Medal.
+</Text>
+
+<Text style={styles.mobileBody}>
+No unnecessary reading.{'\n'}
+No guesswork.{'\n'}
+No last-minute panic.
 </Text>
 
 <Text style={[styles.mobileBody, styles.emphasis]}>
-  Just an AI-tutored, self-paced, hyper-personalised adaptive learning journey{'\n'}
-  covering the complete 5-year MBBS CBME curriculum{'\n'}
-  across all 19 MBBS subjects.
+Just a precise, university-exam–oriented system{'\n'}
+that tells you exactly what to study — and what to skip.
 </Text>
       </View>
     </View>
@@ -433,50 +439,56 @@ const Section5Web = memo(({ image }: { image: string }) => {
       <View style={styles.webHero}>
         <View style={styles.webTextBlock}>
  <Text style={styles.webHeading}>
-  Your 5-Year MBBS Journey to Master 5,000 Concepts and Competencies
-  Based on the NMC CBME Curriculum, Simplified
+14 MBBS University Exams. 19 Subjects. One Proven System.
 </Text>
 
 <Text style={styles.webSubheading}>
-  University MBBS exam preparation every year looks overwhelming
-  only if you walk it blindly.
+University exams reward precision — not volume.
+Paragraph trains you exactly for that.
 </Text>
 
-          <Text style={styles.webBody}>
-            Paragraph breaks your preparation into a clear 4-step roadmap:
-          </Text>
-          <View style={styles.webStepGrid}>
-            <View style={styles.webStep}>
-              <Text style={styles.webStepNumber}>1️⃣</Text>
-              <Text style={styles.webStepText}>4577 CBME Concepts</Text>
-            </View>
-            <View style={styles.webStep}>
-              <Text style={styles.webStepNumber}>2️⃣</Text>
-              <Text style={styles.webStepText}>50000 Flash Cards</Text>
-            </View>
-            <View style={styles.webStep}>
-              <Text style={styles.webStepNumber}>3️⃣</Text>
-              <Text style={styles.webStepText}>22885 Practice MCQs</Text>
-            </View>
-            <View style={styles.webStep}>
-              <Text style={styles.webStepNumber}>4️⃣</Text>
-             <Text style={styles.webStepText}>22885 Clinical Cases</Text>
-            </View>
-          </View>
-          <Text style={[styles.webBody, styles.emphasis]}>
-            Every day you move forward. Every gap gets fixed automatically.{'\n'}
-            Every milestone is visible.
-          </Text>
-         <Text style={styles.webBody}>
-  No costly tuitions. No books or voluminous notes to buy.{'\n'}
-  No overhyped faculty needed.
+<Text style={styles.webBody}>
+Paragraph is powered by AI analysis of the last 15 years —
+30 UHS MBBS university question papers per subject.
+</Text>
+
+<Text style={styles.webBody}>
+Across all 15 MBBS subjects, the system extracts:
+</Text>
+
+<View style={styles.webStepGrid}>
+  <View style={styles.webStep}>
+    <Text style={styles.webStepNumber}>1️⃣</Text>
+    <Text style={styles.webStepText}>200 Most Repeated Questions</Text>
+  </View>
+  <View style={styles.webStep}>
+    <Text style={styles.webStepNumber}>2️⃣</Text>
+    <Text style={styles.webStepText}>25 High-Yield Facts per Topic</Text>
+  </View>
+  <View style={styles.webStep}>
+    <Text style={styles.webStepNumber}>3️⃣</Text>
+    <Text style={styles.webStepText}>10-Minute Rapid Revision</Text>
+  </View>
+  <View style={styles.webStep}>
+    <Text style={styles.webStepNumber}>4️⃣</Text>
+    <Text style={styles.webStepText}>Exam-Ready Answer Framing</Text>
+  </View>
+</View>
+
+<Text style={[styles.webBody, styles.emphasis]}>
+40 hours of focused preparation per paper{'\n'}
+is sufficient for Distinction-level performance.
+</Text>
+
+<Text style={styles.webBody}>
+No bulky textbooks. No random notes. No uncertainty.
 </Text>
 
 <Text style={[styles.webBody, styles.emphasis]}>
-  Just an AI-tutored, self-paced, hyper-personalised adaptive learning journey{'\n'}
-  covering the complete 5-year MBBS CBME curriculum{'\n'}
-  across all 19 MBBS subjects.
+Just a clear, repeatable university-exam system{'\n'}
+designed to maximise marks — year after year.
 </Text>
+
         </View>
         <Image source={{ uri: image }} style={styles.webSideImage} resizeMode="contain" progressiveRenderingEnabled />
       </View>
