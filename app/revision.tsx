@@ -145,7 +145,13 @@ export default function RevisionScreen() {
           return;
         }
 
-        const data = JSON.parse(raw);
+        let data;
+        try {
+          data = JSON.parse(raw);
+        } catch (parseErr) {
+          console.error("❌ Failed to parse JSON:", raw);
+          return;
+        }
 
         console.log("🧠 session_id:", data.session_id);
         console.log("📘 first concept:", data.payload);
@@ -256,12 +262,44 @@ export default function RevisionScreen() {
       const res = await fetch(`${API_BASE}/revision/next`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId }),
+        body: JSON.stringify({
+          session_id: sessionId,
+          event: "timer_elapsed",
+        }),
       });
 
       console.log("📡 /revision/next (MCQ) status:", res.status);
 
-      const data = await res.json();
+      const raw = await res.text();
+      console.log("📦 raw response:", raw);
+
+      if (!res.ok) {
+        console.error("❌ API returned error status:", res.status);
+        return;
+      }
+
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (parseErr) {
+        console.error("❌ Failed to parse JSON:", raw);
+        return;
+      }
+
+      console.log("📦 Response type:", data.type);
+
+      // Guard: Expecting MCQ
+      if (data.type !== "mcq") {
+        console.warn("⚠️ Expected MCQ but got:", data.type);
+        
+        // Handle completion
+        if (data.type === "complete") {
+          console.log("✅ Revision complete!");
+          setState('complete');
+        }
+        return;
+      }
+
       console.log("📦 MCQ payload received:", data.payload);
 
       setCurrentMCQ(data.payload);
@@ -334,25 +372,49 @@ export default function RevisionScreen() {
       const res = await fetch(`${API_BASE}/revision/next`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId }),
+        body: JSON.stringify({
+          session_id: sessionId,
+          event: "timer_elapsed",
+        }),
       });
 
       console.log("📡 /revision/next (Concept) status:", res.status);
 
-      const data = await res.json();
+      const raw = await res.text();
+      console.log("📦 raw response:", raw);
+
+      if (!res.ok) {
+        console.error("❌ API returned error status:", res.status);
+        return;
+      }
+
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (parseErr) {
+        console.error("❌ Failed to parse JSON:", raw);
+        return;
+      }
+
       console.log("📦 Response type:", data.type);
 
+      // Guard: Handle completion
       if (data.type === 'complete') {
         console.log("✅ Revision complete!");
         setState('complete');
         return;
       }
 
-      const nextIndex = currentIndex + 1;
+      // Guard: Expecting concept
+      if (data.type !== "concept") {
+        console.warn("⚠️ Expected concept but got:", data.type);
+        return;
+      }
 
       console.log("📘 Next concept loaded:", data.payload);
 
-      setCurrentIndex(nextIndex);
+      // FIX: Use functional update for currentIndex
+      setCurrentIndex(prev => prev + 1);
       setCurrentConcept(data.payload);
       setCurrentMCQ(null);
 
@@ -361,7 +423,7 @@ export default function RevisionScreen() {
         {
           type: 'concept',
           concept: data.payload,
-          index: nextIndex,
+          index: items.length, // Use items.length for accurate index
         },
       ]);
 
