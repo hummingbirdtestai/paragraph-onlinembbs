@@ -126,12 +126,13 @@ const isCorrect = selectedOption === resolvedCorrect;
     <View style={styles.mcqContainer}>
       <MCQQuestion mcq={item} />
 
-      <OptionsGrid
-        options={item.options}
-        selectedOption={selectedOption}
-        correctAnswer={item.correct_answer}
-        onSelect={handleOptionSelect}
-      />
+     <OptionsGrid
+  options={item.options}
+  selectedOption={selectedOption}
+  correctAnswer={resolvedCorrect}
+  onSelect={handleOptionSelect}
+/>
+
 
       {showFeedback && selectedOption && (
         <FeedbackSection
