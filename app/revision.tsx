@@ -187,7 +187,7 @@ export default function RevisionScreen() {
           clearInterval(mcqCountdownTimerRef.current!);
           setAutoSubmitTriggered(true);
           setMcqCountdownActive(false);
-          setFeedbackCountdownActive(true);
+  
           return 0;
         }
         return prev - 1;
