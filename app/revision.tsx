@@ -285,6 +285,7 @@ export default function RevisionScreen() {
       console.log("📦 MCQ payload received:", data.payload);
 
       setCurrentMCQ(data.payload);
+setAutoSubmitTriggered(false);
 
       setRenderedItems((items) => [
         ...items,
@@ -331,7 +332,7 @@ export default function RevisionScreen() {
 
 setMcqCountdownActive(false);
 clearInterval(mcqCountdownTimerRef.current!);
-
+setAutoSubmitTriggered(false);
 
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 400);
     setFeedbackCountdownActive(true);
