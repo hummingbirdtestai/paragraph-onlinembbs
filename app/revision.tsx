@@ -84,7 +84,6 @@ export default function RevisionScreen() {
   /* ───────────── TIMERS ───────────── */
 
   const [countdown, setCountdown] = useState(20);
-  const [conceptWaitCountdownActive, setConceptWaitCountdownActive] = useState(false);
   const [mcqCountdownActive, setMcqCountdownActive] = useState(false);
   const [feedbackCountdownActive, setFeedbackCountdownActive] = useState(false);
   const [autoSubmitTriggered, setAutoSubmitTriggered] = useState(false);
@@ -109,7 +108,6 @@ export default function RevisionScreen() {
   /* ───────────── REFS ───────────── */
 
   const scrollRef = useRef<ScrollView>(null);
-  const conceptWaitTimerRef = useRef<NodeJS.Timeout | null>(null);
   const mcqCountdownTimerRef = useRef<NodeJS.Timeout | null>(null);
   const feedbackCountdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -174,36 +172,14 @@ export default function RevisionScreen() {
   }, [TOPIC_ID]);
 
   /* ─────────────────────────────────────────────
-     CONCEPT → WAIT TIMER
+     START MCQ TIMER WHEN CONCEPT APPEARS
   ───────────────────────────────────────────── */
 
   useEffect(() => {
-    if (!conceptWaitCountdownActive || !currentConcept) return;
+    if (!currentConcept || currentMCQ) return;
 
     setCountdown(20);
-
-    conceptWaitTimerRef.current = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(conceptWaitTimerRef.current!);
-          loadMCQ();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(conceptWaitTimerRef.current!);
-  }, [conceptWaitCountdownActive]);
-
-  /* ─────────────────────────────────────────────
-     MCQ TIMER
-  ───────────────────────────────────────────── */
-
-  useEffect(() => {
-    if (!mcqCountdownActive) return;
-
-    setCountdown(20);
+    setMcqCountdownActive(true);
 
     mcqCountdownTimerRef.current = setInterval(() => {
       setCountdown((prev) => {
@@ -211,7 +187,7 @@ export default function RevisionScreen() {
           clearInterval(mcqCountdownTimerRef.current!);
           setAutoSubmitTriggered(true);
           setMcqCountdownActive(false);
-          setTimeout(() => setFeedbackCountdownActive(true), 2200);
+          setFeedbackCountdownActive(true);
           return 0;
         }
         return prev - 1;
@@ -219,7 +195,7 @@ export default function RevisionScreen() {
     }, 1000);
 
     return () => clearInterval(mcqCountdownTimerRef.current!);
-  }, [mcqCountdownActive]);
+  }, [currentConcept]);
 
   /* ─────────────────────────────────────────────
      FEEDBACK TIMER
@@ -228,7 +204,7 @@ export default function RevisionScreen() {
   useEffect(() => {
     if (!feedbackCountdownActive) return;
 
-    setCountdown(20);
+    setCountdown(10);
 
     feedbackCountdownTimerRef.current = setInterval(() => {
       setCountdown((prev) => {
@@ -314,8 +290,8 @@ export default function RevisionScreen() {
         },
       ]);
 
-      setConceptWaitCountdownActive(false);
-      setMcqCountdownActive(true);
+      setMcqCountdownActive(false);
+      clearInterval(mcqCountdownTimerRef.current!);
 
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (err) {
@@ -352,7 +328,7 @@ export default function RevisionScreen() {
     clearInterval(mcqCountdownTimerRef.current!);
 
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 400);
-    setTimeout(() => setFeedbackCountdownActive(true), 2200);
+    setFeedbackCountdownActive(true);
   };
 
   /* ─────────────────────────────────────────────
@@ -427,7 +403,6 @@ export default function RevisionScreen() {
         },
       ]);
 
-      setConceptWaitCountdownActive(false);
       setFeedbackCountdownActive(false);
       setAutoSubmitTriggered(false);
 
@@ -470,7 +445,7 @@ export default function RevisionScreen() {
         />
       )}
 
-      {(conceptWaitCountdownActive || mcqCountdownActive || feedbackCountdownActive) && (
+      {(mcqCountdownActive || feedbackCountdownActive) && (
         <View style={styles.floatingCountdown}>
           <Text style={styles.floatingCountdownText}>{countdown}s</Text>
         </View>
@@ -502,7 +477,7 @@ export default function RevisionScreen() {
                 totalConcepts={totalConcepts}
                 onComplete={
                   item.index === currentIndex
-                    ? () => setConceptWaitCountdownActive(true)
+                    ? loadMCQ
                     : undefined
                 }
               />
