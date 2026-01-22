@@ -290,7 +290,8 @@ export default function RevisionScreen() {
         },
       ]);
 
-
+      setMcqCountdownActive(false);
+      clearInterval(mcqCountdownTimerRef.current!);
 
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (err) {
@@ -323,7 +324,8 @@ export default function RevisionScreen() {
       }),
     });
 
-
+    setMcqCountdownActive(false);
+    clearInterval(mcqCountdownTimerRef.current!);
 
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 400);
     setFeedbackCountdownActive(true);
