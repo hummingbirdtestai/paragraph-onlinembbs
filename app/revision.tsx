@@ -8,9 +8,10 @@ export default function RevisionScreen() {
   const params = useLocalSearchParams<{
     topic_id?: string;
     subject?: string;
+    mode?: "mentor" | "revision";
   }>();
 
-  const { topic_id, subject } = params;
+  const { topic_id, subject, mode } = params;
 
   if (!topic_id) {
     return (
@@ -32,8 +33,15 @@ export default function RevisionScreen() {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        <ConceptCard topicId={topic_id} subject={subject} />
+        {mode !== "mentor" && (
+          <ConceptCard topicId={topic_id} subject={subject} />
+        )}
       </ScrollView>
+      {mode === "mentor" && (
+        <Text style={{ color: "#25D366", textAlign: "center", marginTop: 40 }}>
+          Mentor session starting…
+        </Text>
+      )}
     </View>
   );
 }
