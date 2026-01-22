@@ -32,7 +32,11 @@ const YEARS = [
   {
     year: "First Year",
     yearFull: "MBBS First Year",
-    subjects: ["Anatomy", "Physiology", "Biochemistry"],
+    subjects: [
+      "Anatomy",
+      "Physiology",
+      "Biochemistry",
+    ],
     color: "#4A90E2",
     bgColor: "rgba(74, 144, 226, 0.08)",
     borderColor: "rgba(74, 144, 226, 0.35)",
@@ -41,7 +45,11 @@ const YEARS = [
   {
     year: "Second Year",
     yearFull: "MBBS Second Year",
-    subjects: ["Pathology", "Pharmacology", "Microbiology"],
+    subjects: [
+      "Pathology",
+      "Pharmacology",
+      "Microbiology",
+    ],
     color: "#B8D4A8",
     bgColor: "rgba(184, 212, 168, 0.08)",
     borderColor: "rgba(184, 212, 168, 0.35)",
@@ -50,7 +58,10 @@ const YEARS = [
   {
     year: "Third Year",
     yearFull: "MBBS Third Year",
-    subjects: ["Forensic Medicine", "Community Medicine"],
+    subjects: [
+      "Forensic Medicine",
+      "Community Medicine",
+    ],
     color: "#E91E63",
     bgColor: "rgba(233, 30, 99, 0.08)",
     borderColor: "rgba(233, 30, 99, 0.35)",
@@ -62,15 +73,7 @@ const YEARS = [
     subjects: [
       "General Medicine",
       "Pediatrics",
-      "Psychiatry",
-      "Radiodiagnosis",
-      "Radiotherapy",
-      "Dermatology",
-      "Gynaecology",
-      "Obstetrics",
       "General Surgery",
-      "Anaesthesiology",
-      "Orthopaedics",
       "ENT",
       "Ophthalmology",
     ],
@@ -82,27 +85,71 @@ const YEARS = [
 ];
 
 const SUBJECT_COLORS: Record<string, any> = {
-  "Anatomy": { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)", borderColor: "rgba(74, 144, 226, 0.35)" },
-  "Physiology": { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)", borderColor: "rgba(37, 211, 102, 0.35)" },
-  "Biochemistry": { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)", borderColor: "rgba(184, 212, 168, 0.35)" },
-  "Pathology": { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)", borderColor: "rgba(233, 30, 99, 0.35)" },
-  "Pharmacology": { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)", borderColor: "rgba(255, 152, 0, 0.35)" },
-  "Microbiology": { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)", borderColor: "rgba(37, 211, 102, 0.35)" },
-  "Forensic Medicine": { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)", borderColor: "rgba(74, 144, 226, 0.35)" },
-  "Community Medicine": { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)", borderColor: "rgba(184, 212, 168, 0.35)" },
-  "General Medicine": { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)", borderColor: "rgba(233, 30, 99, 0.35)" },
-  "Pediatrics": { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)", borderColor: "rgba(255, 215, 0, 0.35)" },
-  "Psychiatry": { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)", borderColor: "rgba(74, 144, 226, 0.35)" },
-  "Radiodiagnosis": { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)", borderColor: "rgba(255, 152, 0, 0.35)" },
-  "Radiotherapy": { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)", borderColor: "rgba(233, 30, 99, 0.35)" },
-  "Dermatology": { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)", borderColor: "rgba(37, 211, 102, 0.35)" },
-  "Gynaecology": { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)", borderColor: "rgba(255, 215, 0, 0.35)" },
-  "Obstetrics": { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)", borderColor: "rgba(184, 212, 168, 0.35)" },
-  "General Surgery": { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)", borderColor: "rgba(233, 30, 99, 0.35)" },
-  "Anaesthesiology": { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)", borderColor: "rgba(74, 144, 226, 0.35)" },
-  "Orthopaedics": { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)", borderColor: "rgba(255, 152, 0, 0.35)" },
-  "ENT": { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)", borderColor: "rgba(37, 211, 102, 0.35)" },
-  "Ophthalmology": { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)", borderColor: "rgba(255, 215, 0, 0.35)" },
+  "Anatomy": {
+    color: "#4A90E2",
+    bgColor: "rgba(74, 144, 226, 0.08)",
+    borderColor: "rgba(74, 144, 226, 0.35)",
+  },
+  "Physiology": {
+    color: "#25D366",
+    bgColor: "rgba(37, 211, 102, 0.08)",
+    borderColor: "rgba(37, 211, 102, 0.35)",
+  },
+  "Biochemistry": {
+    color: "#B8D4A8",
+    bgColor: "rgba(184, 212, 168, 0.08)",
+    borderColor: "rgba(184, 212, 168, 0.35)",
+  },
+  "Pathology": {
+    color: "#E91E63",
+    bgColor: "rgba(233, 30, 99, 0.08)",
+    borderColor: "rgba(233, 30, 99, 0.35)",
+  },
+  "Pharmacology": {
+    color: "#FF9800",
+    bgColor: "rgba(255, 152, 0, 0.08)",
+    borderColor: "rgba(255, 152, 0, 0.35)",
+  },
+  "Microbiology": {
+    color: "#25D366",
+    bgColor: "rgba(37, 211, 102, 0.08)",
+    borderColor: "rgba(37, 211, 102, 0.35)",
+  },
+  "Forensic Medicine": {
+    color: "#4A90E2",
+    bgColor: "rgba(74, 144, 226, 0.08)",
+    borderColor: "rgba(74, 144, 226, 0.35)",
+  },
+  "Community Medicine": {
+    color: "#B8D4A8",
+    bgColor: "rgba(184, 212, 168, 0.08)",
+    borderColor: "rgba(184, 212, 168, 0.35)",
+  },
+  "General Medicine": {
+    color: "#E91E63",
+    bgColor: "rgba(233, 30, 99, 0.08)",
+    borderColor: "rgba(233, 30, 99, 0.35)",
+  },
+  "Pediatrics": {
+    color: "#FFD700",
+    bgColor: "rgba(255, 215, 0, 0.08)",
+    borderColor: "rgba(255, 215, 0, 0.35)",
+  },
+  "General Surgery": {
+    color: "#E91E63",
+    bgColor: "rgba(233, 30, 99, 0.08)",
+    borderColor: "rgba(233, 30, 99, 0.35)",
+  },
+  "ENT": {
+    color: "#25D366",
+    bgColor: "rgba(37, 211, 102, 0.08)",
+    borderColor: "rgba(37, 211, 102, 0.35)",
+  },
+  "Ophthalmology": {
+    color: "#FFD700",
+    bgColor: "rgba(255, 215, 0, 0.08)",
+    borderColor: "rgba(255, 215, 0, 0.35)",
+  },
 };
 
 const CHAPTER_COLORS = [
