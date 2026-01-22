@@ -48,19 +48,19 @@ export function ConceptBubble({
 
   const titleTyping = useTypingAnimation({
     text: stage === 'title' ? normalizeForTyping(title) : normalizeForTyping(title),
-    speed: 30,
+    speed: 10,
     onComplete: handleTitleComplete,
   });
 
   const coreTyping = useTypingAnimation({
     text: stage === 'core' || stage === 'explanation' ? normalizeForTyping(coreIdea) : '',
-    speed: 15,
+    speed: 5,
     onComplete: handleCoreComplete,
   });
 
   const explanationTyping = useTypingAnimation({
     text: stage === 'explanation' ? normalizeForTyping(keyExplanation) : '',
-    speed: 15,
+    speed: 5,
     onComplete: handleExplanationComplete,
   });
 
