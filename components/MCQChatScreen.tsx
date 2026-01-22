@@ -62,19 +62,20 @@ useEffect(() => {
   }, []);
 
   // Auto-submit correct answer when countdown hits 0
-  useEffect(() => {
-    if (autoSubmit && !selectedOption) {
-      const correct_answer = correctAnswer || item.correct_answer;
+useEffect(() => {
+  if (autoSubmit && !selectedOption) {
+    const correct_answer = correctAnswer || item.correct_answer;
 
-      console.log("⏰ [MCQScreen] Auto submit triggered", {
-        correct_answer,
-      });
+    console.log("⏰ [MCQScreen] Auto submit triggered", {
+      correct_answer,
+    });
 
-      setSelectedOption(correct_answer);
-      setShowFeedback(true);
-      onAnswerSelected?.(correct_answer);
-    }
-  }, [autoSubmit]);
+    setSelectedOption(correct_answer);
+    setShowFeedback(true);
+    onAnswerSelected?.(correct_answer);
+  }
+}, [autoSubmit, selectedOption, correctAnswer, item.correct_answer]);
+
 // 🔍 DEBUG: confirm feedback render cycle
 useEffect(() => {
   if (showFeedback && selectedOption) {
