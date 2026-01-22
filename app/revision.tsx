@@ -183,13 +183,17 @@ export default function RevisionScreen() {
 
     mcqCountdownTimerRef.current = setInterval(() => {
       setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(mcqCountdownTimerRef.current!);
-          setAutoSubmitTriggered(true);
-          setMcqCountdownActive(false);
-  
-          return 0;
-        }
+       if (prev <= 1) {
+  clearInterval(mcqCountdownTimerRef.current!);
+
+  console.log("⏰ MCQ timer expired → auto submit");
+
+  setAutoSubmitTriggered(true);      // tells MCQChatScreen to auto-submit
+  setMcqCountdownActive(false);      // hides 20s timer
+  setFeedbackCountdownActive(true);  // ✅ START feedback timer
+
+  return 0;
+}
         return prev - 1;
       });
     }, 1000);
