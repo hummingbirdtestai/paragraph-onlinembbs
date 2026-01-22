@@ -469,7 +469,7 @@ setSubjectProgress(normalized);
                                       activeOpacity={0.8}
 onPress={() => {
   router.push({
-    pathname: '/revision',
+   pathname: '/concept',
     params: {
       topic_id: topic.topic_id,
       subject: selectedSubject,
