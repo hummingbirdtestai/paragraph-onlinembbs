@@ -7,6 +7,7 @@ import {
   Text,
   Dimensions,
 } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { ConceptBubble } from '@/components/ConceptBubble';
 import MCQChatScreen from '@/components/MCQChatScreen';
 import ConfettiCannon from 'react-native-confetti-cannon';
@@ -16,7 +17,6 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 ───────────────────────────────────────────── */
 
 const API_BASE = 'https://revisionmainpy-production.up.railway.app';
-const TOPIC_ID = 'REPLACE_WITH_REAL_TOPIC_ID'; // wire from router later
 const TOTAL_CONCEPTS_FALLBACK = 10;
 const { width, height } = Dimensions.get('window');
 
@@ -63,6 +63,11 @@ interface RenderedItem {
 ───────────────────────────────────────────── */
 
 export default function RevisionScreen() {
+  /* ───────────── ROUTER PARAMS ───────────── */
+
+  const params = useLocalSearchParams<{ topic_id?: string }>();
+  const TOPIC_ID = params.topic_id;
+
   /* ───────────── SESSION / API ───────────── */
 
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -113,28 +118,54 @@ export default function RevisionScreen() {
   ───────────────────────────────────────────── */
 
   useEffect(() => {
+    if (!TOPIC_ID) {
+      console.error("❌ topic_id missing in route params, aborting revision start");
+      return;
+    }
+
     (async () => {
-      const res = await fetch(`${API_BASE}/revision/start`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic_id: TOPIC_ID }),
-      });
+      console.log("🚀 Starting revision");
+      console.log("📌 topic_id:", TOPIC_ID);
+      console.log("🌍 API_BASE:", API_BASE);
 
-      const data = await res.json();
+      try {
+        const res = await fetch(`${API_BASE}/revision/start`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic_id: TOPIC_ID }),
+        });
 
-      setSessionId(data.session_id);
-      setCurrentConcept(data.payload);
-      setTotalConcepts(data.total_concepts || TOTAL_CONCEPTS_FALLBACK);
+        console.log("📡 /revision/start status:", res.status);
 
-      setRenderedItems([
-        {
-          type: 'concept',
-          concept: data.payload,
-          index: 0,
-        },
-      ]);
+        const raw = await res.text();
+        console.log("📦 raw response:", raw);
+
+        if (!res.ok) {
+          console.error("❌ API returned error status:", res.status);
+          return;
+        }
+
+        const data = JSON.parse(raw);
+
+        console.log("🧠 session_id:", data.session_id);
+        console.log("📘 first concept:", data.payload);
+
+        setSessionId(data.session_id);
+        setCurrentConcept(data.payload);
+        setTotalConcepts(data.total_concepts || TOTAL_CONCEPTS_FALLBACK);
+
+        setRenderedItems([
+          {
+            type: 'concept',
+            concept: data.payload,
+            index: 0,
+          },
+        ]);
+      } catch (err) {
+        console.error("❌ Revision start failed:", err);
+      }
     })();
-  }, []);
+  }, [TOPIC_ID]);
 
   /* ─────────────────────────────────────────────
      CONCEPT → WAIT TIMER
@@ -212,31 +243,46 @@ export default function RevisionScreen() {
   ───────────────────────────────────────────── */
 
   const loadMCQ = async () => {
-    if (!sessionId || !currentConcept) return;
+    console.log("⏭️ loadMCQ called");
+    console.log("🆔 sessionId:", sessionId);
+    console.log("📘 currentConcept:", currentConcept?.concept);
 
-    const res = await fetch(`${API_BASE}/revision/next`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: sessionId }),
-    });
+    if (!sessionId || !currentConcept) {
+      console.warn("⚠️ loadMCQ aborted (missing session or concept)");
+      return;
+    }
 
-    const data = await res.json();
-    setCurrentMCQ(data.payload);
+    try {
+      const res = await fetch(`${API_BASE}/revision/next`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
 
-    setRenderedItems((items) => [
-      ...items,
-      {
-        type: 'mcq',
-        concept: currentConcept,
-        mcq: data.payload,
-        index: currentIndex,
-      },
-    ]);
+      console.log("📡 /revision/next (MCQ) status:", res.status);
 
-    setConceptWaitCountdownActive(false);
-    setMcqCountdownActive(true);
+      const data = await res.json();
+      console.log("📦 MCQ payload received:", data.payload);
 
-    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+      setCurrentMCQ(data.payload);
+
+      setRenderedItems((items) => [
+        ...items,
+        {
+          type: 'mcq',
+          concept: currentConcept,
+          mcq: data.payload,
+          index: currentIndex,
+        },
+      ]);
+
+      setConceptWaitCountdownActive(false);
+      setMcqCountdownActive(true);
+
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+    } catch (err) {
+      console.error("❌ loadMCQ failed:", err);
+    }
   };
 
   /* ─────────────────────────────────────────────
@@ -276,41 +322,57 @@ export default function RevisionScreen() {
   ───────────────────────────────────────────── */
 
   const loadNextConcept = async () => {
-    if (!sessionId) return;
+    console.log("⏭️ loadNextConcept called");
+    console.log("🆔 sessionId:", sessionId);
 
-    const res = await fetch(`${API_BASE}/revision/next`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: sessionId }),
-    });
-
-    const data = await res.json();
-
-    if (data.type === 'complete') {
-      setState('complete');
+    if (!sessionId) {
+      console.warn("⚠️ loadNextConcept aborted (missing sessionId)");
       return;
     }
 
-    const nextIndex = currentIndex + 1;
+    try {
+      const res = await fetch(`${API_BASE}/revision/next`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
 
-    setCurrentIndex(nextIndex);
-    setCurrentConcept(data.payload);
-    setCurrentMCQ(null);
+      console.log("📡 /revision/next (Concept) status:", res.status);
 
-    setRenderedItems((items) => [
-      ...items,
-      {
-        type: 'concept',
-        concept: data.payload,
-        index: nextIndex,
-      },
-    ]);
+      const data = await res.json();
+      console.log("📦 Response type:", data.type);
 
-    setConceptWaitCountdownActive(false);
-    setFeedbackCountdownActive(false);
-    setAutoSubmitTriggered(false);
+      if (data.type === 'complete') {
+        console.log("✅ Revision complete!");
+        setState('complete');
+        return;
+      }
 
-    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+      const nextIndex = currentIndex + 1;
+
+      console.log("📘 Next concept loaded:", data.payload);
+
+      setCurrentIndex(nextIndex);
+      setCurrentConcept(data.payload);
+      setCurrentMCQ(null);
+
+      setRenderedItems((items) => [
+        ...items,
+        {
+          type: 'concept',
+          concept: data.payload,
+          index: nextIndex,
+        },
+      ]);
+
+      setConceptWaitCountdownActive(false);
+      setFeedbackCountdownActive(false);
+      setAutoSubmitTriggered(false);
+
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+    } catch (err) {
+      console.error("❌ loadNextConcept failed:", err);
+    }
   };
 
   /* ─────────────────────────────────────────────
@@ -323,7 +385,7 @@ export default function RevisionScreen() {
         <View style={styles.completeContainer}>
           <Text style={styles.completeTitle}>🎉 Revision Complete!</Text>
           <Text style={styles.completeText}>
-            You’ve completed all concepts. Excellent work!
+            You've completed all concepts. Excellent work!
           </Text>
         </View>
       </View>
