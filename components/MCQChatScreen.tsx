@@ -44,6 +44,13 @@ export default function MCQChatScreen({
 }) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
+// 🔁 Reset MCQ state when a NEW MCQ loads
+useEffect(() => {
+  console.log("🔄 [MCQScreen] Resetting state for new MCQ", item.id);
+
+  setSelectedOption(null);
+  setShowFeedback(false);
+}, [item.id]);
 
   useEffect(() => {
     console.log("🟦 [MCQScreen] Mounted MCQ", {
@@ -68,6 +75,20 @@ export default function MCQChatScreen({
       onAnswerSelected?.(correct_answer);
     }
   }, [autoSubmit]);
+// 🔍 DEBUG: confirm feedback render cycle
+useEffect(() => {
+  if (showFeedback && selectedOption) {
+    console.log("✅ [MCQScreen] Feedback rendered", {
+      selectedOption,
+      resolvedCorrect: correctAnswer || item.correct_answer,
+      isCorrect: selectedOption === (correctAnswer || item.correct_answer),
+      feedbackText:
+        selectedOption === (correctAnswer || item.correct_answer)
+          ? item.feedback.correct
+          : item.feedback.wrong,
+    });
+  }
+}, [showFeedback, selectedOption]);
 
   const handleOptionSelect = async (option: string) => {
     if (selectedOption) return;
