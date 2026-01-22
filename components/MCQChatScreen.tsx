@@ -96,7 +96,9 @@ export default function MCQChatScreen({
     }
   };
 
-  const isCorrect = selectedOption === item.correct_answer;
+  const resolvedCorrect = correctAnswer || item.correct_answer;
+const isCorrect = selectedOption === resolvedCorrect;
+
 
   return (
     <View style={styles.mcqContainer}>
