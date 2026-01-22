@@ -16,6 +16,7 @@ import { BookOpen, Award, Star, Trophy, Sparkles, ChevronRight, ArrowLeft, Check
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
 import MainLayout from '@/components/MainLayout';
+import RevisionScreen from '@/app/revision';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -205,6 +206,12 @@ export default function UhsPyqCurriculumTable({ onSubjectSelect }: LearningPathP
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  type ViewMode = 'PYQS' | 'CHAT';
+
+  const [viewMode, setViewMode] = useState<ViewMode>('PYQS');
+
+  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+
   const handleSubjectPress = async (subject: string) => {
 
     setSelectedSubject(subject);
@@ -227,7 +234,6 @@ const { data, error: rpcError } = await supabase.rpc(
     : [];
 
 setSubjectProgress(normalized);
-
 
       if (onSubjectSelect) {
         onSubjectSelect(subject);
@@ -462,6 +468,10 @@ setSubjectProgress(normalized);
                                   <View key={topicIndex} style={styles.topicWrapper}>
                                     <TouchableOpacity
                                       activeOpacity={0.8}
+                                      onPress={() => {
+                                        setSelectedTopicId(topic.topic_id);
+                                        setViewMode('CHAT');
+                                      }}
                                       style={[
                                         styles.topicTab,
                                         {
@@ -611,6 +621,10 @@ setSubjectProgress(normalized);
   };
 
   // Main render - show either subject overview or subject progress
+  if (viewMode === 'CHAT' && selectedTopicId) {
+    return <RevisionScreen />;
+  }
+
   if (selectedSubject) {
     return renderSubjectProgress();
   }
@@ -653,7 +667,6 @@ setSubjectProgress(normalized);
     />
   ))}
 </View>
-
 
             {/* Start Node */}
             <View style={styles.startNode}>
