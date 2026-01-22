@@ -16,7 +16,8 @@ import { BookOpen, Award, Star, Trophy, Sparkles, ChevronRight, ArrowLeft, Check
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
 import MainLayout from '@/components/MainLayout';
-import RevisionScreen from '@/app/revision';
+import { useRouter } from 'expo-router';
+
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -201,16 +202,14 @@ interface GroupedProgress {
 }
 
 export default function UhsPyqCurriculumTable({ onSubjectSelect }: LearningPathProps) {
+    const router = useRouter();
+
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [subjectProgress, setSubjectProgress] = useState<GroupedProgress[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  type ViewMode = 'PYQS' | 'CHAT';
-
-  const [viewMode, setViewMode] = useState<ViewMode>('PYQS');
-
-  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+  
 
   const handleSubjectPress = async (subject: string) => {
 
@@ -468,10 +467,17 @@ setSubjectProgress(normalized);
                                   <View key={topicIndex} style={styles.topicWrapper}>
                                     <TouchableOpacity
                                       activeOpacity={0.8}
-                                      onPress={() => {
-                                        setSelectedTopicId(topic.topic_id);
-                                        setViewMode('CHAT');
-                                      }}
+onPress={() => {
+  router.push({
+    pathname: '/revision',
+    params: {
+      topic_id: topic.topic_id,
+      subject: selectedSubject,
+      chapter: chapter.chapter,
+    },
+  });
+}}
+
                                       style={[
                                         styles.topicTab,
                                         {
@@ -621,9 +627,7 @@ setSubjectProgress(normalized);
   };
 
   // Main render - show either subject overview or subject progress
-  if (viewMode === 'CHAT' && selectedTopicId) {
-    return <RevisionScreen />;
-  }
+
 
   if (selectedSubject) {
     return renderSubjectProgress();
