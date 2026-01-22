@@ -39,10 +39,11 @@ export default function MCQChatScreen({
   correctAnswer?: string;
   phaseUniqueId?: string;
   mode?: "practice" | "video";
-  onAnswerSelected?: () => void;
+  onAnswerSelected?: (option: string) => void;
   autoSubmit?: boolean;
 }) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     console.log("🟦 [MCQScreen] Mounted MCQ", {
@@ -57,13 +58,16 @@ export default function MCQChatScreen({
   useEffect(() => {
     if (autoSubmit && !selectedOption) {
       const correct_answer = correctAnswer || item.correct_answer;
-      console.log("⏰ [MCQScreen] Auto-submitting correct answer due to timeout", {
+
+      console.log("⏰ [MCQScreen] Auto submit triggered", {
         correct_answer,
       });
+
       setSelectedOption(correct_answer);
-      onAnswerSelected?.();
+      setShowFeedback(true);
+      onAnswerSelected?.(correct_answer);
     }
-  }, [autoSubmit, selectedOption]);
+  }, [autoSubmit]);
 
   const handleOptionSelect = async (option: string) => {
     if (selectedOption) return;
@@ -75,7 +79,8 @@ export default function MCQChatScreen({
     });
 
     setSelectedOption(option);
-    onAnswerSelected?.();
+    setShowFeedback(true);
+    onAnswerSelected?.(option);
 
     const correct_answer = correctAnswer || item.correct_answer;
     const is_correct = option === correct_answer;
@@ -104,7 +109,7 @@ export default function MCQChatScreen({
         onSelect={handleOptionSelect}
       />
 
-      {selectedOption && (
+      {showFeedback && selectedOption && (
         <FeedbackSection
           feedback={isCorrect ? item.feedback.correct : item.feedback.wrong}
           learningGap={item.learning_gap}
