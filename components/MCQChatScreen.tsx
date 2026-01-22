@@ -135,11 +135,11 @@ const isCorrect = selectedOption === resolvedCorrect;
 
 
       {showFeedback && selectedOption && (
-        <FeedbackSection
-          feedback={isCorrect ? item.feedback.correct : item.feedback.wrong}
-          learningGap={item.learning_gap}
-          correctAnswer={item.correct_answer}
-        />
+       <FeedbackSection
+  feedback={item.feedback[selectedOption]}
+  learningGap={item.learning_gap}
+  correctAnswer={resolvedCorrect}
+/>
       )}
     </View>
   );
