@@ -357,7 +357,7 @@ setSubjectProgress(normalized);
                                 {tbChapter.textbook_chapter}
                               </Text>
                               <Text style={styles.yearBlockSubjects}>
-                                {tbChapter.chapters.length} Chapters
+                                {tbChapter.chapters.length} Topics
                               </Text>
                             </View>
                           </View>
