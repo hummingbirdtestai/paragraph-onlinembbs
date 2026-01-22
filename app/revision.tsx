@@ -423,7 +423,7 @@ export default function RevisionScreen() {
         {
           type: 'concept',
           concept: data.payload,
-          index: items.length, // Use items.length for accurate index
+          index: currentIndex + 1 // Use items.length for accurate index
         },
       ]);
 
