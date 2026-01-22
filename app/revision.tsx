@@ -189,6 +189,8 @@ export default function RevisionScreen() {
   console.log("⏰ MCQ timer expired → auto submit");
 
   setAutoSubmitTriggered(true);      // tells MCQChatScreen to auto-submit
+         console.log("🟣 autoSubmitTriggered = true");
+
   setMcqCountdownActive(false);      // hides 20s timer
   setFeedbackCountdownActive(true);  // ✅ START feedback timer
 
