@@ -1,450 +1,1357 @@
-//revision.tsx
-import React, { useState, useEffect, useRef } from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
-import { ConceptBubble } from '@/components/ConceptBubble';
-import MCQChatScreen from '@/components/MCQChatScreen';
-import ConfettiCannon from 'react-native-confetti-cannon';
+// components/UhsPyqCurriculumTable.tsx
+// cloned from CBME Learning Path – adapted for UHS PYQ
 
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BookOpen, Award, Star, Trophy, Sparkles, ChevronRight, ArrowLeft, CheckCircle2, Circle, Zap } from 'lucide-react-native';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/contexts/AuthContext';
+import MainLayout from '@/components/MainLayout';
+import RevisionScreen from '@/app/revision';
 
-interface Concept {
-  title: string;
-  concept: number;
-  core_idea: string;
-  key_explanation: string;
-}
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-interface MCQ {
-  id: string;
-  stem: string;
-  options: {
-    A: string;
-    B: string;
-    C: string;
-    D: string;
-  };
-  feedback: {
-    wrong: string;
-    correct: string;
-  };
-  learning_gap: string;
-  correct_answer: 'A' | 'B' | 'C' | 'D';
-  concept_value: number;
-}
-
-const MOCK_CONCEPTS: Concept[] = [
-  {
-    title: 'Definition and Purpose of HRT 💡⚕',
-    concept: 1,
-    core_idea:
-      '**_HRT_** = systemic or local **_estrogen_** ± **_progestogen_** to treat **_hypoestrogenic_** states and relieve menopausal symptoms.',
-    key_explanation:
-      "In one sentence, **_Hormone Replacement Therapy (HRT)_** is the use of **_estrogen_** alone or with **_progestogen_** to replace deficient hormones and improve symptoms; in practice we choose systemic vs local formulations depending on whether the goal is vasomotor control, **_vulvovaginal atrophy (VVA)_**, bone protection, or **_gender-affirming_** care. Think of **_HRT_** as a targeted therapy: systemic **_estrogen_** addresses **_hot flashes_**, sleep, mood and **_bone mineral density (BMD)_**, while **_local vaginal estrogen_** treats **_vaginal atrophy_** with minimal systemic exposure. Always frame decisions around indication, risk profile, and patient preferences. 🧠📘",
-  },
-  {
-    title: 'Cardiovascular Effects of HRT 🫀',
-    concept: 2,
-    core_idea:
-      '**_HRT_** has **_complex cardiovascular effects_** that depend heavily on **_timing of initiation_** relative to menopause onset.',
-    key_explanation:
-      'The **_timing hypothesis_** suggests that starting **_HRT_** within 10 years of menopause or before age 60 may provide **_cardiovascular benefits_**, while initiation later carries increased risk. Early HRT may improve **_endothelial function_** and reduce **_atherosclerosis_** progression, but in women with established disease, it can destabilize plaques. Key point: **_cardiovascular risk is not absolute_** but depends on age, time since menopause, and baseline cardiovascular health. 🫀📊',
-  },
-];
-
-const MOCK_MCQS: MCQ[] = [
-  {
-    id: 'mcq-1',
-    stem: '**A 51-year-old woman** presents with bothersome *hot flashes*, sleep disturbance and vaginal dryness 2 years after her last menstrual period. Which statement best describes the primary purpose of **_HRT_**?',
-    options: {
-      A: "To provide long-term prevention of Alzheimer's disease in all postmenopausal women",
-      B: '**_To replace deficient estrogen ± progestogen to relieve vasomotor symptoms, improve vaginal trophicity and protect bone_**',
-      C: 'To treat osteoporosis exclusively by increasing calcium absorption in the gut',
-      D: 'To be used only for gender-affirming therapy and not for menopausal symptoms',
-    },
-    feedback: {
-      correct: '✅ Correct! HRT replaces estrogen ± progestogen to manage menopausal symptoms (hot flashes, vaginal atrophy) and provides bone protection. This is the core therapeutic goal.',
-      wrong: '❌ The primary indication for HRT is symptom relief and bone protection through estrogen replacement with or without progestogen. It addresses vasomotor symptoms, vaginal atrophy, and helps maintain bone density.',
-    },
-    learning_gap: 'HRT is fundamentally about replacing deficient hormones to manage menopausal symptoms and protect bone health. While it may have other effects, the core purpose is managing hypoestrogenic states through systemic or local hormone replacement.',
-    correct_answer: 'B',
-    concept_value: 1,
-  },
-  {
-    id: 'mcq-2',
-    stem: '**A 63-year-old woman** with no prior HRT use wants to start estrogen therapy for persistent hot flashes that began 11 years ago at menopause. She has **_no history of cardiovascular disease_**. What is the most important consideration?',
-    options: {
-      A: 'HRT should be avoided entirely in women over 60 regardless of symptoms',
-      B: '**_The timing hypothesis suggests increased cardiovascular risk when initiating HRT more than 10 years post-menopause_**',
-      C: 'Cardiovascular benefits of HRT increase with age, so she is an ideal candidate',
-      D: 'Only local vaginal estrogen should be used in all postmenopausal women over 60',
-    },
-    feedback: {
-      correct: '✅ Correct! The timing hypothesis indicates that starting HRT beyond 10 years post-menopause or after age 60 may increase cardiovascular risk, even without prior CVD. Careful counseling is essential.',
-      wrong: '❌ The timing hypothesis is critical here: initiating HRT more than 10 years after menopause or after age 60 carries increased cardiovascular risk, even in women without prior cardiovascular disease.',
-    },
-    learning_gap: 'The timing hypothesis is a key principle in HRT: starting therapy within 10 years of menopause or before age 60 may provide cardiovascular benefits, while later initiation increases risk. This relationship exists even in women without established cardiovascular disease.',
-    correct_answer: 'B',
-    concept_value: 2,
-  },
-];
-
-type State = 'concept' | 'countdown' | 'complete';
-
-interface RenderedItem {
-  type: 'concept' | 'mcq';
-  concept: Concept;
-  mcq?: MCQ;
-  index: number;
-}
-
-export default function RevisionScreen() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [state, setState] = useState<State>('concept');
-  const [countdown, setCountdown] = useState(20);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [renderedItems, setRenderedItems] = useState<RenderedItem[]>([]);
-  const [conceptWaitCountdownActive, setConceptWaitCountdownActive] = useState(false);
-  const [mcqCountdownActive, setMcqCountdownActive] = useState(false);
-  const [feedbackCountdownActive, setFeedbackCountdownActive] = useState(false);
-  const [autoSubmitTriggered, setAutoSubmitTriggered] = useState(false);
-  const scrollRef = useRef<ScrollView>(null);
-  const conceptWaitTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const mcqCountdownTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const feedbackCountdownTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const currentConcept = MOCK_CONCEPTS[currentIndex];
-  const currentMCQ = MOCK_MCQS.find((mcq) => mcq.concept_value === currentConcept?.concept);
-
-  // Initialize with first concept
-  useEffect(() => {
-    if (renderedItems.length === 0) {
-      setRenderedItems([{
-        type: 'concept',
-        concept: currentConcept,
-        index: 0,
-      }]);
-    }
-  }, []);
-
-  // Concept wait countdown - starts after concept completes, before MCQ appears
-  useEffect(() => {
-    if (conceptWaitCountdownActive) {
-      setCountdown(20);
-      conceptWaitTimerRef.current = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            if (conceptWaitTimerRef.current) {
-              clearInterval(conceptWaitTimerRef.current);
-            }
-            // Show MCQ after countdown
-            setRenderedItems((items) => [
-              ...items,
-              {
-                type: 'mcq',
-                concept: currentConcept,
-                mcq: currentMCQ,
-                index: currentIndex,
-              },
-            ]);
-            setConceptWaitCountdownActive(false);
-            // Start MCQ countdown
-            setMcqCountdownActive(true);
-            // Auto-scroll when MCQ appears
-            setTimeout(() => {
-              scrollRef.current?.scrollToEnd({ animated: true });
-            }, 100);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => {
-        if (conceptWaitTimerRef.current) {
-          clearInterval(conceptWaitTimerRef.current);
-        }
-      };
-    }
-  }, [conceptWaitCountdownActive, currentConcept, currentMCQ, currentIndex]);
-
-  // MCQ countdown - starts when MCQ appears
-  useEffect(() => {
-    if (mcqCountdownActive) {
-      setCountdown(20);
-      mcqCountdownTimerRef.current = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            if (mcqCountdownTimerRef.current) {
-              clearInterval(mcqCountdownTimerRef.current);
-            }
-            // Auto-submit when countdown hits 0
-            setAutoSubmitTriggered(true);
-            setMcqCountdownActive(false);
-
-            // Start feedback countdown after auto-submit feedback completes
-            setTimeout(() => {
-              setFeedbackCountdownActive(true);
-            }, 2200);
-
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => {
-        if (mcqCountdownTimerRef.current) {
-          clearInterval(mcqCountdownTimerRef.current);
-        }
-      };
-    }
-  }, [mcqCountdownActive]);
-
-  // Feedback countdown - starts after feedback appears
-  useEffect(() => {
-    if (feedbackCountdownActive) {
-      setCountdown(20);
-      feedbackCountdownTimerRef.current = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            if (feedbackCountdownTimerRef.current) {
-              clearInterval(feedbackCountdownTimerRef.current);
-            }
-            handleNextConcept();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => {
-        if (feedbackCountdownTimerRef.current) {
-          clearInterval(feedbackCountdownTimerRef.current);
-        }
-      };
-    }
-  }, [feedbackCountdownActive]);
-
-  const handleAnswerSelected = () => {
-  setShowConfetti(true); // 🎉 FIRE CONFETTI
-
-  setTimeout(() => {
-    setShowConfetti(false); // cleanup
-  }, 3000);
-
-  setMcqCountdownActive(false);
-  if (mcqCountdownTimerRef.current) {
-    clearInterval(mcqCountdownTimerRef.current);
-  }
-
-  setTimeout(() => {
-    scrollRef.current?.scrollToEnd({ animated: true });
-  }, 400);
-
-  setTimeout(() => {
-    setFeedbackCountdownActive(true);
-    setTimeout(() => {
-      scrollRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-  }, 2200);
+const formatDate = (iso: string) => {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
 };
 
-  const handleNextConcept = () => {
-    if (currentIndex < MOCK_CONCEPTS.length - 1) {
-      const nextIndex = currentIndex + 1;
-      setCurrentIndex(nextIndex);
-      setFeedbackCountdownActive(false);
-      setConceptWaitCountdownActive(false);
-      setMcqCountdownActive(false);
-      setAutoSubmitTriggered(false);
+const YEARS = [
+  {
+    year: "First Year",
+    yearFull: "MBBS First Year",
+    subjects: [
+      "Anatomy",
+      "Physiology",
+      "Biochemistry",
+    ],
+    color: "#4A90E2",
+    bgColor: "rgba(74, 144, 226, 0.08)",
+    borderColor: "rgba(74, 144, 226, 0.35)",
+    icon: "book",
+  },
+  {
+    year: "Second Year",
+    yearFull: "MBBS Second Year",
+    subjects: [
+      "Pathology",
+      "Pharmacology",
+      "Microbiology",
+    ],
+    color: "#B8D4A8",
+    bgColor: "rgba(184, 212, 168, 0.08)",
+    borderColor: "rgba(184, 212, 168, 0.35)",
+    icon: "lab",
+  },
+  {
+    year: "Third Year",
+    yearFull: "MBBS Third Year",
+    subjects: [
+      "Forensic Medicine",
+      "Community Medicine",
+    ],
+    color: "#E91E63",
+    bgColor: "rgba(233, 30, 99, 0.08)",
+    borderColor: "rgba(233, 30, 99, 0.35)",
+    icon: "research",
+  },
+  {
+    year: "Final Year",
+    yearFull: "MBBS Final Year",
+    subjects: [
+      "General Medicine",
+      "Pediatrics",
+      "General Surgery",
+      "ENT",
+      "Ophthalmology",
+    ],
+    color: "#25D366",
+    bgColor: "rgba(37, 211, 102, 0.08)",
+    borderColor: "rgba(37, 211, 102, 0.35)",
+    icon: "trophy",
+  },
+];
 
-      // Add next concept to rendered items
-      setRenderedItems((items) => [
-        ...items,
-        {
-          type: 'concept',
-          concept: MOCK_CONCEPTS[nextIndex],
-          index: nextIndex,
-        },
-      ]);
+const SUBJECT_COLORS: Record<string, any> = {
+  "Anatomy": {
+    color: "#4A90E2",
+    bgColor: "rgba(74, 144, 226, 0.08)",
+    borderColor: "rgba(74, 144, 226, 0.35)",
+  },
+  "Physiology": {
+    color: "#25D366",
+    bgColor: "rgba(37, 211, 102, 0.08)",
+    borderColor: "rgba(37, 211, 102, 0.35)",
+  },
+  "Biochemistry": {
+    color: "#B8D4A8",
+    bgColor: "rgba(184, 212, 168, 0.08)",
+    borderColor: "rgba(184, 212, 168, 0.35)",
+  },
+  "Pathology": {
+    color: "#E91E63",
+    bgColor: "rgba(233, 30, 99, 0.08)",
+    borderColor: "rgba(233, 30, 99, 0.35)",
+  },
+  "Pharmacology": {
+    color: "#FF9800",
+    bgColor: "rgba(255, 152, 0, 0.08)",
+    borderColor: "rgba(255, 152, 0, 0.35)",
+  },
+  "Microbiology": {
+    color: "#25D366",
+    bgColor: "rgba(37, 211, 102, 0.08)",
+    borderColor: "rgba(37, 211, 102, 0.35)",
+  },
+  "Forensic Medicine": {
+    color: "#4A90E2",
+    bgColor: "rgba(74, 144, 226, 0.08)",
+    borderColor: "rgba(74, 144, 226, 0.35)",
+  },
+  "Community Medicine": {
+    color: "#B8D4A8",
+    bgColor: "rgba(184, 212, 168, 0.08)",
+    borderColor: "rgba(184, 212, 168, 0.35)",
+  },
+  "General Medicine": {
+    color: "#E91E63",
+    bgColor: "rgba(233, 30, 99, 0.08)",
+    borderColor: "rgba(233, 30, 99, 0.35)",
+  },
+  "Pediatrics": {
+    color: "#FFD700",
+    bgColor: "rgba(255, 215, 0, 0.08)",
+    borderColor: "rgba(255, 215, 0, 0.35)",
+  },
+  "General Surgery": {
+    color: "#E91E63",
+    bgColor: "rgba(233, 30, 99, 0.08)",
+    borderColor: "rgba(233, 30, 99, 0.35)",
+  },
+  "ENT": {
+    color: "#25D366",
+    bgColor: "rgba(37, 211, 102, 0.08)",
+    borderColor: "rgba(37, 211, 102, 0.35)",
+  },
+  "Ophthalmology": {
+    color: "#FFD700",
+    bgColor: "rgba(255, 215, 0, 0.08)",
+    borderColor: "rgba(255, 215, 0, 0.35)",
+  },
+};
 
-      setState('concept');
+const CHAPTER_COLORS = [
+  { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)" },
+  { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)" },
+  { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)" },
+  { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)" },
+  { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)" },
+  { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)" },
+  { color: "#9C27B0", bgColor: "rgba(156, 39, 176, 0.08)" },
+  { color: "#00BCD4", bgColor: "rgba(0, 188, 212, 0.08)" },
+  { color: "#FF5722", bgColor: "rgba(255, 87, 34, 0.08)" },
+  { color: "#607D8B", bgColor: "rgba(96, 125, 139, 0.08)" },
+];
 
-      // Scroll to show new concept
-      setTimeout(() => {
-        scrollRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    } else {
-      setState('complete');
+const TOPIC_COLORS = [
+  { color: "#4A90E2", bgColor: "rgba(74, 144, 226, 0.08)" },
+  { color: "#B8D4A8", bgColor: "rgba(184, 212, 168, 0.08)" },
+  { color: "#FFD700", bgColor: "rgba(255, 215, 0, 0.08)" },
+  { color: "#FF9800", bgColor: "rgba(255, 152, 0, 0.08)" },
+  { color: "#25D366", bgColor: "rgba(37, 211, 102, 0.08)" },
+  { color: "#E91E63", bgColor: "rgba(233, 30, 99, 0.08)" },
+  { color: "#9C27B0", bgColor: "rgba(156, 39, 176, 0.08)" },
+  { color: "#00BCD4", bgColor: "rgba(0, 188, 212, 0.08)" },
+  { color: "#FF5722", bgColor: "rgba(255, 87, 34, 0.08)" },
+  { color: "#607D8B", bgColor: "rgba(96, 125, 139, 0.08)" },
+];
+
+interface LearningPathProps {
+  onSubjectSelect?: (subject: string) => void;
+}
+
+interface TopicItem {
+  topic: string;
+  topic_id: string;
+  is_complete: boolean;
+  visited_at: string | null;
+}
+
+interface ChapterItem {
+  chapter: string;
+  topics: TopicItem[];
+}
+
+interface GroupedProgress {
+  textbook_chapter: string;
+  chapters: ChapterItem[];
+}
+
+export default function UhsPyqCurriculumTable({ onSubjectSelect }: LearningPathProps) {
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [subjectProgress, setSubjectProgress] = useState<GroupedProgress[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  type ViewMode = 'PYQS' | 'CHAT';
+
+  const [viewMode, setViewMode] = useState<ViewMode>('PYQS');
+
+  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+
+  const handleSubjectPress = async (subject: string) => {
+
+    setSelectedSubject(subject);
+    setLoading(true);
+    setError(null);
+
+    try {
+const { data, error: rpcError } = await supabase.rpc(
+  'get_subject_curriculum_tree_pyq',
+  {
+    p_subject: subject,
+  }
+);
+
+      if (rpcError) throw rpcError;
+
+     const normalized =
+  Array.isArray(data) && data.length > 0
+    ? data[0].curriculum_tree ?? []
+    : [];
+
+setSubjectProgress(normalized);
+
+      if (onSubjectSelect) {
+        onSubjectSelect(subject);
+      }
+    } catch (err) {
+      console.error('Error fetching subject progress:', err);
+      setError('Failed to load learning path');
+      setSubjectProgress([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (state === 'complete') {
+  const handleBackToSubjects = () => {
+    setSelectedSubject(null);
+    setSubjectProgress(null);
+    setError(null);
+  };
+
+  const getSubjectColor = (subject: string) => {
+    return SUBJECT_COLORS[subject] || SUBJECT_COLORS["Anatomy"];
+  };
+
+  const getChapterColor = (index: number) => {
+    return CHAPTER_COLORS[index % CHAPTER_COLORS.length];
+  };
+
+  const getTopicColor = (index: number) => {
+    return TOPIC_COLORS[index % TOPIC_COLORS.length];
+  };
+
+  const renderSubjectProgress = () => {
+    if (!selectedSubject) return null;
+
+    const subjectColor = getSubjectColor(selectedSubject);
+
+    let chapterGlobalIndex = 0;
+
     return (
-      <View style={styles.container}>
-        <View style={styles.completeContainer}>
-          <Text style={styles.completeTitle}>🎉 Revision Complete!</Text>
-          <Text style={styles.completeText}>
-            You've reviewed all concepts. Great work!
-          </Text>
+      <MainLayout>
+        <View style={styles.container}>
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Header with Back Button */}
+            <View style={styles.header}>
+              <TouchableOpacity
+                onPress={handleBackToSubjects}
+                style={styles.backButton}
+                activeOpacity={0.7}
+              >
+                <ArrowLeft size={18} color={subjectColor.color} />
+                <Text style={[styles.backButtonText, { color: subjectColor.color }]}>
+                  Back to Subjects
+                </Text>
+              </TouchableOpacity>
+
+              <View style={[styles.journeyBadge, { backgroundColor: subjectColor.bgColor, borderColor: subjectColor.borderColor }]}>
+                <Sparkles size={14} color={subjectColor.color} />
+                <Text style={[styles.journeyBadgeText, { color: subjectColor.color }]}>YOUR JOURNEY</Text>
+              </View>
+              <Text style={styles.headerTitle}>{selectedSubject}</Text>
+              <Text style={styles.headerSubtitle}>
+                Follow your personalized learning path through the curriculum
+              </Text>
+            </View>
+
+            {/* Loading State */}
+            {loading && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={subjectColor.color} />
+                <Text style={styles.loadingText}>Loading your learning path...</Text>
+              </View>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
+
+            {/* Subject Progress Flowchart */}
+            {!loading && !error && subjectProgress && (
+              <View style={styles.flowchartContainer}>
+                {/* Start Node */}
+                <View style={styles.startNode}>
+                  <View style={[styles.startNodeCircle, { backgroundColor: subjectColor.color }]}>
+                    <Sparkles size={16} color="#ffffff" />
+                  </View>
+                  <View style={styles.startNodeContent}>
+                    <Text style={[styles.startNodeText, { color: subjectColor.color }]}>
+                      Start Learning {selectedSubject}
+                    </Text>
+                  </View>
+                  <View style={[styles.connectionLine, { backgroundColor: subjectColor.borderColor }]} />
+                </View>
+
+                {/* Textbook Chapters and Topics Flow */}
+                {subjectProgress.map((tbChapter, tbIndex) => (
+                  <View key={tbIndex} style={styles.yearSection}>
+                    {/* Textbook Chapter Block */}
+                    <View style={styles.yearBlockWrapper}>
+                      <View
+                        style={[
+                          styles.yearBlock,
+                          { 
+                            backgroundColor: subjectColor.bgColor, 
+                            borderLeftColor: subjectColor.color,
+                          },
+                        ]}
+                      >
+                        <View style={styles.yearBlockContent}>
+                          <View style={styles.yearBlockHeader}>
+                            <View
+                              style={[
+                                styles.yearIconCircle, 
+                                { backgroundColor: 'rgba(255, 255, 255, 0.05)' }
+                              ]}
+                            >
+                              <BookOpen size={18} color={subjectColor.color} strokeWidth={2} />
+                            </View>
+                            <View style={styles.yearBlockTextContainer}>
+                              <Text style={styles.textbookChapterTitle}>
+                                {tbChapter.textbook_chapter}
+                              </Text>
+                              <Text style={styles.yearBlockSubjects}>
+                                {tbChapter.chapters.length} Topics
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                        <View
+                          style={[
+                            styles.yearConnectionPoint, 
+                            { backgroundColor: subjectColor.color }
+                          ]}
+                        />
+                      </View>
+                      <View style={[styles.horizontalConnector, { backgroundColor: subjectColor.borderColor }]} />
+                    </View>
+
+                    {/* Chapters and Topics */}
+                    <View style={styles.subjectsContainer}>
+                      {tbChapter.chapters.map((chapter, chapterIndex) => {
+                        const chapterColor = getChapterColor(chapterGlobalIndex);
+                        const isLastChapter = chapterIndex === tbChapter.chapters.length - 1;
+                        const allTopicsComplete = chapter.topics.every(t => !!t.visited_at);
+                        const firstIncomplete = chapter.topics.findIndex(t => !t.visited_at);
+                        const isCurrent = firstIncomplete >= 0;
+                        
+                        const currentChapterIndex = chapterGlobalIndex;
+                        chapterGlobalIndex++;
+
+                        return (
+                          <View key={chapterIndex} style={styles.chapterSection}>
+                            {/* Per-Chapter Vertical Timeline Segment */}
+                            <View
+                              style={[
+                                styles.chapterTimelineSegment,
+                                { backgroundColor: chapterColor.color },
+                              ]}
+                            />
+
+                            {/* Chapter Block */}
+                            <View style={styles.subjectWrapper}>
+                              <View
+                                style={[
+                                  styles.chapterBlock,
+                                  {
+                                    backgroundColor: allTopicsComplete || isCurrent
+                                      ? chapterColor.bgColor
+                                      : 'rgba(30, 30, 30, 0.4)',
+                                    borderLeftColor: allTopicsComplete || isCurrent
+                                      ? chapterColor.color
+                                      : 'rgba(100, 100, 100, 0.4)',
+                                  },
+                                ]}
+                              >
+                                <View style={styles.chapterBlockContent}>
+                                  <View
+                                    style={[
+                                      styles.chapterIconDot,
+                                      {
+                                        backgroundColor: allTopicsComplete || isCurrent
+                                          ? chapterColor.color
+                                          : 'rgba(100, 100, 100, 0.5)',
+                                      },
+                                    ]}
+                                  />
+                                  <Text style={styles.chapterTextFixed}>
+                                    {chapter.chapter}
+                                  </Text>
+                                  {allTopicsComplete && (
+                                    <CheckCircle2 size={16} color={chapterColor.color} strokeWidth={2} />
+                                  )}
+                                </View>
+                                <View
+                                  style={[
+                                    styles.chapterConnectionPoint,
+                                    {
+                                      backgroundColor: allTopicsComplete || isCurrent
+                                        ? chapterColor.color
+                                        : 'rgba(100, 100, 100, 0.6)',
+                                    },
+                                  ]}
+                                />
+                              </View>
+                              <View
+                                style={[
+                                  styles.horizontalConnectorChapter,
+                                  { 
+                                    backgroundColor: chapterColor.color,
+                                    opacity: allTopicsComplete || isCurrent ? 0.5 : 0.2,
+                                  },
+                                ]}
+                              />
+                            </View>
+
+                            {/* Topics (nested) - TAB STYLE */}
+                            <View style={styles.topicsContainer}>
+                              {chapter.topics.map((topic, topicIndex) => {
+                                const topicColor = getTopicColor(topicIndex);
+                                const isComplete = !!topic.visited_at;
+                                const isCurrentTopic = !isComplete && firstIncomplete === topicIndex;
+                                const isLastTopic = topicIndex === chapter.topics.length - 1;
+                                const isFuture = !isComplete && !isCurrentTopic;
+
+                                return (
+                                  <View key={topicIndex} style={styles.topicWrapper}>
+                                    <TouchableOpacity
+                                      activeOpacity={0.8}
+                                      onPress={() => {
+                                        setSelectedTopicId(topic.topic_id);
+                                        setViewMode('CHAT');
+                                      }}
+                                      style={[
+                                        styles.topicTab,
+                                        {
+                                          backgroundColor: isComplete
+                                            ? 'rgba(37, 211, 102, 0.08)'
+                                            : 'rgba(30, 30, 30, 0.3)',
+                                          borderLeftColor: isComplete
+                                            ? '#25D366'
+                                            : isCurrentTopic
+                                            ? topicColor.color
+                                            : '#9FB3C8',
+
+                                        },
+                                      ]}
+                                    >
+                                      <View style={styles.topicTabContent}>
+                                        {isComplete && topic.visited_at && (
+                                          <Text style={styles.completedDateText}>
+                                            {formatDate(topic.visited_at)}
+                                          </Text>
+                                        )}
+
+                                        <View style={styles.topicMainRow}>
+                                          <View style={styles.topicIconContainer}>
+                                            {isComplete ? (
+                                              <CheckCircle2 size={14} color="#25D366" strokeWidth={2} />
+                                            ) : isCurrentTopic ? (
+                                              <Circle size={12} color={topicColor.color} strokeWidth={2} fill={topicColor.color} />
+                                            ) : (
+                                              <Circle size={12} color="#9FB3C8" strokeWidth={1.5} />
+                                            )}
+                                          </View>
+
+                                          <Text
+                                            style={[
+                                              styles.topicTabText,
+                                              {
+                                                color: isComplete
+                                                  ? '#25D366'
+                                                  : isCurrentTopic
+                                                  ? topicColor.color
+                                                  : '#9FB3C8',
+                                              },
+                                            ]}
+                                          >
+                                            {topic.topic}
+                                          </Text>
+                                        </View>
+                                      </View>
+                                      <View
+                                        style={[
+                                          styles.topicConnectionPoint,
+                                          {
+                                            backgroundColor: isComplete
+                                              ? '#25D366'
+                                              : isCurrentTopic
+                                              ? topicColor.color
+                                              : '#9FB3C8',
+                                          },
+                                        ]}
+                                      />
+                                    </TouchableOpacity>
+                                    {!isLastTopic && (
+                                      <View
+                                        style={[
+                                          styles.topicConnector,
+                                          {
+                                            backgroundColor: isComplete
+                                              ? '#25D366'
+                                              : chapterColor.color,
+                                            opacity: 0.3,
+                                          },
+                                        ]}
+                                      />
+                                    )}
+                                    <View
+                                      style={[
+                                        styles.horizontalConnectorTopic,
+                                        {
+                                          backgroundColor: isComplete
+                                            ? '#25D366'
+                                            : isCurrentTopic
+                                            ? topicColor.color
+                                            : chapterColor.color,
+                                          opacity: isComplete || isCurrentTopic ? 0.4 : 0.2,
+                                        },
+                                      ]}
+                                    />
+                                  </View>
+                                );
+                              })}
+                            </View>
+
+                            {!isLastChapter && (
+                              <View
+                                style={[
+                                  styles.chapterConnector,
+                                  { 
+                                    backgroundColor: chapterColor.color, 
+                                    opacity: 0.3,
+                                  },
+                                ]}
+                              />
+                            )}
+                          </View>
+                        );
+                      })}
+                    </View>
+
+                    {/* Textbook Chapter to Chapter Connector */}
+                    {tbIndex < subjectProgress.length - 1 && (
+                      <View
+                        style={[
+                          styles.yearToYearConnector,
+                          { backgroundColor: subjectColor.borderColor, opacity: 0.4 },
+                        ]}
+                      />
+                    )}
+                  </View>
+                ))}
+
+                {/* End Node */}
+                <View style={styles.endNode}>
+                  <View style={[styles.endNodeCircle, { backgroundColor: '#25D366' }]}>
+                    <Trophy size={20} color="#ffffff" strokeWidth={2} />
+                  </View>
+                  <View style={styles.endNodeContent}>
+                    <Text style={[styles.endNodeTitle, { color: '#25D366' }]}>Journey Complete!</Text>
+                    <Text style={styles.endNodeSubtitle}>{selectedSubject} Mastered</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && subjectProgress && subjectProgress.length === 0 && (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No learning path data available yet</Text>
+              </View>
+            )}
+
+            <View style={styles.bottomSpacer} />
+          </ScrollView>
         </View>
-      </View>
+      </MainLayout>
     );
+  };
+
+  // Main render - show either subject overview or subject progress
+  if (viewMode === 'CHAT' && selectedTopicId) {
+    return <RevisionScreen />;
   }
 
-  if (!currentConcept || !currentMCQ) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Loading concepts...</Text>
-      </View>
-    );
+  if (selectedSubject) {
+    return renderSubjectProgress();
   }
 
   return (
-    <View style={styles.container}>
-      {showConfetti && (
-  <ConfettiCannon
-    count={120}
-    origin={{ x: -10, y: 0 }}
-    fadeOut
-    explosionSpeed={350}
-    fallSpeed={3000}
-  />
-)}
+    <MainLayout>
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.journeyBadge}>
+              <Sparkles size={14} color="#FFD700" />
+              <Text style={[styles.journeyBadgeText, { color: '#FFD700' }]}>YOUR JOURNEY</Text>
+            </View>
+          <Text style={styles.headerTitle}>MBBS UHS PYQ Learning Path</Text>
+<Text style={styles.headerSubtitle}>
+  AI-curated Previous Year Question journey mapped to MBBS curriculum
+</Text>
 
-
-      {(conceptWaitCountdownActive || mcqCountdownActive || feedbackCountdownActive) && (
-        <View style={styles.floatingCountdown}>
-          <Text style={styles.floatingCountdownText}>{countdown}s</Text>
-        </View>
-      )}
-
-      <ScrollView
-        ref={scrollRef}
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <Text style={styles.headerText}>AI Tutor Revision</Text>
-          <View style={styles.progressBadge}>
-            <Text style={styles.progressText}>
-              Concept {currentIndex + 1}/10
-            </Text>
           </View>
-        </View>
 
-        {renderedItems.map((item, idx) => (
-          <React.Fragment key={`${item.type}-${item.index}-${idx}`}>
-            {item.type === 'concept' && (
-              <ConceptBubble
-                title={item.concept.title}
-                coreIdea={item.concept.core_idea}
-                keyExplanation={item.concept.key_explanation}
-                conceptNumber={item.index + 1}
-                totalConcepts={10}
-                onComplete={item.index === currentIndex ? handleConceptComplete : undefined}
-              />
-            )}
+          {/* Flowchart Container */}
+          <View style={styles.flowchartContainer}>
+            {/* Vertical Timeline Line (Right Side) */}
+<View style={styles.timelineLineContainer}>
+  {YEARS.map((yearData, yearIndex) => (
+    <View
+      key={`year-line-${yearIndex}`}
+      style={[
+        styles.timelineSegment,
+        {
+          backgroundColor: yearData.color,
+          flex: 1, // one solid segment per year
+        },
+      ]}
+    />
+  ))}
+</View>
 
-            {item.type === 'mcq' && item.mcq && (
-              <MCQChatScreen
-                item={item.mcq}
-                studentId="practice-student"
-                conceptId={item.concept.concept.toString()}
-                mcqId={item.mcq.id}
-                correctAnswer={item.mcq.correct_answer}
-                phaseUniqueId="practice-session"
-                mode="practice"
-                onAnswerSelected={item.index === currentIndex ? handleAnswerSelected : undefined}
-                autoSubmit={item.index === currentIndex ? autoSubmitTriggered : false}
-              />
-            )}
-          </React.Fragment>
-        ))}
-      </ScrollView>
-    </View>
+            {/* Start Node */}
+            <View style={styles.startNode}>
+              <View style={[styles.startNodeCircle, { backgroundColor: '#25D366' }]}>
+                <Sparkles size={16} color="#ffffff" />
+              </View>
+              <View style={styles.startNodeContent}>
+                <Text style={[styles.startNodeText, { color: '#25D366' }]}>Start Your Journey</Text>
+              </View>
+              <View style={[styles.connectionLine, { backgroundColor: 'rgba(255, 255, 255, 0.15)' }]} />
+            </View>
+
+            {/* Years and Subjects Flow */}
+            {YEARS.map((yearData, yearIndex) => (
+              <View key={yearIndex} style={styles.yearSection}>
+                {/* Year Block */}
+                <View style={styles.yearBlockWrapper}>
+                  <View
+                    style={[
+                      styles.yearBlock,
+                      { backgroundColor: yearData.bgColor, borderLeftColor: yearData.color },
+                    ]}
+                  >
+                    <View style={styles.yearBlockContent}>
+                      <View style={styles.yearBlockHeader}>
+                        <View
+                          style={[styles.yearIconCircle, { backgroundColor: 'rgba(255, 255, 255, 0.05)' }]}
+                        >
+                          {yearIndex === 0 && <BookOpen size={16} color={yearData.color} />}
+                          {yearIndex === 1 && <Star size={16} color={yearData.color} />}
+                          {yearIndex === 2 && <Award size={16} color={yearData.color} />}
+                          {yearIndex === 3 && <Trophy size={16} color={yearData.color} />}
+                        </View>
+                        <View style={styles.yearBlockTextContainer}>
+                          <Text style={[styles.yearBlockTitle, { color: yearData.color }]}>
+                            {yearData.year}
+                          </Text>
+                          <Text style={styles.yearBlockSubjects}>
+                            {yearData.subjects.length} Subjects
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      style={[styles.yearConnectionPoint, { backgroundColor: yearData.color }]}
+                    />
+                  </View>
+                  <View style={[styles.horizontalConnector, { backgroundColor: yearData.borderColor }]} />
+                </View>
+
+                {/* Subject Blocks */}
+                <View style={styles.subjectsContainer}>
+                  {yearData.subjects.map((subject, subjectIndex) => {
+                    const isLast = subjectIndex === yearData.subjects.length - 1;
+
+                    return (
+                      <View key={subjectIndex} style={styles.subjectWrapper}>
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          onPress={() => handleSubjectPress(subject)}
+                          style={[
+                            styles.subjectBlock,
+                            {
+                              backgroundColor: 'rgba(30, 30, 30, 0.3)',
+                              borderLeftColor: 'rgba(100, 100, 100, 0.3)',
+                            },
+                          ]}
+                        >
+                          <View style={styles.subjectBlockContent}>
+                            <View
+                              style={[
+                                styles.subjectDot,
+                                { backgroundColor: 'rgba(100, 100, 100, 0.5)' },
+                              ]}
+                            />
+                            <Text style={[styles.subjectText, { color: '#999999' }]}>
+                              {subject}
+                            </Text>
+                            <View style={styles.selectedBadge}>
+                              <ChevronRight size={14} color="#808080" />
+                            </View>
+                          </View>
+                          <View
+                            style={[
+                              styles.subjectConnectionPoint,
+                              { backgroundColor: 'rgba(100, 100, 100, 0.6)' },
+                            ]}
+                          />
+                        </TouchableOpacity>
+                        {!isLast && (
+                          <View
+                            style={[
+                              styles.subjectConnector,
+                              { backgroundColor: yearData.color, opacity: 0.2 },
+                            ]}
+                          />
+                        )}
+                        <View
+                          style={[
+                            styles.horizontalConnectorSmall,
+                            { backgroundColor: yearData.color, opacity: 0.3 },
+                          ]}
+                        />
+                      </View>
+                    );
+                  })}
+                </View>
+
+                {/* Year to Year Connector */}
+                {yearIndex < YEARS.length - 1 && (
+                  <View
+                    style={[
+                      styles.yearToYearConnector,
+                      { backgroundColor: YEARS[yearIndex + 1].color, opacity: 0.3 },
+                    ]}
+                  />
+                )}
+              </View>
+            ))}
+
+            {/* End Node */}
+            <View style={styles.endNode}>
+              <View style={[styles.endNodeCircle, { backgroundColor: '#FFD700' }]}>
+                <Trophy size={20} color="#ffffff" />
+              </View>
+              <View style={styles.endNodeContent}>
+                <Text style={[styles.endNodeTitle, { color: '#FFD700' }]}>Journey Complete!</Text>
+                <Text style={styles.endNodeSubtitle}>MBBS Mastery Achieved</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.bottomSpacer} />
+        </ScrollView>
+      </View>
+    </MainLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0B',
+    backgroundColor: '#0d0d0d',
   },
+
   scrollView: {
     flex: 1,
   },
-  contentContainer: {
-    paddingVertical: 20,
+
+  scrollContent: {
+    paddingTop: 20,
     paddingBottom: 40,
   },
+
+  // HEADER
   header: {
+    paddingHorizontal: 20,
+    marginBottom: 28,
+  },
+
+  journeyBadge: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    marginBottom: 24,
-    marginTop: 48,
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  progressBadge: {
-    backgroundColor: '#1F1F23',
+    alignSelf: 'flex-start',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#8B5CF6',
+    marginBottom: 12,
   },
-  progressText: {
-    color: '#8B5CF6',
-    fontSize: 14,
+
+  journeyBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    marginLeft: 6,
+    letterSpacing: 1.2,
+  },
+
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#F5E6C8', // ← Image 2 heading color
+    marginBottom: 6,
+    letterSpacing: -0.3,
+  },
+
+  headerSubtitle: {
+    fontSize: 15,
+    color: '#999999',
+    lineHeight: 22,
+  },
+
+  // BACK BUTTON
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 2,
+  },
+
+  backButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginLeft: 6,
+    letterSpacing: 0.2,
+  },
+
+  // LOADING & ERROR
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+
+  loadingText: {
+    fontSize: 15,
+    color: '#999999',
+    marginTop: 16,
+  },
+
+  errorContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 32,
+  },
+
+  errorText: {
+    fontSize: 15,
+    color: '#E91E63',
+    textAlign: 'center',
+  },
+
+  emptyContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 60,
+  },
+
+  emptyText: {
+    fontSize: 15,
+    color: '#808080',
+    textAlign: 'center',
+  },
+
+  // FLOWCHART
+  flowchartContainer: {
+    paddingLeft: 20,
+    paddingRight: 80,
+    position: 'relative',
+  },
+
+  // TIMELINE LINE (RIGHT SIDE)
+  timelineLineContainer: {
+    position: 'absolute',
+    right: 32,
+    top: 0,
+    bottom: 0,
+    width: 2,
+    zIndex: 0,
+  },
+
+  timelineLine: {
+    flex: 1,
+    borderRadius: 1,
+  },
+
+  // START NODE
+  startNode: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 28,
+    position: 'relative',
+  },
+
+  startNodeCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  startNodeContent: {
+    marginLeft: 14,
+    flex: 1,
+  },
+
+  startNodeText: {
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+
+  connectionLine: {
+    position: 'absolute',
+    right: -48,
+    width: 32,
+    height: 1,
+  },
+
+  // YEAR SECTION
+  yearSection: {
+    marginBottom: 20,
+  },
+
+  yearBlockWrapper: {
+    position: 'relative',
+    marginBottom: 14,
+  },
+
+  yearBlock: {
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+
+  yearBlockContent: {
+    padding: 14,
+  },
+
+  yearBlockHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  yearIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  yearBlockTextContainer: {
+    marginLeft: 12,
+    flex: 1,
+  },
+
+  yearBlockTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 2,
+    letterSpacing: 0.3,
+  },
+
+  textbookChapterTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 2,
+    letterSpacing: 0.3,
+    color: '#e1e1e1',
+  },
+
+  yearBlockSubjects: {
+    fontSize: 13,
+    color: '#808080',
     fontWeight: '600',
   },
-  floatingCountdown: {
+
+  yearConnectionPoint: {
     position: 'absolute',
-    top: 100,
-    right: 16,
-    backgroundColor: '#8B5CF6',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    right: -8,
+    top: '50%',
+    marginTop: -4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#0d0d0d',
+    zIndex: 2,
+  },
+
+  horizontalConnector: {
+    position: 'absolute',
+    right: -48,
+    top: '50%',
+    marginTop: -0.5,
+    width: 40,
+    height: 1,
+    zIndex: 1,
+  },
+
+  // SUBJECTS
+  subjectsContainer: {
+    paddingLeft: 28,
+  },
+
+  subjectWrapper: {
+    position: 'relative',
+  },
+
+  subjectBlock: {
+    borderRadius: 10,
+    borderLeftWidth: 2,
+    marginBottom: 2,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+
+  subjectBlockContent: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 100,
-    shadowColor: '#8B5CF6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 10,
+    padding: 12,
   },
-  floatingCountdownText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFFFFF',
+
+  subjectDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 10,
   },
-  completeContainer: {
+
+  subjectText: {
     flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+
+  selectedBadge: {
+    marginLeft: 6,
+  },
+
+  subjectConnectionPoint: {
+    position: 'absolute',
+    right: -6,
+    top: '50%',
+    marginTop: -3,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    borderWidth: 1.5,
+    borderColor: '#0d0d0d',
+    zIndex: 2,
+  },
+
+  subjectConnector: {
+    position: 'absolute',
+    right: -6,
+    top: '50%',
+    width: 1,
+    height: '100%',
+    zIndex: 0,
+  },
+
+  horizontalConnectorSmall: {
+    position: 'absolute',
+    right: -48,
+    top: '50%',
+    marginTop: -0.5,
+    width: 42,
+    height: 1,
+    zIndex: 1,
+  },
+
+  yearToYearConnector: {
+    width: 1,
+    height: 20,
+    marginLeft: 19,
+    marginVertical: 6,
+  },
+
+  // CHAPTER SECTION
+  chapterSection: {
+    marginBottom: 10,
+    position: 'relative',
+  },
+
+  chapterTimelineSegment: {
+    position: 'absolute',
+    right: -48,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    borderRadius: 2,
+    opacity: 0.9,
+  },
+
+  chapterBlock: {
+    borderRadius: 10,
+    borderLeftWidth: 2,
+    marginBottom: 3,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+
+  chapterBlockContent: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
+    padding: 12,
   },
-  completeTitle: {
-    fontSize: 32,
+
+  chapterIconDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 10,
+  },
+
+  chapterText: {
+    flex: 1,
+    fontSize: 15,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 16,
-    textAlign: 'center',
+    letterSpacing: 0.3,
   },
-  completeText: {
-    fontSize: 18,
-    color: '#C4C4C4',
-    textAlign: 'center',
+
+  chapterTextFixed: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+    color: '#e1e1e1',
   },
-  errorText: {
-    fontSize: 16,
-    color: '#EF4444',
-    textAlign: 'center',
-    marginTop: 100,
+
+  chapterConnectionPoint: {
+    position: 'absolute',
+    right: -7,
+    top: '50%',
+    marginTop: -3.5,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    borderWidth: 1.5,
+    borderColor: '#0d0d0d',
+    zIndex: 2,
   },
+
+  horizontalConnectorChapter: {
+    position: 'absolute',
+    right: -48,
+    top: '50%',
+    marginTop: -0.5,
+    width: 41,
+    height: 1,
+    zIndex: 1,
+  },
+
+  chapterConnector: {
+    width: 1,
+    height: 16,
+    marginLeft: 4,
+    marginVertical: 4,
+  },
+
+  // TOPICS (TAB STYLE)
+  topicsContainer: {
+    paddingLeft: 20,
+    marginTop: 6,
+    marginBottom: 6,
+  },
+
+  topicWrapper: {
+    position: 'relative',
+    marginBottom: 4,
+  },
+
+  topicTab: {
+    borderRadius: 8,
+    borderLeftWidth: 2,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+
+  topicTabContent: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+
+  topicIconContainer: {
+    marginRight: 10,
+  },
+
+  topicTabText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+    lineHeight: 20,
+  },
+
+  topicMainRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+
+  completedDateText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#25D366',
+    marginBottom: 4,
+    letterSpacing: 0.4,
+  },
+
+  currentBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 5,
+    marginLeft: 6,
+  },
+
+  currentBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#ffffff',
+    letterSpacing: 0.8,
+  },
+
+  topicConnectionPoint: {
+    position: 'absolute',
+    right: -5,
+    top: '50%',
+    marginTop: -2.5,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    borderWidth: 1.5,
+    borderColor: '#0d0d0d',
+    zIndex: 2,
+  },
+
+  topicConnector: {
+    position: 'absolute',
+    right: -5,
+    top: '50%',
+    width: 1,
+    height: '100%',
+    zIndex: 0,
+  },
+
+  horizontalConnectorTopic: {
+    position: 'absolute',
+    right: -48,
+    top: '50%',
+    marginTop: -0.5,
+    width: 43,
+    height: 1,
+    zIndex: 1,
+  },
+
+  // END NODE
+  endNode: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 28,
+    paddingRight: 48,
+  },
+
+  endNodeCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  endNodeContent: {
+    marginLeft: 14,
+    flex: 1,
+  },
+
+  endNodeTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 3,
+    letterSpacing: 0.3,
+  },
+
+  endNodeSubtitle: {
+    fontSize: 13,
+    color: '#808080',
+    fontWeight: '600',
+  },
+
+  bottomSpacer: {
+    height: 40,
+  },
+
+  timelineSegment: {
+  flex: 1,          // keeps one solid segment per YEAR
+  width: 4,         // ⬅️ thicker, clearly visible
+  borderRadius: 2,
+  opacity: 0.9,
+},
 });
