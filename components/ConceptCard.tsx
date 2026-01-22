@@ -10,13 +10,16 @@ import {
 import { MessageCircle } from "lucide-react-native";
 import { supabase } from "@/lib/supabaseClient";
 import HighYieldFactSheetScreen from "@/components/types/HighYieldFactSheetScreen";
-
+import { useRouter } from "expo-router";
 interface ConceptCardProps {
   topicId: string; // row id from all_subjects_raw
   subject?: string | null;
 }
 
 export default function ConceptCard({ topicId, subject }: ConceptCardProps) {
+  export default function ConceptCard({ topicId, subject }: ConceptCardProps) {
+  const router = useRouter();
+
   const [loading, setLoading] = React.useState(true);
   const [concept, setConcept] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -87,12 +90,17 @@ export default function ConceptCard({ topicId, subject }: ConceptCardProps) {
           <TouchableOpacity
             activeOpacity={0.8}
             style={styles.discussButton}
-            onPress={() => {
-              console.log("🤖 Discuss with Paragraph AI Mentor", {
-                topicId,
-              });
-              // future: router.push("/mentor-chat", { topicId })
-            }}
+onPress={() => {
+  router.push({
+    pathname: "/revision",
+    params: {
+      topic_id: topicId,
+      subject: subject ?? undefined,
+      mode: "mentor",
+    },
+  });
+}}
+
           >
             <MessageCircle size={18} color="#25D366" />
             <Text style={styles.discussText}>
