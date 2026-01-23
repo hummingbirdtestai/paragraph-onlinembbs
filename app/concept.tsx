@@ -40,7 +40,7 @@ export default function ConceptScreen() {
                 if (from === 'uhs_pyq') {
                   router.replace('/uhs-pyq');
                 } else {
-                  router.back();
+                 router.replace('/subjects'); // or your actual subject-level route
                 }
               }}
             >
