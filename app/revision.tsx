@@ -464,25 +464,29 @@ setAutoSubmitTriggered(false);
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <View>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => router.back()}
-              style={styles.backButton}
-            >
-              <Text style={styles.backButtonText}>← Back</Text>
-            </TouchableOpacity>
-            <Text style={styles.headerText}>
-              {params.topic_name ?? 'AI Tutor Revision'}
-            </Text>
-          </View>
-          <View style={styles.progressBadge}>
-            <Text style={styles.progressText}>
-              Concept {currentIndex + 1}/{totalConcepts}
-            </Text>
-          </View>
-        </View>
+<View style={styles.topicCard}>
+  {/* Back */}
+  <TouchableOpacity
+    activeOpacity={0.7}
+    onPress={() => router.back()}
+    style={styles.backButton}
+  >
+    <Text style={styles.backButtonText}>← Back</Text>
+  </TouchableOpacity>
+
+  {/* Topic */}
+  <Text style={styles.topicTitle}>
+    {params.topic_name ?? 'AI Tutor Revision'}
+  </Text>
+
+  {/* Progress */}
+  <View style={styles.progressRow}>
+    <Text style={styles.progressText}>
+      🧠 Concept {currentIndex + 1} / {totalConcepts}
+    </Text>
+  </View>
+</View>
+
 
         {renderedItems.map((item, idx) => (
           <React.Fragment key={`${item.type}-${item.index}-${idx}`}>
@@ -594,4 +598,28 @@ header: {
     color: '#C4C4C4',
     textAlign: 'center',
   },
+  topicCard: {
+  backgroundColor: '#111b21',
+  borderRadius: 14,
+  padding: 16,
+  marginBottom: 20,
+},
+
+topicTitle: {
+  color: '#25D366',
+  fontSize: 18,
+  fontWeight: '700',
+  marginBottom: 10,
+},
+
+progressRow: {
+  paddingVertical: 4,
+  paddingHorizontal: 10,
+  backgroundColor: '#0d2017',
+  borderRadius: 12,
+  alignSelf: 'flex-start',
+  borderWidth: 1,
+  borderColor: '#25D36655',
+},
+
 });
