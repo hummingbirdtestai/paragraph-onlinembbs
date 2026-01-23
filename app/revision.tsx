@@ -170,6 +170,14 @@ export default function RevisionScreen() {
       }
     })();
   }, [TOPIC_ID]);
+  /* ─────────────────────────────────────────────
+     AUTO LOAD MCQ AFTER CONCEPT RENDERS
+  ───────────────────────────────────────────── */
+
+  useEffect(() => {
+    if (!currentConcept || currentMCQ) return;
+    loadMCQ();
+  }, [currentConcept]);
 
   /* ─────────────────────────────────────────────
      START MCQ TIMER WHEN CONCEPT APPEARS
@@ -261,7 +269,7 @@ export default function RevisionScreen() {
       console.log("📦 MCQ payload received:", data.payload);
 
       setCurrentMCQ(data.payload);
-setAutoSubmitTriggered(false);
+
 
       setRenderedItems((items) => [
         ...items,
@@ -383,7 +391,7 @@ setAutoSubmitTriggered(false);
       ]);
 
       setFeedbackCountdownActive(false);
-      setAutoSubmitTriggered(false);
+     
 
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (err) {
@@ -469,11 +477,7 @@ setAutoSubmitTriggered(false);
                 keyExplanation={item.concept.key_explanation}
                 conceptNumber={item.index + 1}
                 totalConcepts={totalConcepts}
-                onComplete={
-                  item.index === currentIndex
-                    ? loadMCQ
-                    : undefined
-                }
+        
               />
             )}
 
