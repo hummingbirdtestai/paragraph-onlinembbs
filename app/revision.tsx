@@ -170,20 +170,6 @@ export default function RevisionScreen() {
       }
     })();
   }, [TOPIC_ID]);
-  /* ─────────────────────────────────────────────
-     AUTO LOAD MCQ AFTER CONCEPT RENDERS
-  ───────────────────────────────────────────── */
-
-  useEffect(() => {
-    if (!currentConcept || currentMCQ) return;
-    loadMCQ();
-  }, [currentConcept]);
-
-  /* ─────────────────────────────────────────────
-     START MCQ TIMER WHEN CONCEPT APPEARS
-  ───────────────────────────────────────────── */
-
-
 
   /* ─────────────────────────────────────────────
      FEEDBACK TIMER
@@ -471,14 +457,17 @@ export default function RevisionScreen() {
         {renderedItems.map((item, idx) => (
           <React.Fragment key={`${item.type}-${item.index}-${idx}`}>
             {item.type === 'concept' && (
-              <ConceptBubble
-                title={item.concept.title}
-                coreIdea={item.concept.core_idea}
-                keyExplanation={item.concept.key_explanation}
-                conceptNumber={item.index + 1}
-                totalConcepts={totalConcepts}
-        
-              />
+<ConceptBubble
+  title={item.concept.title}
+  coreIdea={item.concept.core_idea}
+  keyExplanation={item.concept.key_explanation}
+  conceptNumber={item.index + 1}
+  totalConcepts={totalConcepts}
+  onComplete={
+    item.index === currentIndex ? loadMCQ : undefined
+  }
+/>
+
             )}
 
             {item.type === 'mcq' && item.mcq && (
