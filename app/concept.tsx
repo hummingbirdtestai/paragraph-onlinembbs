@@ -29,42 +29,7 @@ export default function ConceptScreen() {
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
     >
-      {/* Breadcrumb / Context Header */}
-      {(subject || chapter || topic_name) && (
-        <View style={styles.breadcrumb}>
-{/* SUBJECT */}
-{subject && (
-  <TouchableOpacity
-    activeOpacity={0.7}
-    onPress={() => {
-      router.replace({
-        pathname: '/uhs-pyq',
-        params: { reset: 'true' },
-      });
-    }}
-  >
-    <Text style={styles.crumb}>{subject}</Text>
-  </TouchableOpacity>
-)}
-
-
-          {/* CHAPTER */}
-          {chapter && (
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => router.back()}
-            >
-              <Text style={styles.crumb}>› {chapter}</Text>
-            </TouchableOpacity>
-          )}
-
-          {/* TOPIC (ACTIVE) */}
-          {topic_name && (
-            <Text style={styles.crumbActive}>› {topic_name}</Text>
-          )}
-        </View>
-      )}
-
+     
       {/* Concept Content */}
 <ConceptCard
   topicId={topic_id}
