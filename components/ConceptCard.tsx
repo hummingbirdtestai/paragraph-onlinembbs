@@ -88,13 +88,15 @@ export default function ConceptCard({ topicId }: ConceptCardProps) {
             activeOpacity={0.8}
             style={styles.discussButton}
             onPress={() => {
-              router.push({
-                pathname: "/revision",
-                params: {
-                  topic_id: topicId,
-                  mode: "mentor",
-                },
-              });
+             router.push({
+  pathname: "/revision",
+  params: {
+    topic_id: topicId,
+    topic_name, // 👈 pass topic name
+    mode: "mentor",
+  },
+});
+
             }}
           >
             <MessageCircle size={18} color="#25D366" />
