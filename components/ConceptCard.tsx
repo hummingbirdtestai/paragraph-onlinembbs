@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { MessageCircle } from "lucide-react-native";
 import { supabase } from "@/lib/supabaseClient";
-import HighYieldFactSheetScreen from "@/components/types/HighYieldFactSheetScreen";
+import ConceptJSONRenderer from "@/components/types/ConceptJSONRenderer";
 import { useRouter } from "expo-router";
 
 interface ConceptCardProps {
@@ -84,7 +84,7 @@ export default function ConceptCard({ topicId, subject }: ConceptCardProps) {
       {/* Concept renderer */}
       {!loading && !error && concept && (
         <>
-          <HighYieldFactSheetScreen data={concept} />
+        <ConceptJSONRenderer data={concept} />
 
           {/* Discuss with Mentor */}
           <TouchableOpacity
