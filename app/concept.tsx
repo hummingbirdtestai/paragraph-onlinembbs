@@ -33,8 +33,11 @@ export default function ConceptScreen() {
       {/* Concept Content */}
 <ConceptCard
   topicId={topic_id}
-  topicName={topic_name} // ✅ PASS IT DOWN
+  topicName={topic_name}
+  subject={subject}
+  chapter={chapter}
 />
+
 
     </ScrollView>
   );
