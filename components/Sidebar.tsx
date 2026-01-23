@@ -132,57 +132,61 @@ export default function Sidebar({
     }
     return pathname.startsWith(href);
   };
+const renderNavItem = (item: NavItem) => {
+  const active = isActive(item.href);
+  const Icon = item.icon;
 
-  const renderNavItem = (item: NavItem) => {
-    const active = isActive(item.href);
-    const Icon = item.icon;
+  const isProtected =
+    item.href !== '/' &&
+    item.href !== '/settings';
 
-    const isProtected =
-      item.href !== '/' &&
-      item.href !== '/settings';
+  const blocked = isProtected && !hasAccess;
 
-    const blocked = isProtected && !hasAccess;
-
-    return (
-      <Pressable
-        key={item.href}
-        style={[
-          active ? styles.navItemActive : styles.navItem,
-          blocked && { opacity: 0.5 },
-        ]}
-        onPress={() => {
-          if (blocked) {
-            setShowSubscribeModal(true);
-            return;
-          }
-          if (isMobile) onClose?.();
-        }}
-      >
+  return (
+    <Pressable
+      key={item.href}
+      style={[
+        active ? styles.navItemActive : styles.navItem,
+        blocked && { opacity: 0.5 },
+      ]}
+      onPress={() => {
+        if (blocked) {
+          setShowSubscribeModal(true);
+          return;
+        }
+        if (isMobile) onClose?.();
+      }}
+    >
+      {blocked ? (
+        // 🔒 BLOCKED → NO LINK
+        <View style={styles.navItemContent}>
+          <View style={styles.iconWrapper}>
+            <Icon size={20} color="#555" />
+          </View>
+          <Text style={styles.navLabel}>{item.label}</Text>
+        </View>
+      ) : (
+        // ✅ ALLOWED → LINK ENABLED
         <Link href={item.href} asChild>
           <View style={styles.navItemContent}>
             <View style={styles.iconWrapper}>
               <Icon
                 size={20}
-                color={blocked ? '#555' : active ? '#25D366' : '#9A9A9A'}
+                color={active ? '#25D366' : '#9A9A9A'}
               />
             </View>
-            <Text
-              style={
-                blocked
-                  ? styles.navLabel
-                  : active
-                  ? styles.navLabelActive
-                  : styles.navLabel
-              }
-            >
+            <Text style={active ? styles.navLabelActive : styles.navLabel}>
               {item.label}
             </Text>
           </View>
         </Link>
-        {active && !blocked && <View style={styles.activeIndicator} />}
-      </Pressable>
-    );
-  };
+      )}
+
+      {active && !blocked && <View style={styles.activeIndicator} />}
+    </Pressable>
+  );
+};
+
 
   return (
     <View style={styles.container}>
