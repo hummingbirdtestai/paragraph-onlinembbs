@@ -386,7 +386,7 @@ function renderLine(line: string, key: number) {
 
   return (
     <Text key={key} style={style}>
-      {parseInlineMarkup(trimmed)}{'\n'}
+      {parseInlineMarkup(stripUnderscoreMarkers(trimmed))}{'\n'}
     </Text>
   );
 }
@@ -448,6 +448,9 @@ function renderTable(tableLines: string[], screenWidth: number) {
 /* ============================================================
    INLINE MARKUP — VERBATIM
    ============================================================ */
+function stripUnderscoreMarkers(text: string): string {
+  return text.replace(/_([^_]+)_/g, '$1');
+}
 
 function stripMarkdown(text: string): string {
   return text
@@ -462,7 +465,7 @@ function parseInlineMarkup(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let key = 0;
 
-  const regex = /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*_[^_]+_\*|\*[^*]+\*|_[^_]+_)/g;
+ const regex = /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*[^*]+\*)/g;
   const segments = text.split(regex);
 
   segments.forEach(segment => {
@@ -470,8 +473,6 @@ function parseInlineMarkup(text: string): React.ReactNode {
     else if (segment.startsWith('**')) parts.push(<Text key={key++} style={styles.bold}>{segment.slice(2,-2)}</Text>);
     else if (segment.startsWith('*_')) parts.push(<Text key={key++} style={styles.bold}>{segment.slice(2,-2)}</Text>);
     else if (segment.startsWith('*')) parts.push(<Text key={key++} style={styles.bold}>{segment.slice(1,-1)}</Text>);
-    else if (segment.startsWith('_')) parts.push(<Text key={key++}>{segment.slice(1,-1)}</Text>);
-    else parts.push(<Text key={key++}>{segment}</Text>);
   });
 
   return <>{parts}</>;
