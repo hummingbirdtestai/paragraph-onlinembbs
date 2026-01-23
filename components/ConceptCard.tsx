@@ -1,4 +1,3 @@
-// components/ConceptCard.tsx
 import React from "react";
 import {
   View,
@@ -13,11 +12,18 @@ import ConceptJSONRenderer from "@/components/types/ConceptJSONRenderer";
 import { useRouter } from "expo-router";
 
 interface ConceptCardProps {
-  topicId: string; // row id from all_subjects_raw
-   topicName?: string; // ✅ ADD
+  topicId: string;          // row id
+  topicName?: string;       // topic title
+  subject?: string;         // subject name
+  chapter?: string;         // chapter name
 }
 
-export default function ConceptCard({ topicId, topicName }: ConceptCardProps) {
+export default function ConceptCard({
+  topicId,
+  topicName,
+  subject,
+  chapter,
+}: ConceptCardProps) {
   const router = useRouter();
 
   const [loading, setLoading] = React.useState(true);
@@ -79,9 +85,37 @@ export default function ConceptCard({ topicId, topicName }: ConceptCardProps) {
         </View>
       )}
 
-      {/* Concept renderer */}
+      {/* Content */}
       {!loading && !error && concept && (
         <>
+          {/* ✅ PracticeCard-style Context Header */}
+          {(subject || chapter || topicName) && (
+            <View style={styles.contextBox}>
+              {subject && (
+                <TouchableOpacity
+                  onPress={() =>
+                    router.replace({
+                      pathname: "/subjects",
+                    })
+                  }
+                >
+                  <Text style={styles.subjectText}>{subject}</Text>
+                </TouchableOpacity>
+              )}
+
+              {chapter && (
+                <TouchableOpacity onPress={() => router.back()}>
+                  <Text style={styles.chapterText}>{chapter}</Text>
+                </TouchableOpacity>
+              )}
+
+              {topicName && (
+                <Text style={styles.topicText}>{topicName}</Text>
+              )}
+            </View>
+          )}
+
+          {/* Concept Renderer (UNCHANGED) */}
           <ConceptJSONRenderer data={concept} />
 
           {/* Discuss with Mentor */}
@@ -89,15 +123,14 @@ export default function ConceptCard({ topicId, topicName }: ConceptCardProps) {
             activeOpacity={0.8}
             style={styles.discussButton}
             onPress={() => {
-             router.push({
-  pathname: "/revision",
-  params: {
-    topic_id: topicId,
-    topic_name: topicName, // ✅ FIXED
-    mode: "mentor",
-  },
-});
-
+              router.push({
+                pathname: "/revision",
+                params: {
+                  topic_id: topicId,
+                  topic_name: topicName,
+                  mode: "mentor",
+                },
+              });
             }}
           >
             <MessageCircle size={18} color="#25D366" />
@@ -117,6 +150,39 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     marginBottom: 18,
     overflow: "hidden",
+  },
+
+  /* Context Header (PracticeCard-style) */
+  contextBox: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 12,
+    padding: 14,
+    backgroundColor: "#0d2017",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#1f2f28",
+  },
+
+  subjectText: {
+    color: "#25D366",
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+
+  chapterText: {
+    color: "#9FB3C8",
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+
+  topicText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "700",
+    marginTop: 6,
   },
 
   loadingContainer: {
