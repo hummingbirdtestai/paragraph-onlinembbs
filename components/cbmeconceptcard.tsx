@@ -1,3 +1,4 @@
+//components/cbmeconceptcard.tsx
 import React from "react";
 import {
   View,
@@ -65,15 +66,16 @@ export default function CBMEConceptCard({
       }
 
       /**
-       * phase_json is jsonb
-       * HighYieldFactSheetScreen expects STRING
+       * ✅ FIX:
+       * phase_json is an object
+       * Renderer expects ONLY the markdown string
        */
-      const text =
-        typeof data.phase_json === "string"
-          ? data.phase_json
-          : JSON.stringify(data.phase_json);
+      setConcept(
+        typeof data.phase_json?.concept === "string"
+          ? data.phase_json.concept
+          : ""
+      );
 
-      setConcept(text);
       setLoading(false);
     };
 
@@ -104,7 +106,7 @@ export default function CBMEConceptCard({
       {/* Content */}
       {!loading && !error && concept && (
         <>
-          {/* ✅ Context Header (UNCHANGED) */}
+          {/* Context Header */}
           {(subject || chapter || topicName) && (
             <View style={styles.contextBox}>
               {subject && (
