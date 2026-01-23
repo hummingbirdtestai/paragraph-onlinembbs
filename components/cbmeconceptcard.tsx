@@ -1,5 +1,3 @@
-// components/cbmeconceptcard.tsx
-
 import React from "react";
 import {
   View,
@@ -10,14 +8,18 @@ import {
 } from "react-native";
 import { MessageCircle } from "lucide-react-native";
 import { supabase } from "@/lib/supabaseClient";
-import ConceptJSONRenderer from "@/components/types/ConceptJSONRenderer";
 import { useRouter } from "expo-router";
+
+/* ✅ CORRECT RENDERER */
+import HighYieldFactSheetScreen from "@/components/types/HighYieldFactSheetScreen";
 
 interface CBMEConceptCardProps {
   topicId: string;        // concept_phase_final.id
   topicName?: string;     // topic title
   subject?: string;       // subject name
   chapter?: string;       // chapter name
+  chapter_order?: number;
+  topic_order?: number;
 }
 
 export default function CBMEConceptCard({
@@ -25,6 +27,8 @@ export default function CBMEConceptCard({
   topicName,
   subject,
   chapter,
+  chapter_order,
+  topic_order,
 }: CBMEConceptCardProps) {
   const router = useRouter();
 
@@ -39,28 +43,37 @@ export default function CBMEConceptCard({
       setLoading(true);
       setError(null);
 
-      // 🔹 CBME source (concept_phase_final)
       const { data, error } = await supabase
         .from("concept_phase_final")
-        .select("phase_json")
+        .select(`
+          phase_json,
+          chapter,
+          topic,
+          chapter_order,
+          topic_order
+        `)
         .eq("id", topicId)
         .single();
 
       if (!mounted) return;
 
-      if (error) {
+      if (error || !data) {
         console.error("❌ CBME Concept fetch failed", error);
         setError("Failed to load concept");
         setLoading(false);
         return;
       }
 
-      setConcept(
-        data?.phase_json
-          ? JSON.stringify(data.phase_json)
-          : ""
-      );
+      /**
+       * phase_json is jsonb
+       * HighYieldFactSheetScreen expects STRING
+       */
+      const text =
+        typeof data.phase_json === "string"
+          ? data.phase_json
+          : JSON.stringify(data.phase_json);
 
+      setConcept(text);
       setLoading(false);
     };
 
@@ -91,15 +104,13 @@ export default function CBMEConceptCard({
       {/* Content */}
       {!loading && !error && concept && (
         <>
-          {/* ✅ Context Header (IDENTICAL STYLE) */}
+          {/* ✅ Context Header (UNCHANGED) */}
           {(subject || chapter || topicName) && (
             <View style={styles.contextBox}>
               {subject && (
                 <TouchableOpacity
                   onPress={() =>
-                    router.replace({
-                      pathname: "/cbme-learning-path",
-                    })
+                    router.replace({ pathname: "/cbme-learning-path" })
                   }
                 >
                   <Text style={styles.subjectText}>{subject}</Text>
@@ -118,10 +129,18 @@ export default function CBMEConceptCard({
             </View>
           )}
 
-          {/* 🔹 Concept Renderer (UNCHANGED) */}
-          <ConceptJSONRenderer data={concept} />
+          {/* ✅ CORRECT CBME RENDERER */}
+          <HighYieldFactSheetScreen
+            data={concept}
+            cbmeMeta={{
+              chapter,
+              topic: topicName,
+              chapter_order,
+              topic_order,
+            }}
+          />
 
-          {/* 🔹 Mentor CTA */}
+          {/* Mentor CTA */}
           <TouchableOpacity
             activeOpacity={0.8}
             style={styles.discussButton}
@@ -149,7 +168,7 @@ export default function CBMEConceptCard({
 }
 
 /* ============================================================
-   STYLES — 100% IDENTICAL TO ConceptCard
+   STYLES — UNCHANGED
    ============================================================ */
 
 const styles = StyleSheet.create({
@@ -238,4 +257,3 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 });
-
