@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
   TextInput,
 } from 'react-native';
-import { X, Check, Zap, BookOpen, Brain, Image as ImageIcon, Video, FileText, MessageSquare, Users } from 'lucide-react-native';
+import { X, Check, Zap, BookOpen, Brain, Target, Image as ImageIcon, Video, FileText, MessageSquare, Users } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface SubscribeModalProps {
@@ -181,6 +181,23 @@ async function handleSubscribe(
                 ]}
                 isDesktop={isDesktop}
               />
+
+              <FeatureBlock
+                icon={<Target size={26} color="#10b981" />}
+                title="MBBS UHS PYQ Question Bank"
+                bullets={[
+                  'AI powered adaptive revision system',
+                  '2,874 most repeated questions from 14 papers',
+                  '200 must-revise questions per subject',
+                  '100% strike rate in MBBS UHS exams',
+                  'Rapid revision concept notes for all PYQs',
+                  'Each question tested with 10 sub-concepts',
+                  '28,740 MCQs with personalised AI tutor',
+                  'Secret sauce to read less & score gold medal',
+                ]}
+                isDesktop={isDesktop}
+              />
+
             </View>
           </View>
 
@@ -201,6 +218,7 @@ async function handleSubscribe(
                 basePrice={12000}
                 color="#10b981"
                 features={[
+                  'MBBS PYQ Question Bank Revision',   // ⭐ ADD THIS (TOP preferred)
                   'Access to full CBME curriculum',
                   'Flashcards + AI Tutor',
                   'Ideal for single MBBS year',
@@ -214,6 +232,7 @@ async function handleSubscribe(
                 basePrice={20000}
                 color="#3b82f6"
                 features={[
+                  'MBBS PYQ Question Bank Revision',
                   'Deeper AI personalisation',
                   'Long-term flashcard memory',
                   'Best value per year',
@@ -227,6 +246,7 @@ async function handleSubscribe(
                 basePrice={28000}
                 color="#8b5cf6"
                 features={[
+                  'MBBS PYQ Question Bank Revision',
                   'Pre-final to internship coverage',
                   'Stronger adaptive learning',
                   'Highly cost-effective',
@@ -241,6 +261,7 @@ async function handleSubscribe(
                 color="#f59e0b"
                 recommended
                 features={[
+                  'MBBS PYQ Question Bank Revision',
                   'Complete MBBS journey',
                   'Maximum AI adaptation',
                   'Lowest cost per year',
