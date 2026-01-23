@@ -152,6 +152,7 @@ interface GroupedProgress {
 
 export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps) {
   const { user } = useAuth();
+  const router = useRouter();
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [subjectProgress, setSubjectProgress] = useState<GroupedProgress[] | null>(null);
   const [loading, setLoading] = useState(false);
