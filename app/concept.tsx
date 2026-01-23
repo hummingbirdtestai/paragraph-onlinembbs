@@ -1,3 +1,4 @@
+//concept.tsx
 import { ScrollView, StyleSheet } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import ConceptCard from '@/components/ConceptCard';
