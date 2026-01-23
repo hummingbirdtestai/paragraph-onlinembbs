@@ -13,11 +13,7 @@ import ConfettiCannon from "react-native-confetti-cannon";
 import MCQChatScreen from "@/components/MCQChatScreen";
 import { supabase } from "@/lib/supabaseClient";
 
-/* ───────────────────────────────────────────── */
-
 const { width, height } = Dimensions.get("window");
-
-/* ───────────────────────────────────────────── */
 
 interface MCQ {
   id: string;
@@ -36,8 +32,6 @@ interface MCQ {
   correct_answer: "A" | "B" | "C" | "D";
 }
 
-/* ───────────────────────────────────────────── */
-
 export default function CBMERevisionScreen() {
   const { topic_id, topic_name } = useLocalSearchParams<{
     topic_id?: string;
@@ -47,10 +41,9 @@ export default function CBMERevisionScreen() {
   const router = useRouter();
 
   const [mcqs, setMcqs] = useState<MCQ[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answered, setAnswered] = useState(false);
+  const [renderedCount, setRenderedCount] = useState(1);
 
-  /* ───────── Confetti ───────── */
+  /* ───── Confetti ───── */
 
   const [showConfetti, setShowConfetti] = useState(false);
   const confettiRef = useRef<any>(null);
@@ -61,11 +54,9 @@ export default function CBMERevisionScreen() {
     setTimeout(() => setShowConfetti(false), 1800);
   };
 
-  /* ───────── Scroll ───────── */
-
   const scrollRef = useRef<ScrollView>(null);
 
-  /* ───────── Fetch MCQs ───────── */
+  /* ───── Fetch MCQs ───── */
 
   useEffect(() => {
     if (!topic_id) return;
@@ -81,51 +72,33 @@ export default function CBMERevisionScreen() {
         return;
       }
 
-      const parsed: MCQ[] = data.map((row: any) => row.phase_json);
-      setMcqs(parsed);
+      setMcqs(data.map((row: any) => row.phase_json));
     })();
   }, [topic_id]);
 
-  /* ───────── Answer Handler ───────── */
+  /* ───── Answer Handler ───── */
 
-  const handleAnswer = (selected: "A" | "B" | "C" | "D") => {
-    if (answered) return;
+  const handleAnswer = (
+    index: number,
+    selected: "A" | "B" | "C" | "D"
+  ) => {
+    const mcq = mcqs[index];
+    if (!mcq) return;
 
-    const mcq = mcqs[currentIndex];
-    const isCorrect = selected === mcq.correct_answer;
+    if (selected === mcq.correct_answer) {
+      fireConfetti();
+    }
 
-    if (isCorrect) fireConfetti();
-
-    // ✅ IMPORTANT: stay on same MCQ
-    setAnswered(true);
-  };
-
-  /* ───────── Next MCQ ───────── */
-
-  const goNext = () => {
-    if (currentIndex < mcqs.length - 1) {
-      setCurrentIndex((i) => i + 1);
-      setAnswered(false);
-      scrollRef.current?.scrollTo({ y: 0, animated: true });
+    // Append next MCQ (conversation style)
+    if (renderedCount < mcqs.length) {
+      setRenderedCount((c) => c + 1);
+      setTimeout(() => {
+        scrollRef.current?.scrollToEnd({ animated: true });
+      }, 300);
     }
   };
 
-  /* ───────── Complete ───────── */
-
-  if (mcqs.length > 0 && currentIndex >= mcqs.length) {
-    return (
-      <View style={styles.completeContainer}>
-        <Text style={styles.completeTitle}>🎉 Self-check complete</Text>
-        <Text style={styles.completeText}>
-          You’ve identified your learning gaps. Keep going 🚀
-        </Text>
-      </View>
-    );
-  }
-
-  const mcq = mcqs[currentIndex];
-
-  /* ───────── Render ───────── */
+  /* ───── Render ───── */
 
   return (
     <View style={styles.container}>
@@ -157,43 +130,30 @@ export default function CBMERevisionScreen() {
           </Text>
 
           <Text style={styles.progressText}>
-            Question {currentIndex + 1} / {mcqs.length}
+            {renderedCount} / {mcqs.length} questions
           </Text>
         </View>
 
-        {/* MCQ */}
-        {mcq && (
-          <>
-            <MCQChatScreen
-              item={mcq}
-              mcqId={mcq.id}
-              correctAnswer={mcq.correct_answer}
-              mode="practice"
-              disableAfterAnswer
-              onAnswerSelected={handleAnswer}
-            />
-
-            {/* ✅ NEXT BUTTON ONLY AFTER FEEDBACK */}
-            {answered && (
-              <TouchableOpacity
-                style={styles.nextButton}
-                onPress={goNext}
-              >
-                <Text style={styles.nextText}>
-                  {currentIndex === mcqs.length - 1
-                    ? "Finish"
-                    : "Next Question →"}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </>
-        )}
+        {/* MCQs — conversational append */}
+        {mcqs.slice(0, renderedCount).map((mcq, idx) => (
+          <MCQChatScreen
+            key={mcq.id}
+            item={mcq}
+            mcqId={mcq.id}
+            correctAnswer={mcq.correct_answer}
+            mode="practice"
+            disableAfterAnswer
+            onAnswerSelected={(opt) =>
+              handleAnswer(idx, opt)
+            }
+          />
+        ))}
       </ScrollView>
     </View>
   );
 }
 
-/* ───────────────────────────────────────────── */
+/* ───── Styles ───── */
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0A0A0B" },
@@ -231,47 +191,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  nextButton: {
-    marginTop: 16,
-    paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: "#0d2017",
-    borderWidth: 1,
-    borderColor: "#25D366",
-    alignItems: "center",
-  },
-
-  nextText: {
-    color: "#25D366",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-
   confettiOverlay: {
     position: "absolute",
     inset: 0,
     zIndex: 9999,
     pointerEvents: "none",
-  },
-
-  completeContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 32,
-    backgroundColor: "#0A0A0B",
-  },
-
-  completeTitle: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    marginBottom: 12,
-  },
-
-  completeText: {
-    fontSize: 16,
-    color: "#C4C4C4",
-    textAlign: "center",
   },
 });
