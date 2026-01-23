@@ -47,9 +47,10 @@ export default function CBMEConceptCard({
 
       /* ✅ PYQ-STYLE RPC CONSUMPTION */
       const { data, error } = await supabase.rpc(
-        "get_cbme_concept_by_id",
-        { p_id: topicId }
-      );
+  "get_cbme_concept_by_id",
+  { p_topic_id: topicId }
+);
+
 
       if (!mounted) return;
 
