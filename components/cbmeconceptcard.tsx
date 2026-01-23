@@ -1,4 +1,5 @@
-//components/cbmeconceptcard.tsx
+// components/cbmeconceptcard.tsx
+
 import React from "react";
 import {
   View,
@@ -44,35 +45,31 @@ export default function CBMEConceptCard({
       setLoading(true);
       setError(null);
 
-      const { data, error } = await supabase
-        .from("concept_phase_final")
-        .select(`
-          phase_json,
-          chapter,
-          topic,
-          chapter_order,
-          topic_order
-        `)
-        .eq("id", topicId)
-        .single();
+      /* ✅ PYQ-STYLE RPC CONSUMPTION */
+      const { data, error } = await supabase.rpc(
+        "get_cbme_concept_by_id",
+        { p_id: topicId }
+      );
 
       if (!mounted) return;
 
-      if (error || !data) {
+      if (error || !data || data.length === 0) {
         console.error("❌ CBME Concept fetch failed", error);
         setError("Failed to load concept");
         setLoading(false);
         return;
       }
 
+      const row = data[0];
+
       /**
-       * ✅ FIX:
-       * phase_json is an object
-       * Renderer expects ONLY the markdown string
+       * ✅ IMPORTANT:
+       * phase_json is JSONB
+       * Renderer expects ONLY markdown string
        */
       setConcept(
-        typeof data.phase_json?.concept === "string"
-          ? data.phase_json.concept
+        typeof row.phase_json?.concept === "string"
+          ? row.phase_json.concept
           : ""
       );
 
