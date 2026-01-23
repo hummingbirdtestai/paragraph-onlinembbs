@@ -32,21 +32,21 @@ export default function ConceptScreen() {
       {/* Breadcrumb / Context Header */}
       {(subject || chapter || topic_name) && (
         <View style={styles.breadcrumb}>
-          {/* SUBJECT */}
-          {subject && (
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => {
-                if (from === 'uhs_pyq') {
-                  router.replace('/uhs-pyq');
-                } else {
-                 router.replace('/subjects'); // or your actual subject-level route
-                }
-              }}
-            >
-              <Text style={styles.crumb}>{subject}</Text>
-            </TouchableOpacity>
-          )}
+{/* SUBJECT */}
+{subject && (
+  <TouchableOpacity
+    activeOpacity={0.7}
+    onPress={() => {
+      router.replace({
+        pathname: '/uhs-pyq',
+        params: { reset: 'true' },
+      });
+    }}
+  >
+    <Text style={styles.crumb}>{subject}</Text>
+  </TouchableOpacity>
+)}
+
 
           {/* CHAPTER */}
           {chapter && (
