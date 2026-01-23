@@ -39,7 +39,64 @@ export default function ConceptJSONRenderer({
 }
 
 /* ============================================================
-   CORE RENDER BUBBLE (UNCHANGED VISUALLY)
+   BREADCRUMB CONTEXT HEADER (NEW)
+   ============================================================ */
+
+function ContextBreadcrumb({
+  cbmeMeta,
+}: {
+  cbmeMeta?: {
+    chapter?: string | null;
+    topic?: string | null;
+    chapter_order?: number | null;
+    topic_order?: number | null;
+  };
+}) {
+  if (!cbmeMeta?.chapter && !cbmeMeta?.topic) return null;
+
+  return (
+    <View style={styles.breadcrumbContainer}>
+      {/* Subject Pill */}
+      <View style={styles.breadcrumbPill}>
+        <View style={[styles.breadcrumbSegment, styles.subjectSegment]}>
+          <Text style={styles.breadcrumbLabel}>SUBJECT</Text>
+          <Text style={styles.breadcrumbValue}>MBBS</Text>
+        </View>
+
+        {/* Chapter Segment */}
+        {cbmeMeta.chapter && (
+          <>
+            <View style={styles.breadcrumbDivider} />
+            <View style={[styles.breadcrumbSegment, styles.chapterSegment]}>
+              <Text style={styles.breadcrumbLabel}>CHAPTER</Text>
+              <Text style={styles.breadcrumbValue} numberOfLines={1}>
+                {cbmeMeta.chapter_order ? `${cbmeMeta.chapter_order}. ` : ''}
+                {cbmeMeta.chapter}
+              </Text>
+            </View>
+          </>
+        )}
+
+        {/* Topic Segment */}
+        {cbmeMeta.topic && (
+          <>
+            <View style={styles.breadcrumbDivider} />
+            <View style={[styles.breadcrumbSegment, styles.topicSegment]}>
+              <Text style={styles.breadcrumbLabel}>TOPIC</Text>
+              <Text style={styles.breadcrumbValue} numberOfLines={1}>
+                {cbmeMeta.topic_order ? `${cbmeMeta.topic_order}. ` : ''}
+                {cbmeMeta.topic}
+              </Text>
+            </View>
+          </>
+        )}
+      </View>
+    </View>
+  );
+}
+
+/* ============================================================
+   CORE RENDER BUBBLE (WITH BREADCRUMB)
    ============================================================ */
 
 function MentorFactSheetBubble({
@@ -70,16 +127,19 @@ function MentorFactSheetBubble({
     : parseContentIntoSections(message?.trim() ?? '');
 
   return (
-    <Animated.View style={[styles.mentorBubble, { opacity: fadeAnim }]}>
-      {sections.map((section, index) => (
-        <SectionBlock
-          key={index}
-          section={section}
-          isLast={index === sections.length - 1}
-          screenWidth={screenWidth}
-        />
-      ))}
-    </Animated.View>
+    <>
+      <ContextBreadcrumb cbmeMeta={cbmeMeta} />
+      <Animated.View style={[styles.mentorBubble, { opacity: fadeAnim }]}>
+        {sections.map((section, index) => (
+          <SectionBlock
+            key={index}
+            section={section}
+            isLast={index === sections.length - 1}
+            screenWidth={screenWidth}
+          />
+        ))}
+      </Animated.View>
+    </>
   );
 }
 
@@ -457,13 +517,71 @@ function parseInlineMarkup(text: string): React.ReactNode {
 }
 
 /* ============================================================
-   STYLES — 100% VERBATIM
+   STYLES — WITH NEW BREADCRUMB STYLES
    ============================================================ */
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0d0d0d' },
   scrollView: { flex: 1 },
   scrollContent: { padding: 16, paddingBottom: 32 },
+  
+  // BREADCRUMB CONTEXT HEADER
+  breadcrumbContainer: {
+    width: '100%',
+    maxWidth: 900,
+    alignSelf: 'center',
+    marginBottom: 12,
+  },
+  breadcrumbPill: {
+    flexDirection: 'row',
+    backgroundColor: '#1a1a1a',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  breadcrumbSegment: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 58,
+  },
+  breadcrumbDivider: {
+    width: 1,
+    backgroundColor: '#2a2a2a',
+    alignSelf: 'stretch',
+  },
+  subjectSegment: {
+    backgroundColor: '#1a2530',
+  },
+  chapterSegment: {
+    backgroundColor: '#1a2a1a',
+  },
+  topicSegment: {
+    backgroundColor: '#2a1a2a',
+  },
+  breadcrumbLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#888',
+    letterSpacing: 1,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+  },
+  breadcrumbValue: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#e1e1e1',
+    textAlign: 'center',
+  },
+
   mentorBubble: {
     width: '100%',
     maxWidth: 900,
