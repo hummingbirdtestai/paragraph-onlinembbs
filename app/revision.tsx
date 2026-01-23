@@ -6,8 +6,9 @@ import {
   StyleSheet,
   Text,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ConceptBubble } from '@/components/ConceptBubble';
 import MCQChatScreen from '@/components/MCQChatScreen';
 import ConfettiCannon from 'react-native-confetti-cannon';
@@ -65,8 +66,9 @@ interface RenderedItem {
 export default function RevisionScreen() {
   /* ───────────── ROUTER PARAMS ───────────── */
 
-  const params = useLocalSearchParams<{ topic_id?: string }>();
+  const params = useLocalSearchParams<{ topic_id?: string; topic_name?: string }>();
   const TOPIC_ID = params.topic_id;
+  const router = useRouter();
 
   /* ───────────── SESSION / API ───────────── */
 
@@ -189,7 +191,7 @@ export default function RevisionScreen() {
   console.log("⏰ MCQ timer expired → auto submit");
 
   setAutoSubmitTriggered(true);      // tells MCQChatScreen to auto-submit
-         console.log("🟣 autoSubmitTriggered = true");
+        console.log("🟣 autoSubmitTriggered = true");
 
   setMcqCountdownActive(false);      // hides 20s timer
   setFeedbackCountdownActive(true);  // ✅ START feedback timer
@@ -296,8 +298,6 @@ setAutoSubmitTriggered(false);
           index: currentIndex,
         },
       ]);
-
-
 
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (err) {
@@ -465,7 +465,18 @@ setAutoSubmitTriggered(false);
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.headerText}>AI Tutor Revision</Text>
+          <View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => router.back()}
+              style={styles.backButton}
+            >
+              <Text style={styles.backButtonText}>← Back</Text>
+            </TouchableOpacity>
+            <Text style={styles.headerText}>
+              {params.topic_name ?? 'AI Tutor Revision'}
+            </Text>
+          </View>
           <View style={styles.progressBadge}>
             <Text style={styles.progressText}>
               Concept {currentIndex + 1}/{totalConcepts}
@@ -511,7 +522,7 @@ setAutoSubmitTriggered(false);
 }
 
 /* ─────────────────────────────────────────────
-   STYLES (UNCHANGED)
+   STYLES
 ───────────────────────────────────────────── */
 
 const styles = StyleSheet.create({
@@ -525,6 +536,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 24,
     marginTop: 48,
+  },
+  backButton: {
+    marginBottom: 8,
+  },
+  backButtonText: {
+    color: '#9FB3C8',
+    fontSize: 14,
+    fontWeight: '600',
   },
   headerText: { fontSize: 24, fontWeight: '700', color: '#FFFFFF' },
   progressBadge: {
