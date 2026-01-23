@@ -43,21 +43,7 @@ const navItems: NavItem[] = [
     id: "home", 
     label: "Master NMC CBME Syllabus with AI", 
     href: "/", 
-    icon: Brain 
-  },
-
-  { 
-    id: "practice", 
-    label: "5000 NMC CBME Syllabus Topics", 
-    href: "/practice", 
-    icon: BookOpen 
-  },
-
-  {
-    id: "cbme-path",
-    label: "CBME Learning Path",
-    href: "/cbme-learning-path",
-    icon: Map,
+    icon: Brain,
   },
 
   {
@@ -67,18 +53,18 @@ const navItems: NavItem[] = [
     icon: Target,
   },
 
-  { 
-    id: "flash", 
-    label: "45000 Flash Cards", 
-    href: "/flashcard-feed-demo", 
-    icon: CreditCard 
+  {
+    id: "cbme-path",
+    label: "CBME Learning Path",
+    href: "/cbme-learning-path",
+    icon: Map,
   },
 
   { 
-    id: "mentor", 
-    label: "Paragraph Mentor (AI Tutor)", 
-    href: "/ask-paragraph-mbbs", 
-    icon: Bot 
+    id: "flash", 
+    label: "45,000 Flash Cards", 
+    href: "/flashcard-feed-demo", 
+    icon: CreditCard,
   },
 ];
 
