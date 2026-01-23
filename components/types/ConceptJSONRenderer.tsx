@@ -137,21 +137,42 @@ function parseJsonIntoSections(json: FactSheetJSON): Section[] {
     });
   }
 
-  json.cases?.forEach((caseObj) => {
-    const title = Object.keys(caseObj)[0];
-    const body = caseObj[title];
+json.cases?.forEach((caseObj, index) => {
+  const values = Object.values(caseObj);
 
+  // CASE 1: Flat case object (your current JSON)
+  if (values.length > 0 && typeof values[0] === 'string') {
     const lines: string[] = [];
-    Object.entries(body).forEach(([k, v]) => {
+
+    Object.entries(caseObj).forEach(([k, v]) => {
       lines.push(`- ${k}: ${v}`);
     });
 
     sections.push({
       type: 'clinical_case',
-      title,
+      title: `Case ${index + 1}`,
       content: lines,
     });
+
+    return;
+  }
+
+  // CASE 2: Nested case object (future-proof)
+  const title = Object.keys(caseObj)[0];
+  const body = caseObj[title];
+
+  const lines: string[] = [];
+  Object.entries(body).forEach(([k, v]) => {
+    lines.push(`- ${k}: ${v}`);
   });
+
+  sections.push({
+    type: 'clinical_case',
+    title,
+    content: lines,
+  });
+});
+
 
   if (json.high_yield_facts?.length) {
     sections.push({
