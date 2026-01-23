@@ -466,39 +466,36 @@ setSubjectProgress(normalized);
                                 return (
                                   <View key={topicIndex} style={styles.topicWrapper}>
                                     <TouchableOpacity
-                                      activeOpacity={0.8}
-onPress={() => {
-router.push({
-  pathname: '/concept',
-  params: {
-    topic_id: topic.topic_id,
-    subject: selectedSubject,
-    chapter: chapter.chapter,
+  activeOpacity={0.8}
+  onPress={() => {
+    router.push({
+      pathname: '/concept',
+      params: {
+        topic_id: topic.topic_id,
+        subject: selectedSubject,
+        chapter: chapter.chapter,
+        from: 'uhs_pyq',
+        topic_name: topic.topic,
+        topic_index: topicIndex,
+        chapter_index: chapterIndex,
+      },
+    });
+  }}
+  style={[
+    styles.topicTab,
+    {
+      backgroundColor: isComplete
+        ? 'rgba(37, 211, 102, 0.08)'
+        : 'rgba(30, 30, 30, 0.3)',
+      borderLeftColor: isComplete
+        ? '#25D366'
+        : isCurrentTopic
+        ? topicColor.color
+        : '#9FB3C8',
+    },
+  ]}
+>
 
-    // 🔑 navigation memory
-    from: 'uhs_pyq',
-    topic_name: topic.topic,
-    topic_index: topicIndex,
-    chapter_index: chapterIndex,
-  },
-});
-
-
-                                      style={[
-                                        styles.topicTab,
-                                        {
-                                          backgroundColor: isComplete
-                                            ? 'rgba(37, 211, 102, 0.08)'
-                                            : 'rgba(30, 30, 30, 0.3)',
-                                          borderLeftColor: isComplete
-                                            ? '#25D366'
-                                            : isCurrentTopic
-                                            ? topicColor.color
-                                            : '#9FB3C8',
-
-                                        },
-                                      ]}
-                                    >
                                       <View style={styles.topicTabContent}>
                                         {isComplete && topic.visited_at && (
                                           <Text style={styles.completedDateText}>
