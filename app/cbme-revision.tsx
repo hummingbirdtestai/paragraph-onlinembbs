@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import ConfettiCannon from "react-native-confetti-cannon";
-import MCQChatScreen from "@/components/MCQChatScreen";
+import CBMEMCQChatScreen from "@/components/cbmeMCQChatScreen";
 import { supabase } from "@/lib/supabaseClient";
 
 const { width, height } = Dimensions.get("window");
@@ -136,17 +136,17 @@ export default function CBMERevisionScreen() {
 
         {/* MCQs — conversational append */}
         {mcqs.slice(0, renderedCount).map((mcq, idx) => (
-          <MCQChatScreen
-            key={mcq.id}
-            item={mcq}
-            mcqId={mcq.id}
-            correctAnswer={mcq.correct_answer}
-            mode="practice"
-            disableAfterAnswer
-            onAnswerSelected={(opt) =>
-              handleAnswer(idx, opt)
-            }
-          />
+     <CBMEMCQChatScreen
+  key={mcq.id}
+  item={mcq}
+  mcqId={mcq.id}
+  correctAnswer={mcq.correct_answer}
+  mode="practice"
+  onAnswerSelected={(opt) =>
+    handleAnswer(idx, opt)
+  }
+/>
+
         ))}
       </ScrollView>
     </View>
