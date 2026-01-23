@@ -193,7 +193,7 @@ function parseJsonIntoSections(json: FactSheetJSON): Section[] {
     sections.push({
       type: 'major_header',
       title: 'Central Concepts',
-      content: normalizeMarkdown(json.concept).split('\n'),
+      content: json.concept.split('\n'),
     });
   }
 
@@ -425,7 +425,7 @@ function renderLine(line: string, key: number) {
 
   return (
     <Text key={key} style={style}>
-      {parseInlineMarkup(stripMarkdown(trimmed))}{'\n'}
+      {parseInlineMarkup(trimmed)}{'\n'}
     </Text>
   );
 }
