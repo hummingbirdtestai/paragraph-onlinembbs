@@ -661,8 +661,6 @@ const ProFeaturesUnlockMobile = memo(() => {
     – AI-Powered Hyper-Personalised Adaptive Learning Paths
   </Text>
 </View>
-
-    </View>
   );
 });
 
