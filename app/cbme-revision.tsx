@@ -1,4 +1,4 @@
-//app/cbme-revision.tsx
+// app/cbme-revision.tsx
 import React, { useEffect, useRef, useState } from "react";
 import {
   View,
@@ -13,15 +13,11 @@ import ConfettiCannon from "react-native-confetti-cannon";
 import MCQChatScreen from "@/components/MCQChatScreen";
 import { supabase } from "@/lib/supabaseClient";
 
-/* ─────────────────────────────────────────────
-   CONFIG
-───────────────────────────────────────────── */
+/* ───────────────────────────────────────────── */
 
 const { width, height } = Dimensions.get("window");
 
-/* ─────────────────────────────────────────────
-   TYPES
-───────────────────────────────────────────── */
+/* ───────────────────────────────────────────── */
 
 interface MCQ {
   id: string;
@@ -40,13 +36,9 @@ interface MCQ {
   correct_answer: "A" | "B" | "C" | "D";
 }
 
-/* ─────────────────────────────────────────────
-   COMPONENT
-───────────────────────────────────────────── */
+/* ───────────────────────────────────────────── */
 
 export default function CBMERevisionScreen() {
-  /* ───────── ROUTER PARAMS ───────── */
-
   const { topic_id, topic_name } = useLocalSearchParams<{
     topic_id?: string;
     topic_name?: string;
@@ -54,13 +46,11 @@ export default function CBMERevisionScreen() {
 
   const router = useRouter();
 
-  /* ───────── DATA ───────── */
-
   const [mcqs, setMcqs] = useState<MCQ[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answered, setAnswered] = useState(false);
 
-  /* ───────── CONFETTI ───────── */
+  /* ───────── Confetti ───────── */
 
   const [showConfetti, setShowConfetti] = useState(false);
   const confettiRef = useRef<any>(null);
@@ -71,13 +61,11 @@ export default function CBMERevisionScreen() {
     setTimeout(() => setShowConfetti(false), 1800);
   };
 
-  /* ───────── SCROLL ───────── */
+  /* ───────── Scroll ───────── */
 
   const scrollRef = useRef<ScrollView>(null);
 
-  /* ─────────────────────────────────────────────
-     FETCH MCQs (RPC)
-  ───────────────────────────────────────────── */
+  /* ───────── Fetch MCQs ───────── */
 
   useEffect(() => {
     if (!topic_id) return;
@@ -93,15 +81,12 @@ export default function CBMERevisionScreen() {
         return;
       }
 
-      // unwrap phase_json
       const parsed: MCQ[] = data.map((row: any) => row.phase_json);
       setMcqs(parsed);
     })();
   }, [topic_id]);
 
-  /* ─────────────────────────────────────────────
-     ANSWER HANDLER
-  ───────────────────────────────────────────── */
+  /* ───────── Answer Handler ───────── */
 
   const handleAnswer = (selected: "A" | "B" | "C" | "D") => {
     if (answered) return;
@@ -111,28 +96,28 @@ export default function CBMERevisionScreen() {
 
     if (isCorrect) fireConfetti();
 
+    // ✅ IMPORTANT: stay on same MCQ
     setAnswered(true);
-
-    // move to next after short delay
-    setTimeout(() => {
-      if (currentIndex < mcqs.length - 1) {
-        setCurrentIndex((i) => i + 1);
-        setAnswered(false);
-        scrollRef.current?.scrollTo({ y: 0, animated: true });
-      }
-    }, 1200);
   };
 
-  /* ─────────────────────────────────────────────
-     COMPLETE
-  ───────────────────────────────────────────── */
+  /* ───────── Next MCQ ───────── */
+
+  const goNext = () => {
+    if (currentIndex < mcqs.length - 1) {
+      setCurrentIndex((i) => i + 1);
+      setAnswered(false);
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
+    }
+  };
+
+  /* ───────── Complete ───────── */
 
   if (mcqs.length > 0 && currentIndex >= mcqs.length) {
     return (
       <View style={styles.completeContainer}>
         <Text style={styles.completeTitle}>🎉 Self-check complete</Text>
         <Text style={styles.completeText}>
-          You’ve checked your understanding. Keep going 🚀
+          You’ve identified your learning gaps. Keep going 🚀
         </Text>
       </View>
     );
@@ -140,9 +125,7 @@ export default function CBMERevisionScreen() {
 
   const mcq = mcqs[currentIndex];
 
-  /* ─────────────────────────────────────────────
-     RENDER
-  ───────────────────────────────────────────── */
+  /* ───────── Render ───────── */
 
   return (
     <View style={styles.container}>
@@ -180,29 +163,40 @@ export default function CBMERevisionScreen() {
 
         {/* MCQ */}
         {mcq && (
-          <MCQChatScreen
-            item={mcq}
-            mcqId={mcq.id}
-            correctAnswer={mcq.correct_answer}
-            mode="practice"
-            disableAfterAnswer
-            onAnswerSelected={handleAnswer}
-          />
+          <>
+            <MCQChatScreen
+              item={mcq}
+              mcqId={mcq.id}
+              correctAnswer={mcq.correct_answer}
+              mode="practice"
+              disableAfterAnswer
+              onAnswerSelected={handleAnswer}
+            />
+
+            {/* ✅ NEXT BUTTON ONLY AFTER FEEDBACK */}
+            {answered && (
+              <TouchableOpacity
+                style={styles.nextButton}
+                onPress={goNext}
+              >
+                <Text style={styles.nextText}>
+                  {currentIndex === mcqs.length - 1
+                    ? "Finish"
+                    : "Next Question →"}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </ScrollView>
     </View>
   );
 }
 
-/* ─────────────────────────────────────────────
-   STYLES
-───────────────────────────────────────────── */
+/* ───────────────────────────────────────────── */
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0A0A0B",
-  },
+  container: { flex: 1, backgroundColor: "#0A0A0B" },
 
   content: {
     padding: 16,
@@ -237,12 +231,25 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
+  nextButton: {
+    marginTop: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#0d2017",
+    borderWidth: 1,
+    borderColor: "#25D366",
+    alignItems: "center",
+  },
+
+  nextText: {
+    color: "#25D366",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+
   confettiOverlay: {
     position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    inset: 0,
     zIndex: 9999,
     pointerEvents: "none",
   },
