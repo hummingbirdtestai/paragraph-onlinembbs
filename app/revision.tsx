@@ -85,9 +85,9 @@ export default function RevisionScreen() {
 
   /* ───────────── TIMERS ───────────── */
 
- 
+ const [countdown, setCountdown] = useState(10);
   const [feedbackCountdownActive, setFeedbackCountdownActive] = useState(false);
-  const [autoSubmitTriggered, setAutoSubmitTriggered] = useState(false);
+
 
   /* ───────────── CONFETTI (BATTLE STYLE) ───────────── */
 
@@ -109,7 +109,6 @@ export default function RevisionScreen() {
   /* ───────────── REFS ───────────── */
 
   const scrollRef = useRef<ScrollView>(null);
-  const mcqCountdownTimerRef = useRef<NodeJS.Timeout | null>(null);
   const feedbackCountdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   /* ─────────────────────────────────────────────
@@ -425,7 +424,7 @@ setAutoSubmitTriggered(false);
         />
       )}
 
-      {(mcqCountdownActive || feedbackCountdownActive) && (
+{feedbackCountdownActive && (
         <View style={styles.floatingCountdown}>
           <Text style={styles.floatingCountdownText}>{countdown}s</Text>
         </View>
@@ -488,7 +487,7 @@ setAutoSubmitTriggered(false);
                 phaseUniqueId={sessionId || 'session'}
                 mode="practice"
                 onAnswerSelected={handleAnswerSelected}
-                autoSubmit={autoSubmitTriggered}
+
               />
             )}
           </React.Fragment>
