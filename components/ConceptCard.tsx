@@ -14,7 +14,7 @@ import { useRouter } from "expo-router";
 
 interface ConceptCardProps {
   topicId: string; // row id from all_subjects_raw
-  subject?: string | null;
+
 }
 
 export default function ConceptCard({ topicId, subject }: ConceptCardProps) {
@@ -65,12 +65,7 @@ setConcept(
 
   return (
     <View style={styles.card}>
-      {/* Subject header */}
-      {subject && (
-        <Text style={styles.subjectText}>
-          {subject}
-        </Text>
-      )}
+
 
       {/* Loading */}
       {loading && (
