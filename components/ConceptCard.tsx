@@ -14,9 +14,10 @@ import { useRouter } from "expo-router";
 
 interface ConceptCardProps {
   topicId: string; // row id from all_subjects_raw
+   topicName?: string; // ✅ ADD
 }
 
-export default function ConceptCard({ topicId }: ConceptCardProps) {
+export default function ConceptCard({ topicId, topicName }: ConceptCardProps) {
   const router = useRouter();
 
   const [loading, setLoading] = React.useState(true);
@@ -92,7 +93,7 @@ export default function ConceptCard({ topicId }: ConceptCardProps) {
   pathname: "/revision",
   params: {
     topic_id: topicId,
-    topic_name, // 👈 pass topic name
+    topic_name: topicName, // ✅ FIXED
     mode: "mentor",
   },
 });
