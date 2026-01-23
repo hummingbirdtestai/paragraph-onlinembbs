@@ -31,10 +31,11 @@ export default function ConceptCard({ topicId, subject }: ConceptCardProps) {
       setLoading(true);
       setError(null);
 
-      const { data, error } = await supabase.rpc(
-        "get_pyq_concept_v2",
-        { p_id: topicId }
-      );
+     const { data, error } = await supabase.rpc(
+  "get_pyq_concept_v3",
+  { p_id: topicId }
+);
+
 
       if (!mounted) return;
 
@@ -45,8 +46,13 @@ export default function ConceptCard({ topicId, subject }: ConceptCardProps) {
         return;
       }
 
-      const row = data?.[0];
-      setConcept(row?.concept ?? "");
+const row = data?.[0];
+setConcept(
+  row?.concept_v2_final
+    ? JSON.stringify(row.concept_v2_final)
+    : ""
+);
+
       setLoading(false);
     };
 
