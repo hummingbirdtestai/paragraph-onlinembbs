@@ -468,15 +468,21 @@ setSubjectProgress(normalized);
                                     <TouchableOpacity
                                       activeOpacity={0.8}
 onPress={() => {
-  router.push({
-   pathname: '/concept',
-    params: {
-      topic_id: topic.topic_id,
-      subject: selectedSubject,
-      chapter: chapter.chapter,
-    },
-  });
-}}
+router.push({
+  pathname: '/concept',
+  params: {
+    topic_id: topic.topic_id,
+    subject: selectedSubject,
+    chapter: chapter.chapter,
+
+    // 🔑 navigation memory
+    from: 'uhs_pyq',
+    topic_name: topic.topic,
+    topic_index: topicIndex,
+    chapter_index: chapterIndex,
+  },
+});
+
 
                                       style={[
                                         styles.topicTab,
