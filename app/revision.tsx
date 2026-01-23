@@ -85,8 +85,7 @@ export default function RevisionScreen() {
 
   /* ───────────── TIMERS ───────────── */
 
-  const [countdown, setCountdown] = useState(20);
-  const [mcqCountdownActive, setMcqCountdownActive] = useState(false);
+ 
   const [feedbackCountdownActive, setFeedbackCountdownActive] = useState(false);
   const [autoSubmitTriggered, setAutoSubmitTriggered] = useState(false);
 
@@ -177,56 +176,32 @@ export default function RevisionScreen() {
      START MCQ TIMER WHEN CONCEPT APPEARS
   ───────────────────────────────────────────── */
 
-  useEffect(() => {
-    if (!currentConcept || currentMCQ) return;
 
-    setCountdown(20);
-    setMcqCountdownActive(true);
-
-    mcqCountdownTimerRef.current = setInterval(() => {
-      setCountdown((prev) => {
-       if (prev <= 1) {
-  clearInterval(mcqCountdownTimerRef.current!);
-
-  console.log("⏰ MCQ timer expired → auto submit");
-
-  setAutoSubmitTriggered(true);      // tells MCQChatScreen to auto-submit
-        console.log("🟣 autoSubmitTriggered = true");
-
-  setMcqCountdownActive(false);      // hides 20s timer
-  setFeedbackCountdownActive(true);  // ✅ START feedback timer
-
-  return 0;
-}
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(mcqCountdownTimerRef.current!);
-  }, [currentConcept]);
 
   /* ─────────────────────────────────────────────
      FEEDBACK TIMER
   ───────────────────────────────────────────── */
 
   useEffect(() => {
-    if (!feedbackCountdownActive) return;
+  if (!feedbackCountdownActive) return;
 
-    setCountdown(10);
+  setCountdown(10);
 
-    feedbackCountdownTimerRef.current = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(feedbackCountdownTimerRef.current!);
-          loadNextConcept();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  feedbackCountdownTimerRef.current = setInterval(() => {
+    setCountdown((prev) => {
+      if (prev <= 1) {
+        clearInterval(feedbackCountdownTimerRef.current!);
+        setFeedbackCountdownActive(false);
+        loadNextConcept();
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
 
-    return () => clearInterval(feedbackCountdownTimerRef.current!);
-  }, [feedbackCountdownActive]);
+  return () => clearInterval(feedbackCountdownTimerRef.current!);
+}, [feedbackCountdownActive]);
+
 
   /* ─────────────────────────────────────────────
      LOAD MCQ
@@ -330,9 +305,7 @@ setAutoSubmitTriggered(false);
       }),
     });
 
-setMcqCountdownActive(false);
-clearInterval(mcqCountdownTimerRef.current!);
-setAutoSubmitTriggered(false);
+
 
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 400);
     setFeedbackCountdownActive(true);
