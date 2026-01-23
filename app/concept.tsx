@@ -66,7 +66,11 @@ export default function ConceptScreen() {
       )}
 
       {/* Concept Content */}
-      <ConceptCard topicId={topic_id} />
+<ConceptCard
+  topicId={topic_id}
+  topicName={topic_name} // ✅ PASS IT DOWN
+/>
+
     </ScrollView>
   );
 }
