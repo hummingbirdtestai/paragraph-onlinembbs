@@ -137,7 +137,11 @@ const isCorrect = selectedOption === resolvedCorrect;
 
       {showFeedback && selectedOption && (
        <FeedbackSection
-  feedback={item.feedback[selectedOption]}
+  feedback={
+  selectedOption === resolvedCorrect
+    ? item.feedback.correct
+    : item.feedback.wrong
+}
   learningGap={item.learning_gap}
   correctAnswer={resolvedCorrect}
 />
