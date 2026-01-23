@@ -1,4 +1,4 @@
-
+//cbme-learning-path.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -415,7 +415,7 @@ export default function CBMELearningPath({ onSubjectSelect }: LearningPathProps)
   activeOpacity={0.8}
   onPress={() => {
     router.push({
-      pathname: '/concept',
+      pathname: '/cbme-concept',
       params: {
         topic_id: topic.topic_id,
         subject: selectedSubject,
