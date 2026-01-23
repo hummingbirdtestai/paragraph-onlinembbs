@@ -180,12 +180,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
 
-  topicText: {
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "700",
-    marginTop: 6,
-  },
+topicText: {
+  color: "#B7E4C7",     // 🌿 cream-green (easy on eyes)
+  fontSize: 14.5,
+  fontWeight: "500",    // ❌ no bold
+  lineHeight: 20,
+  marginTop: 6,
+},
+
 
   loadingContainer: {
     paddingVertical: 48,
