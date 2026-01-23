@@ -528,15 +528,23 @@ setAutoSubmitTriggered(false);
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0A0A0B' },
   scrollView: { flex: 1 },
-  contentContainer: { paddingVertical: 20, paddingBottom: 40 },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    marginBottom: 24,
-    marginTop: 48,
-  },
+ contentContainer: {
+  paddingVertical: 20,
+  paddingBottom: 40,
+  paddingHorizontal: 12,     // 👈 tighter sides
+  maxWidth: 560,             // 👈 prevents horizontal stretch
+  alignSelf: 'center',       // 👈 centers content column
+},
+
+header: {
+  flexDirection: 'column',   // 👈 stack vertically
+  alignItems: 'flex-start',
+  gap: 8,
+  paddingHorizontal: 16,
+  marginBottom: 20,
+  marginTop: 48,
+},
+
   backButton: {
     marginBottom: 8,
   },
@@ -545,7 +553,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  headerText: { fontSize: 24, fontWeight: '700', color: '#FFFFFF' },
+  headerText: { fontSize: 20, fontWeight: '700', color: '#FFFFFF' },
   progressBadge: {
     backgroundColor: '#1F1F23',
     paddingHorizontal: 12,
