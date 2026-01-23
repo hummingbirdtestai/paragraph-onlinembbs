@@ -425,7 +425,7 @@ function renderLine(line: string, key: number) {
 
   return (
     <Text key={key} style={style}>
-      {parseInlineMarkup(trimmed)}{'\n'}
+      {parseInlineMarkup(stripMarkdown(trimmed))}{'\n'}
     </Text>
   );
 }
