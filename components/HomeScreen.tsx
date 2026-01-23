@@ -389,8 +389,9 @@ const Section5Mobile = memo(({ image }: { image: string }) => {
 14 MBBS University Exams. 19 Subjects. One Proven System.
 </Text>
 <Text style={styles.mobileBody}>
-AI-powered MBBS UHS University PYQ Question Bank — built strictly for Indian medical colleges.
+MBBS UHS University PYQ Question Bank – AI analysed pattern with 100% prediction of past 15 question years – the 200 questions every MBBS student should master to survive MBBS exams.
 </Text>
+
 <Text style={styles.mobileBody}>
 MBBS university exams are not about reading everything.
 They are about writing what examiners repeatedly ask.
@@ -440,7 +441,7 @@ const Section5Web = memo(({ image }: { image: string }) => {
 14 MBBS University Exams. 19 Subjects. One Proven System.
 </Text>
 <Text style={styles.webBody}>
-AI-powered MBBS UHS University PYQ Question Bank designed for UHS & Indian medical universities.
+MBBS UHS University PYQ Question Bank – AI analysed pattern with 100% prediction of past 15 question years – the 200 questions every MBBS student should master to survive MBBS exams.
 </Text>
 <Text style={styles.webSubheading}>
 University exams reward precision — not volume.
