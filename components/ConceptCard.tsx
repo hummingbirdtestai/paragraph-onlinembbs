@@ -102,6 +102,7 @@ export default function ConceptCard({
 >
   <Text style={styles.subjectText}>{subject}</Text>
 </TouchableOpacity>
+)}
 
 
               {chapter && (
