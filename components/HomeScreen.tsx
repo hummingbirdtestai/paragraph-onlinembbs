@@ -647,12 +647,21 @@ const ProFeaturesUnlockMobile = memo(() => {
   </View>
 
   <View style={styles.proFeatureCard}>
-    <Text style={styles.proFeatureTitle}>1,505 AI-Guided Study Hours</Text>
-    <Text style={styles.proFeatureText}>– Distributed across all 5 MBBS years</Text>
-    <Text style={styles.proFeatureText}>– Delivered via AI-planned daily learning objectives</Text>
-    <Text style={styles.proFeatureText}>– No overload, no burnout</Text>
-  </View>
+  <Text style={styles.proFeatureTitle}>
+    200 UHS MBBS Exam PYQ Questions per Subject
+  </Text>
+  <Text style={styles.proFeatureText}>– Each question with 25 High-Yield Facts</Text>
+  <Text style={styles.proFeatureText}>– 5 Clinical Case Vignettes per question</Text>
+  <Text style={styles.proFeatureText}>– Central Concept distilled from PYQs</Text>
+  <Text style={styles.proFeatureText}>– Rapid Revision Synopsis Tables</Text>
+  <Text style={styles.proFeatureText}>
+    – Conversational AI-Tutored Concepts with gap filling
+  </Text>
+  <Text style={styles.proFeatureText}>
+    – AI-Powered Hyper-Personalised Adaptive Learning Paths
+  </Text>
 </View>
+
     </View>
   );
 });
@@ -704,13 +713,29 @@ const ProFeaturesUnlockWeb = memo(() => {
           </View>
 
           <View style={styles.webProCard}>
-            <Text style={styles.webProCardTitle}>1,505 AI-Guided Study Hours</Text>
-            <Text style={styles.webProCardText}>– Distributed across all 5 MBBS years</Text>
-            <Text style={styles.webProCardText}>
-              – Delivered via AI-planned daily learning objectives
-            </Text>
-            <Text style={styles.webProCardText}>– No overload, no burnout</Text>
-          </View>
+  <Text style={styles.webProCardTitle}>
+    200 UHS MBBS Exam PYQ Questions per Subject
+  </Text>
+  <Text style={styles.webProCardText}>
+    – Each question with 25 High-Yield Facts
+  </Text>
+  <Text style={styles.webProCardText}>
+    – 5 Clinical Case Vignettes per question
+  </Text>
+  <Text style={styles.webProCardText}>
+    – Central Concept distilled from PYQs
+  </Text>
+  <Text style={styles.webProCardText}>
+    – Rapid Revision Synopsis Tables
+  </Text>
+  <Text style={styles.webProCardText}>
+    – Conversational AI-Tutored Concepts with gap filling
+  </Text>
+  <Text style={styles.webProCardText}>
+    – AI-Powered Hyper-Personalised Adaptive Learning Paths
+  </Text>
+</View>
+
         </View>
       </View>
     </View>
