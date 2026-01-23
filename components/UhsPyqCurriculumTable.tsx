@@ -17,7 +17,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
 import MainLayout from '@/components/MainLayout';
 import { useRouter } from 'expo-router';
-
+import { useLocalSearchParams } from 'expo-router';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -29,6 +29,7 @@ const formatDate = (iso: string) => {
     year: 'numeric',
   });
 };
+
 
 const YEARS = [
   {
@@ -208,6 +209,15 @@ export default function UhsPyqCurriculumTable({ onSubjectSelect }: LearningPathP
   const [subjectProgress, setSubjectProgress] = useState<GroupedProgress[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { reset } = useLocalSearchParams<{ reset?: string }>();
+
+  React.useEffect(() => {
+    if (reset === 'true') {
+      setSelectedSubject(null);
+      setSubjectProgress(null);
+      setError(null);
+    }
+  }, [reset]);
 
   
 
