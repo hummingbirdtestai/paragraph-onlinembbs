@@ -32,7 +32,7 @@ export default function ConceptScreen() {
       {/* Breadcrumb / Context Header */}
       {(subject || chapter || topic_name) && (
         <View style={styles.breadcrumb}>
-          {/* SUBJECT → go back 2 levels (deterministic) */}
+          {/* SUBJECT */}
           {subject && (
             <TouchableOpacity
               activeOpacity={0.7}
@@ -48,19 +48,17 @@ export default function ConceptScreen() {
             </TouchableOpacity>
           )}
 
-          {/* CHAPTER → go back 1 level */}
+          {/* CHAPTER */}
           {chapter && (
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => {
-                router.back();
-              }}
+              onPress={() => router.back()}
             >
               <Text style={styles.crumb}>› {chapter}</Text>
             </TouchableOpacity>
           )}
 
-          {/* TOPIC → active, no navigation */}
+          {/* TOPIC (ACTIVE) */}
           {topic_name && (
             <Text style={styles.crumbActive}>› {topic_name}</Text>
           )}
@@ -68,7 +66,7 @@ export default function ConceptScreen() {
       )}
 
       {/* Concept Content */}
-      <ConceptCard topicId={topic_id} subject={subject} />
+      <ConceptCard topicId={topic_id} />
     </ScrollView>
   );
 }
@@ -84,7 +82,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
-  // Breadcrumb styles
   breadcrumb: {
     marginBottom: 12,
     flexDirection: 'row',
