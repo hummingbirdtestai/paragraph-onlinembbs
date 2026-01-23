@@ -92,16 +92,17 @@ export default function ConceptCard({
           {(subject || chapter || topicName) && (
             <View style={styles.contextBox}>
               {subject && (
-                <TouchableOpacity
-                  onPress={() =>
-                    router.replace({
-                      pathname: "/subjects",
-                    })
-                  }
-                >
-                  <Text style={styles.subjectText}>{subject}</Text>
-                </TouchableOpacity>
-              )}
+               <TouchableOpacity
+  onPress={() =>
+    router.replace({
+      pathname: "/uhs-pyq",
+      params: { reset: "true" },
+    })
+  }
+>
+  <Text style={styles.subjectText}>{subject}</Text>
+</TouchableOpacity>
+
 
               {chapter && (
                 <TouchableOpacity onPress={() => router.back()}>
