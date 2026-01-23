@@ -605,62 +605,64 @@ const ProFeaturesUnlockMobile = memo(() => {
   return (
     <View style={styles.mobileSection}>
       <View style={styles.mobilePadding}>
-  <Text style={styles.mobileHeading}>
-    What You Unlock with Paragraph (MBBS NMC-CBME Edition)
-  </Text>
+        <Text style={styles.mobileHeading}>
+          What You Unlock with Paragraph (MBBS NMC-CBME Edition)
+        </Text>
 
-  <View style={styles.proFeatureCard}>
-    <Text style={styles.proFeatureTitle}>4,577 NMC-Mapped CBME Topics</Text>
-    <Text style={styles.proFeatureText}>– Every topic taught from first principles</Text>
-    <Text style={styles.proFeatureText}>– Structured exactly as competencies demand</Text>
-  </View>
+        <View style={styles.proFeatureCard}>
+          <Text style={styles.proFeatureTitle}>4,577 NMC-Mapped CBME Topics</Text>
+          <Text style={styles.proFeatureText}>– Every topic taught from first principles</Text>
+          <Text style={styles.proFeatureText}>– Structured exactly as competencies demand</Text>
+        </View>
 
-  <View style={styles.proFeatureCard}>
-    <Text style={styles.proFeatureTitle}>50,000 Flashcards</Text>
-    <Text style={styles.proFeatureText}>– Rapid recall with spaced repetition</Text>
-    <Text style={styles.proFeatureText}>– Built directly from CBME concepts</Text>
-    <Text style={styles.proFeatureText}>– Long-term retention across 5 MBBS years</Text>
-  </View>
+        <View style={styles.proFeatureCard}>
+          <Text style={styles.proFeatureTitle}>50,000 Flashcards</Text>
+          <Text style={styles.proFeatureText}>– Rapid recall with spaced repetition</Text>
+          <Text style={styles.proFeatureText}>– Built directly from CBME concepts</Text>
+          <Text style={styles.proFeatureText}>– Long-term retention across 5 MBBS years</Text>
+        </View>
 
-  <View style={styles.proFeatureCard}>
-    <Text style={styles.proFeatureTitle}>45,770 High-Yield Facts</Text>
-    <Text style={styles.proFeatureText}>– Embedded inside concepts</Text>
-    <Text style={styles.proFeatureText}>– Strictly exam-relevant, zero fluff</Text>
-  </View>
+        <View style={styles.proFeatureCard}>
+          <Text style={styles.proFeatureTitle}>45,770 High-Yield Facts</Text>
+          <Text style={styles.proFeatureText}>– Embedded inside concepts</Text>
+          <Text style={styles.proFeatureText}>– Strictly exam-relevant, zero fluff</Text>
+        </View>
 
-  <View style={styles.proFeatureCard}>
-    <Text style={styles.proFeatureTitle}>22,885 Clinical Case Vignettes</Text>
-    <Text style={styles.proFeatureText}>– CBME-aligned, bedside-oriented</Text>
-    <Text style={styles.proFeatureText}>– Theory translated into clinical reasoning</Text>
-  </View>
+        <View style={styles.proFeatureCard}>
+          <Text style={styles.proFeatureTitle}>22,885 Clinical Case Vignettes</Text>
+          <Text style={styles.proFeatureText}>– CBME-aligned, bedside-oriented</Text>
+          <Text style={styles.proFeatureText}>– Theory translated into clinical reasoning</Text>
+        </View>
 
-  <View style={styles.proFeatureCard}>
-    <Text style={styles.proFeatureTitle}>22,885 Core MCQs (Adaptive & Recursive)</Text>
-    <Text style={styles.proFeatureText}>– Minimum 5 MCQs per topic</Text>
-    <Text style={styles.proFeatureText}>– Automatically repeated until gaps close</Text>
-  </View>
+        <View style={styles.proFeatureCard}>
+          <Text style={styles.proFeatureTitle}>22,885 Core MCQs (Adaptive & Recursive)</Text>
+          <Text style={styles.proFeatureText}>– Minimum 5 MCQs per topic</Text>
+          <Text style={styles.proFeatureText}>– Automatically repeated until gaps close</Text>
+        </View>
 
-  <View style={styles.proFeatureCard}>
-    <Text style={styles.proFeatureTitle}>22,885 Viva Voce Questions</Text>
-    <Text style={styles.proFeatureText}>– University-exam ready answers</Text>
-    <Text style={styles.proFeatureText}>– Ward-round & practical focused</Text>
-  </View>
+        <View style={styles.proFeatureCard}>
+          <Text style={styles.proFeatureTitle}>22,885 Viva Voce Questions</Text>
+          <Text style={styles.proFeatureText}>– University-exam ready answers</Text>
+          <Text style={styles.proFeatureText}>– Ward-round & practical focused</Text>
+        </View>
 
-  <View style={styles.proFeatureCard}>
-  <Text style={styles.proFeatureTitle}>
-    200 UHS MBBS Exam PYQ Questions per Subject
-  </Text>
-  <Text style={styles.proFeatureText}>– Each question with 25 High-Yield Facts</Text>
-  <Text style={styles.proFeatureText}>– 5 Clinical Case Vignettes per question</Text>
-  <Text style={styles.proFeatureText}>– Central Concept distilled from PYQs</Text>
-  <Text style={styles.proFeatureText}>– Rapid Revision Synopsis Tables</Text>
-  <Text style={styles.proFeatureText}>
-    – Conversational AI-Tutored Concepts with gap filling
-  </Text>
-  <Text style={styles.proFeatureText}>
-    – AI-Powered Hyper-Personalised Adaptive Learning Paths
-  </Text>
-</View>
+        <View style={styles.proFeatureCard}>
+          <Text style={styles.proFeatureTitle}>
+            200 UHS MBBS Exam PYQ Questions per Subject
+          </Text>
+          <Text style={styles.proFeatureText}>– Each question with 25 High-Yield Facts</Text>
+          <Text style={styles.proFeatureText}>– 5 Clinical Case Vignettes per question</Text>
+          <Text style={styles.proFeatureText}>– Central Concept distilled from PYQs</Text>
+          <Text style={styles.proFeatureText}>– Rapid Revision Synopsis Tables</Text>
+          <Text style={styles.proFeatureText}>
+            – Conversational AI-Tutored Concepts with gap filling
+          </Text>
+          <Text style={styles.proFeatureText}>
+            – AI-Powered Hyper-Personalised Adaptive Learning Paths
+          </Text>
+        </View>
+      </View>
+    </View>
   );
 });
 
