@@ -408,15 +408,18 @@ export default function RevisionScreen() {
 
   return (
     <View style={styles.container}>
-      {showConfetti && (
-        <ConfettiCannon
-          ref={confettiRef}
-          count={80}
-          origin={{ x: width / 2, y: height / 3 }}
-          autoStart={false}
-          fadeOut
-        />
-      )}
+{showConfetti && (
+  <View style={styles.confettiOverlay}>
+    <ConfettiCannon
+      ref={confettiRef}
+      count={80}
+      origin={{ x: width / 2, y: height / 3 }}
+      autoStart={false}
+      fadeOut
+    />
+  </View>
+)}
+
 
 {feedbackCountdownActive && (
         <View style={styles.floatingCountdown}>
@@ -585,6 +588,15 @@ progressRow: {
   alignSelf: 'flex-start',
   borderWidth: 1,
   borderColor: '#25D36655',
+},
+confettiOverlay: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  zIndex: 9999,
+  pointerEvents: 'none',
 },
 
 });
