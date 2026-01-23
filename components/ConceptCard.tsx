@@ -14,10 +14,9 @@ import { useRouter } from "expo-router";
 
 interface ConceptCardProps {
   topicId: string; // row id from all_subjects_raw
-
 }
 
-export default function ConceptCard({ topicId, subject }: ConceptCardProps) {
+export default function ConceptCard({ topicId }: ConceptCardProps) {
   const router = useRouter();
 
   const [loading, setLoading] = React.useState(true);
@@ -31,11 +30,10 @@ export default function ConceptCard({ topicId, subject }: ConceptCardProps) {
       setLoading(true);
       setError(null);
 
-     const { data, error } = await supabase.rpc(
-  "get_pyq_concept_v3",
-  { p_id: topicId }
-);
-
+      const { data, error } = await supabase.rpc(
+        "get_pyq_concept_v3",
+        { p_id: topicId }
+      );
 
       if (!mounted) return;
 
@@ -46,12 +44,12 @@ export default function ConceptCard({ topicId, subject }: ConceptCardProps) {
         return;
       }
 
-const row = data?.[0];
-setConcept(
-  row?.concept_v2_final
-    ? JSON.stringify(row.concept_v2_final)
-    : ""
-);
+      const row = data?.[0];
+      setConcept(
+        row?.concept_v2_final
+          ? JSON.stringify(row.concept_v2_final)
+          : ""
+      );
 
       setLoading(false);
     };
@@ -65,8 +63,6 @@ setConcept(
 
   return (
     <View style={styles.card}>
-
-
       {/* Loading */}
       {loading && (
         <View style={styles.loadingContainer}>
@@ -85,7 +81,7 @@ setConcept(
       {/* Concept renderer */}
       {!loading && !error && concept && (
         <>
-        <ConceptJSONRenderer data={concept} />
+          <ConceptJSONRenderer data={concept} />
 
           {/* Discuss with Mentor */}
           <TouchableOpacity
@@ -96,7 +92,6 @@ setConcept(
                 pathname: "/revision",
                 params: {
                   topic_id: topicId,
-                  subject: subject ?? undefined,
                   mode: "mentor",
                 },
               });
@@ -119,15 +114,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     marginBottom: 18,
     overflow: "hidden",
-  },
-
-  subjectText: {
-    color: "#25D366",
-    fontSize: 16,
-    fontWeight: "700",
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 6,
   },
 
   loadingContainer: {
