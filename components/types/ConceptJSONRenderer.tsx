@@ -193,7 +193,7 @@ function parseJsonIntoSections(json: FactSheetJSON): Section[] {
     sections.push({
       type: 'major_header',
       title: 'Central Concepts',
-      content: json.concept.split('\n'),
+      content: normalizeMarkdown(json.concept).split('\n'),
     });
   }
 
