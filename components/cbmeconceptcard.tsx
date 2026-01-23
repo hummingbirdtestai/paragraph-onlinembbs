@@ -1,5 +1,3 @@
-// components/cbmeconceptcard.tsx
-
 import React from "react";
 import {
   View,
@@ -47,10 +45,9 @@ export default function CBMEConceptCard({
 
       /* ✅ PYQ-STYLE RPC CONSUMPTION */
       const { data, error } = await supabase.rpc(
-  "get_cbme_concept_by_id",
-  { p_topic_id: topicId }
-);
-
+        "get_cbme_concept_by_id",
+        { p_topic_id: topicId }
+      );
 
       if (!mounted) return;
 
@@ -129,7 +126,7 @@ export default function CBMEConceptCard({
             </View>
           )}
 
-          {/* ✅ CORRECT CBME RENDERER */}
+          {/* ✅ CBME FACT SHEET RENDERER */}
           <HighYieldFactSheetScreen
             data={concept}
             cbmeMeta={{
@@ -140,25 +137,25 @@ export default function CBMEConceptCard({
             }}
           />
 
-          {/* Mentor CTA */}
+          {/* ✅ CBME SELF-ASSESSMENT CTA (NO FASTAPI) */}
           <TouchableOpacity
             activeOpacity={0.8}
             style={styles.discussButton}
             onPress={() => {
               router.push({
-                pathname: "/revision",
+                pathname: "/cbme-revision",
                 params: {
                   topic_id: topicId,
                   topic_name: topicName,
-                  mode: "mentor",
-                  from: "cbme",
+                  subject,
+                  chapter,
                 },
               });
             }}
           >
             <MessageCircle size={18} color="#25D366" />
             <Text style={styles.discussText}>
-              Discuss with Paragraph AI Mentor
+              Let us know my Learning Gaps
             </Text>
           </TouchableOpacity>
         </>
