@@ -77,6 +77,8 @@ const YEARS = [
       "General Medicine",
       "Pediatrics",
       "General Surgery",
+       "Obstetrics",
+       "Gynaecology",
       "ENT",
       "Ophthalmology",
     ],
