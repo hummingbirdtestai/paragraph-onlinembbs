@@ -705,6 +705,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     paddingLeft: 6,
   },
+mobileCheck: {
+  fontSize: 16,
+  color: '#c9d1d9',
+  lineHeight: 24,
+  marginBottom: 12,
+  paddingLeft: 8,
+  fontWeight: '600',
+},
 
   mobileStep: {
     fontSize: 18,
