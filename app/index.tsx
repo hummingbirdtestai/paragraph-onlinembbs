@@ -29,10 +29,8 @@ export default function Index() {
   /**
    * WEB VIDEOS (Bunny Stream iframe URLs)
    * These are used ONLY on web layouts.
-   */
 const videos = {
-const videos = {
-  hero: "https://iframe.mediadelivery.net/play/562001/fd252cc5-912d-4134-86f9-9732f883facf?autoplay=true&muted=yes&loop=yes&controls=0",
+  hero: "https://iframe.mediadelivery.net/play/562001/fd252cc5-912d-4134-86f9-9732f883facf?autoplay=true&muted=true&loop=true&controls=false",
 };
 
 
