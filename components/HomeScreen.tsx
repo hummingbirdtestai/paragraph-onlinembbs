@@ -140,19 +140,19 @@ const HeroWeb = memo(
     position: 'relative',
   }}
 >
-  <iframe
-    src={video}
-    style={{
-      position: 'absolute',
-      top: '-20%',
-      left: '-20%',
-      width: '140%',
-      height: '140%',
-      border: 'none',
-      pointerEvents: 'none', // 🔒 prevents interaction
-    }}
-    allow="autoplay; fullscreen"
-  />
+<iframe
+  src={`${video}?autoplay=1&muted=1&loop=1&background=1&controls=0`}
+  style={{
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    border: "none",
+    pointerEvents: "none",
+  }}
+  allow="autoplay; fullscreen"
+/>
+
 </View>
 
 
