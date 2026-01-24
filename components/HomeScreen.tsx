@@ -873,13 +873,15 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
 
-  mobileBullet: {
-    fontSize: 15,
-    color: '#8b949e',
-    lineHeight: 22,
-    marginBottom: 8,
-    paddingLeft: 6,
-  },
+mobileBullet: {
+  fontSize: 15,
+  color: '#E6B65C',   // 👈 FIX
+  lineHeight: 22,
+  marginBottom: 10,
+  paddingLeft: 6,
+  fontWeight: '500',
+},
+
 
   mobileCheck: {
     fontSize: 16,
@@ -1036,11 +1038,13 @@ const styles = StyleSheet.create({
   },
 
   webBullet: {
-    fontSize: 17,
-    color: '#8b949e',
-    lineHeight: 26,
-    marginBottom: 8,
-  },
+  fontSize: 17,
+  color: '#E6B65C',   // 👈 FIX
+  lineHeight: 26,
+  marginBottom: 10,
+  fontWeight: '500',
+},
+
 
   webStep: {
     fontSize: 20,
