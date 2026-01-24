@@ -119,72 +119,57 @@ const HeroWeb = memo(
     <View style={styles.webSection}>
       <View style={styles.webVerticalLayout}>
 
-{video ? (
-  <View
-    style={{
-      width: '100%',
-      height: 420,
-      borderRadius: 20,
-      overflow: 'hidden',
-      marginBottom: 32,
-      backgroundColor: '#000',
-    }}
-  >
+        {video ? (
+          <View
+            style={{
+              width: '100%',
+              height: 420,
+              borderRadius: 20,
+              overflow: 'hidden',
+              marginBottom: 32,
+              backgroundColor: '#000',
+            }}
+          >
+            <iframe
+              src={video}
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+              }}
+              allow="autoplay; fullscreen"
+              allowFullScreen
+            />
+          </View>
+        ) : (
+          <Image source={{ uri: image }} style={styles.webImage} />
+        )}
 
-<iframe
-  src={video}
-  style={{
-    position: "absolute",
-    inset: 0,
-    width: "100%",
-    height: "100%",
-    border: "none",
-    pointerEvents: "none",
-  }}
-  allow="autoplay; fullscreen"
-/>
+        <Text style={styles.webHeading}>
+          MBBS Exams Are Not About Reading Everything.
+        </Text>
 
+        <Text style={styles.webBody}>
+          They are about writing what examiners keep asking.
+        </Text>
 
-
-</View>
-
-
-  </View>
-) : (
-  <Image source={{ uri: image }} style={styles.webImage} />
-)}
-
-
-
-      
-      <Text style={styles.webHeading}>
-        MBBS Exams Are Not About Reading Everything.
-      </Text>
-
-      <Text style={styles.webBody}>
-        They are about writing what examiners keep asking.
-      </Text>
-
-      <View style={styles.bulletGroup}>
-        <View style={styles.bulletColumn}>
-          <Text style={styles.webBullet}>
-            ⏱ Very little time
-          </Text>
-          <Text style={styles.webBullet}>
-            📚 Too much syllabus
-          </Text>
-          <Text style={styles.webBullet}>
-            ❓ No clarity what to study
-          </Text>
+        <View style={styles.bulletGroup}>
+          <View style={styles.bulletColumn}>
+            <Text style={styles.webBullet}>⏱ Very little time</Text>
+            <Text style={styles.webBullet}>📚 Too much syllabus</Text>
+            <Text style={styles.webBullet}>❓ No clarity what to study</Text>
+          </View>
         </View>
-      </View>
 
-      <Text style={[styles.webBody, styles.emphasis]}>
-        Paragraph fixes this.
-      </Text>
+        <Text style={[styles.webBody, styles.emphasis]}>
+          Paragraph fixes this.
+        </Text>
+
+      </View>
     </View>
-  </View>
-));
+  )
+);
+
 
 /* =========================================================
    SECTION 2 — PROBLEM
