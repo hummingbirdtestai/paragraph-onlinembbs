@@ -105,16 +105,22 @@ const HeroMobile = memo(({ image }: { image: string }) => (
 const HeroWeb = memo(({ image }: { image: string }) => (
   <View style={styles.webSection}>
     <View style={styles.webHero}>
-      <View style={styles.webHeroText}>
-        <Text style={styles.webHeading}>
-          MBBS Exams Are Not About Reading Everything.
-        </Text>
-        <Text style={styles.webBody}>
-          They are about writing what examiners keep asking.
-        </Text>
-        <Text style={[styles.webBody, styles.emphasis]}>
-          200 questions. 40 hours. One clear system.
-        </Text>
+      <View style={styles.webTextBlock}>
+        <View style={styles.webTextInner}>
+
+          <Text style={styles.webHeading}>
+            MBBS Exams Are Not About Reading Everything.
+          </Text>
+
+          <Text style={styles.webBody}>
+            They are about writing what examiners keep asking.
+          </Text>
+
+          <Text style={[styles.webBody, styles.emphasis]}>
+            200 questions. 40 hours. One clear system.
+          </Text>
+
+        </View>
       </View>
       <Image source={{ uri: image }} style={styles.webHeroImage} />
     </View>
@@ -991,27 +997,22 @@ const styles = StyleSheet.create({
   webHero: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    columnGap: 48,
     flexWrap: 'wrap',
   },
 
   webReverse: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    columnGap: 48,
     flexWrap: 'wrap',
-  },
-
-  webHeroText: {
-    flex: 1,
-    minWidth: 320,
-    marginHorizontal: 20,
   },
 
   webTextBlock: {
     flex: 1,
     minWidth: 320,
-    marginHorizontal: 20,
     alignItems: 'center',
   },
 
