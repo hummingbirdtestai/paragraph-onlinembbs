@@ -145,6 +145,16 @@ const SUBJECT_COLORS: Record<string, any> = {
     bgColor: "rgba(233, 30, 99, 0.08)",
     borderColor: "rgba(233, 30, 99, 0.35)",
   },
+  "Obstetrics": {
+  color: "#FF6F91",
+  bgColor: "rgba(255, 111, 145, 0.08)",
+  borderColor: "rgba(255, 111, 145, 0.35)",
+},
+"Gynaecology": {
+  color: "#C77DFF",
+  bgColor: "rgba(199, 125, 255, 0.08)",
+  borderColor: "rgba(199, 125, 255, 0.35)",
+},
   "ENT": {
     color: "#25D366",
     bgColor: "rgba(37, 211, 102, 0.08)",
