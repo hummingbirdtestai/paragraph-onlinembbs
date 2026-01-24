@@ -12,6 +12,7 @@ import {
   Platform,
   useWindowDimensions,
   Pressable,
+  StyleSheet,   // ✅ ADD THIS
 } from 'react-native';
 import Footer from './Footer';
 import { useAuth } from "@/contexts/AuthContext";
