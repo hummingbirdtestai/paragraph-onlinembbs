@@ -104,25 +104,27 @@ const HeroMobile = memo(({ image }: { image: string }) => (
 
 const HeroWeb = memo(({ image }: { image: string }) => (
   <View style={styles.webSection}>
-    <View style={styles.webHero}>
-      <View style={styles.webTextBlock}>
-        <View style={styles.webTextInner}>
+    <View style={styles.webSectionInner}>
+      <View style={styles.webHero}>
+        <View style={styles.webTextBlock}>
+          <View style={styles.webTextInner}>
 
-          <Text style={styles.webHeading}>
-            MBBS Exams Are Not About Reading Everything.
-          </Text>
+            <Text style={styles.webHeading}>
+              MBBS Exams Are Not About Reading Everything.
+            </Text>
 
-          <Text style={styles.webBody}>
-            They are about writing what examiners keep asking.
-          </Text>
+            <Text style={styles.webBody}>
+              They are about writing what examiners keep asking.
+            </Text>
 
-          <Text style={[styles.webBody, styles.emphasis]}>
-            200 questions. 40 hours. One clear system.
-          </Text>
+            <Text style={[styles.webBody, styles.emphasis]}>
+              200 questions. 40 hours. One clear system.
+            </Text>
 
+          </View>
         </View>
+        <Image source={{ uri: image }} style={styles.webHeroImage} />
       </View>
-      <Image source={{ uri: image }} style={styles.webHeroImage} />
     </View>
   </View>
 ));
@@ -167,29 +169,31 @@ const ProblemMobile = memo(({ image }: { image: string }) => (
 
 const ProblemWeb = memo(({ image }: { image: string }) => (
   <View style={styles.webSection}>
-    <View style={styles.webReverse}>
-      <Image source={{ uri: image }} style={styles.webSideImage} />
-      <View style={styles.webTextBlock}>
-        <View style={styles.webTextInner}>
+    <View style={styles.webSectionInner}>
+      <View style={styles.webReverse}>
+        <Image source={{ uri: image }} style={styles.webSideImage} />
+        <View style={styles.webTextBlock}>
+          <View style={styles.webTextInner}>
 
-          <Text style={styles.webHeading}>
-            Why Most MBBS Students Get Stuck
-          </Text>
+            <Text style={styles.webHeading}>
+              Why Most MBBS Students Get Stuck
+            </Text>
 
-          <View style={styles.bulletGroup}>
-            <View style={styles.bulletColumn}>
-              <Text style={styles.webBullet}>
-                • Infinite syllabus
-              </Text>
-              <Text style={styles.webBullet}>
-                • No exam priority
-              </Text>
-              <Text style={styles.webBullet}>
-                • Revision chaos
-              </Text>
+            <View style={styles.bulletGroup}>
+              <View style={styles.bulletColumn}>
+                <Text style={styles.webBullet}>
+                  • Infinite syllabus
+                </Text>
+                <Text style={styles.webBullet}>
+                  • No exam priority
+                </Text>
+                <Text style={styles.webBullet}>
+                  • Revision chaos
+                </Text>
+              </View>
             </View>
-          </View>
 
+          </View>
         </View>
       </View>
     </View>
@@ -235,34 +239,36 @@ const SystemMobile = memo(({ image }: { image: string }) => (
 
 const SystemWeb = memo(({ image }: { image: string }) => (
   <View style={styles.webSection}>
-    <View style={styles.webHero}>
-      <View style={styles.webTextBlock}>
-        <View style={styles.webTextInner}>
+    <View style={styles.webSectionInner}>
+      <View style={styles.webHero}>
+        <View style={styles.webTextBlock}>
+          <View style={styles.webTextInner}>
 
-          <Text style={styles.webHeading}>
-            The System (15 Years Proven)
-          </Text>
+            <Text style={styles.webHeading}>
+              The System (15 Years Proven)
+            </Text>
 
-          <View style={styles.bulletGroup}>
-            <View style={styles.bulletColumn}>
-              <Text style={styles.webBullet}>
-                1️⃣ 15 years analysed
-              </Text>
-              <Text style={styles.webBullet}>
-                2️⃣ 200 repeated questions
-              </Text>
-              <Text style={styles.webBullet}>
-                3️⃣ Examiner-only focus
-              </Text>
-              <Text style={styles.webBullet}>
-                4️⃣ Revise exactly this
-              </Text>
+            <View style={styles.bulletGroup}>
+              <View style={styles.bulletColumn}>
+                <Text style={styles.webBullet}>
+                  1️⃣ 15 years analysed
+                </Text>
+                <Text style={styles.webBullet}>
+                  2️⃣ 200 repeated questions
+                </Text>
+                <Text style={styles.webBullet}>
+                  3️⃣ Examiner-only focus
+                </Text>
+                <Text style={styles.webBullet}>
+                  4️⃣ Revise exactly this
+                </Text>
+              </View>
             </View>
-          </View>
 
+          </View>
         </View>
+        <Image source={{ uri: image }} style={styles.webSideImage} />
       </View>
-      <Image source={{ uri: image }} style={styles.webSideImage} />
     </View>
   </View>
 ));
@@ -324,30 +330,32 @@ const ScopeMobile = memo(({ image }: { image: string }) => (
 
 const ScopeWeb = memo(({ image }: { image: string }) => (
   <View style={styles.webSection}>
-    <View style={styles.webReverse}>
-      <Image source={{ uri: image }} style={styles.webSideImage} />
-      <View style={styles.webTextBlock}>
-        <View style={styles.webTextInner}>
+    <View style={styles.webSectionInner}>
+      <View style={styles.webReverse}>
+        <Image source={{ uri: image }} style={styles.webSideImage} />
+        <View style={styles.webTextBlock}>
+          <View style={styles.webTextInner}>
 
-          <Text style={styles.webHeading}>
-            What You Actually Study
-          </Text>
+            <Text style={styles.webHeading}>
+              What You Actually Study
+            </Text>
 
-          <View style={styles.bulletGroup}>
-            <View style={styles.bulletColumn}>
-              <Text style={styles.webBullet}>
-                • Only 200 repeated MBBS questions
-              </Text>
-              <Text style={styles.webBullet}>
-                • Nothing outside examiner scope
-              </Text>
+            <View style={styles.bulletGroup}>
+              <View style={styles.bulletColumn}>
+                <Text style={styles.webBullet}>
+                  • Only 200 repeated MBBS questions
+                </Text>
+                <Text style={styles.webBullet}>
+                  • Nothing outside examiner scope
+                </Text>
+              </View>
             </View>
+
+            <Text style={[styles.webBody, styles.emphasis]}>
+              This replaces textbooks.
+            </Text>
+
           </View>
-
-          <Text style={[styles.webBody, styles.emphasis]}>
-            This replaces textbooks.
-          </Text>
-
         </View>
       </View>
     </View>
@@ -396,37 +404,39 @@ const ContentMobile = memo(({ image }: { image: string }) => (
 
 const ContentWeb = memo(({ image }: { image: string }) => (
   <View style={styles.webSection}>
-    <View style={styles.webHero}>
-      <View style={styles.webTextBlock}>
-        <View style={styles.webTextInner}>
+    <View style={styles.webSectionInner}>
+      <View style={styles.webHero}>
+        <View style={styles.webTextBlock}>
+          <View style={styles.webTextInner}>
 
-          <Text style={styles.webHeading}>
-            Each Question Includes
-          </Text>
+            <Text style={styles.webHeading}>
+              Each Question Includes
+            </Text>
 
-          <View style={styles.bulletGroup}>
-            <View style={styles.bulletColumn}>
-              <Text style={styles.webBullet}>
-                ✔ Central Concept
-              </Text>
-              <Text style={styles.webBullet}>
-                ✔ 25 High-Yield Facts
-              </Text>
-              <Text style={styles.webBullet}>
-                ✔ 5 Clinical Case Vignettes
-              </Text>
-              <Text style={styles.webBullet}>
-                ✔ Rapid Revision Tables
-              </Text>
-              <Text style={styles.webBullet}>
-                ✔ AI Tutor
-              </Text>
+            <View style={styles.bulletGroup}>
+              <View style={styles.bulletColumn}>
+                <Text style={styles.webBullet}>
+                  ✔ Central Concept
+                </Text>
+                <Text style={styles.webBullet}>
+                  ✔ 25 High-Yield Facts
+                </Text>
+                <Text style={styles.webBullet}>
+                  ✔ 5 Clinical Case Vignettes
+                </Text>
+                <Text style={styles.webBullet}>
+                  ✔ Rapid Revision Tables
+                </Text>
+                <Text style={styles.webBullet}>
+                  ✔ AI Tutor
+                </Text>
+              </View>
             </View>
-          </View>
 
+          </View>
         </View>
+        <Image source={{ uri: image }} style={styles.webSideImage} />
       </View>
-      <Image source={{ uri: image }} style={styles.webSideImage} />
     </View>
   </View>
 ));
@@ -470,32 +480,34 @@ const MethodMobile = memo(({ image }: { image: string }) => (
 
 const MethodWeb = memo(({ image }: { image: string }) => (
   <View style={styles.webSection}>
-    <View style={styles.webReverse}>
-      <Image source={{ uri: image }} style={styles.webSideImage} />
-      <View style={styles.webTextBlock}>
-        <View style={styles.webTextInner}>
+    <View style={styles.webSectionInner}>
+      <View style={styles.webReverse}>
+        <Image source={{ uri: image }} style={styles.webSideImage} />
+        <View style={styles.webTextBlock}>
+          <View style={styles.webTextInner}>
 
-          <Text style={styles.webHeading}>
-            How the AI Tutor Helps You
-          </Text>
+            <Text style={styles.webHeading}>
+              How the AI Tutor Helps You
+            </Text>
 
-          <View style={styles.bulletGroup}>
-            <View style={styles.bulletColumn}>
-              <Text style={styles.webBullet}>
-                • You answer
-              </Text>
-              <Text style={styles.webBullet}>
-                • Gaps are found
-              </Text>
-              <Text style={styles.webBullet}>
-                • Only weak topics repeat
-              </Text>
-              <Text style={styles.webBullet}>
-                • Stops when mastered
-              </Text>
+            <View style={styles.bulletGroup}>
+              <View style={styles.bulletColumn}>
+                <Text style={styles.webBullet}>
+                  • You answer
+                </Text>
+                <Text style={styles.webBullet}>
+                  • Gaps are found
+                </Text>
+                <Text style={styles.webBullet}>
+                  • Only weak topics repeat
+                </Text>
+                <Text style={styles.webBullet}>
+                  • Stops when mastered
+                </Text>
+              </View>
             </View>
-          </View>
 
+          </View>
         </View>
       </View>
     </View>
@@ -538,21 +550,23 @@ const MathMobile = memo(() => (
 
 const MathWeb = memo(() => (
   <View style={styles.webSection}>
-    <View style={styles.webTextBlock}>
-      <View style={styles.webTextInner}>
+    <View style={styles.webSectionInner}>
+      <View style={styles.webTextBlock}>
+        <View style={styles.webTextInner}>
 
-        <Text style={styles.webHeading}>
-          Exam Math That Works
-        </Text>
+          <Text style={styles.webHeading}>
+            Exam Math That Works
+          </Text>
 
-        <Text style={styles.webBody}>
-          200 Questions × 10 Minutes = 40 Hours
-        </Text>
+          <Text style={styles.webBody}>
+            200 Questions × 10 Minutes = 40 Hours
+          </Text>
 
-        <Text style={[styles.webBody, styles.emphasis]}>
-          Enough for medals and distinctions.
-        </Text>
+          <Text style={[styles.webBody, styles.emphasis]}>
+            Enough for medals and distinctions.
+          </Text>
 
+        </View>
       </View>
     </View>
   </View>
@@ -597,27 +611,29 @@ const SystemVsFacultyMobile = memo(() => (
 
 const SystemVsFacultyWeb = memo(() => (
   <View style={styles.webSection}>
-    <View style={styles.webTextBlock}>
-      <View style={styles.webTextInner}>
+    <View style={styles.webSectionInner}>
+      <View style={styles.webTextBlock}>
+        <View style={styles.webTextInner}>
 
-        <Text style={styles.webHeading}>
-          Not Faculty. A System.
-        </Text>
+          <Text style={styles.webHeading}>
+            Not Faculty. A System.
+          </Text>
 
-        <View style={styles.bulletGroup}>
-          <View style={styles.bulletColumn}>
-            <Text style={styles.webBullet}>
-              ✔ Question-first learning
-            </Text>
-            <Text style={styles.webBullet}>
-              ✔ AI revision loops
-            </Text>
-            <Text style={styles.webBullet}>
-              ✔ Continuous gap correction
-            </Text>
+          <View style={styles.bulletGroup}>
+            <View style={styles.bulletColumn}>
+              <Text style={styles.webBullet}>
+                ✔ Question-first learning
+              </Text>
+              <Text style={styles.webBullet}>
+                ✔ AI revision loops
+              </Text>
+              <Text style={styles.webBullet}>
+                ✔ Continuous gap correction
+              </Text>
+            </View>
           </View>
-        </View>
 
+        </View>
       </View>
     </View>
   </View>
@@ -666,27 +682,29 @@ const WhoMobile = memo(() => (
 
 const WhoWeb = memo(() => (
   <View style={styles.webSection}>
-    <View style={styles.webTextBlock}>
-      <View style={styles.webTextInner}>
+    <View style={styles.webSectionInner}>
+      <View style={styles.webTextBlock}>
+        <View style={styles.webTextInner}>
 
-        <Text style={styles.webHeading}>
-          Who This Is For
-        </Text>
+          <Text style={styles.webHeading}>
+            Who This Is For
+          </Text>
 
-        <View style={styles.bulletGroup}>
-          <View style={styles.bulletColumn}>
-            <Text style={styles.webBullet}>
-              • Time-constrained MBBS students
-            </Text>
-            <Text style={styles.webBullet}>
-              • First-attempt and repeat students
-            </Text>
-            <Text style={styles.webBullet}>
-              • Anyone who wants predictable results
-            </Text>
+          <View style={styles.bulletGroup}>
+            <View style={styles.bulletColumn}>
+              <Text style={styles.webBullet}>
+                • Time-constrained MBBS students
+              </Text>
+              <Text style={styles.webBullet}>
+                • First-attempt and repeat students
+              </Text>
+              <Text style={styles.webBullet}>
+                • Anyone who wants predictable results
+              </Text>
+            </View>
           </View>
-        </View>
 
+        </View>
       </View>
     </View>
   </View>
@@ -722,25 +740,27 @@ const FinalCTAMobile = memo(({ onOpenAuth }: any) => (
 
 const FinalCTAWeb = memo(({ onOpenAuth }: any) => (
   <View style={styles.webCTASection}>
-    <View style={styles.webCTAContent}>
+    <View style={styles.webSectionInner}>
+      <View style={styles.webCTAContent}>
 
-      <Text style={styles.webCTAHeading}>
-        Start Exam-Focused Preparation Today
-      </Text>
-
-      <Text style={styles.webCTAText}>
-        200 Questions. 40 Hours. Pass MBBS Exams with Confidence.
-      </Text>
-
-      <Pressable
-        style={styles.webCTAButton}
-        onPress={() => onOpenAuth?.("signup")}
-      >
-        <Text style={styles.webCTAButtonText}>
-          Start MBBS Exam Prep
+        <Text style={styles.webCTAHeading}>
+          Start Exam-Focused Preparation Today
         </Text>
-      </Pressable>
 
+        <Text style={styles.webCTAText}>
+          200 Questions. 40 Hours. Pass MBBS Exams with Confidence.
+        </Text>
+
+        <Pressable
+          style={styles.webCTAButton}
+          onPress={() => onOpenAuth?.("signup")}
+        >
+          <Text style={styles.webCTAButtonText}>
+            Start MBBS Exam Prep
+          </Text>
+        </Pressable>
+
+      </View>
     </View>
   </View>
 ));
@@ -992,6 +1012,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.45,
     shadowRadius: 12,
     elevation: 12,
+  },
+
+  webSectionInner: {
+    width: '100%',
+    maxWidth: 1000,
+    alignSelf: 'center',
   },
 
   webHero: {
