@@ -129,17 +129,7 @@ const HeroWeb = memo(
       backgroundColor: '#000',
     }}
   >
-  <View
-  style={{
-    width: '100%',
-    height: 420,
-    borderRadius: 20,
-    overflow: 'hidden',
-    marginBottom: 32,
-    backgroundColor: '#000',
-    position: 'relative',
-  }}
->
+
 <iframe
   src={`${video}?autoplay=1&muted=1&loop=1&background=1&controls=0`}
   style={{
