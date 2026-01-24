@@ -34,8 +34,12 @@ interface HomeScreenProps {
     img9: string;
     img10: string;
   };
+  videos?: {
+    hero?: string;
+  };
   onOpenAuth?: (mode: "login" | "signup") => void;
 }
+
 
 /* ─────────────────────────────────────────────
    ROOT
@@ -53,7 +57,14 @@ export default function HomeScreen(
       {isMobile ? (
         <MobileLayout images={images} onOpenAuth={onOpenAuth} />
       ) : (
-        <WebLayout images={images} onOpenAuth={onOpenAuth} />
+<WebLayout
+  images={images}
+  videos={{
+    hero: "https://iframe.mediadelivery.net/play/562001/fd252cc5-912d-4134-86f9-9732f883facf"
+  }}
+  onOpenAuth={onOpenAuth}
+/>
+
       )}
       <Footer />
     </ScrollView>
@@ -102,10 +113,35 @@ const HeroMobile = memo(({ image }: { image: string }) => (
   </View>
 ));
 
-const HeroWeb = memo(({ image }: { image: string }) => (
-  <View style={styles.webSection}>
-    <View style={styles.webVerticalLayout}>
-      <Image source={{ uri: image }} style={styles.webImage} />
+const HeroWeb = memo(
+  ({ image, video }: { image: string; video?: string }) => (
+    <View style={styles.webSection}>
+      <View style={styles.webVerticalLayout}>
+
+        {video ? (
+          <View
+            style={{
+              width: '100%',
+              height: 360,
+              borderRadius: 16,
+              overflow: 'hidden',
+              marginBottom: 32,
+            }}
+          >
+            <iframe
+              src={`${video}?autoplay=true&muted=true&loop=true&controls=false`}
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+              }}
+              allow="autoplay; fullscreen"
+            />
+          </View>
+        ) : (
+          <Image source={{ uri: image }} style={styles.webImage} />
+        )}
+
       
       <Text style={styles.webHeading}>
         MBBS Exams Are Not About Reading Everything.
@@ -766,11 +802,14 @@ function MobileLayout({ images, onOpenAuth }: any) {
   );
 }
 
-function WebLayout({ images, onOpenAuth }: any) {
+function WebLayout({ images, videos, onOpenAuth }: any) {
   return (
     <ScrollView contentContainerStyle={styles.webContent}>
+      <HeroWeb
+        image={images.img1}
+        video={videos?.hero}
+      />
 
-      <HeroWeb image={images.img1} />
       <ProblemWeb image={images.img2} />
       <SystemWeb image={images.img3} />
       <ScopeWeb image={images.img4} />
