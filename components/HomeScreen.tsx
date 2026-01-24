@@ -60,7 +60,7 @@ export default function HomeScreen(
 <WebLayout
   images={images}
   videos={{
-    hero: "https://iframe.mediadelivery.net/play/562001/fd252cc5-912d-4134-86f9-9732f883facf"
+hero: "https://iframe.mediadelivery.net/embed/562001/fd252cc5-912d-4134-86f9-9732f883facf?autoplay=1&muted=1&loop=1&background=1&controls=0"
   }}
   onOpenAuth={onOpenAuth}
 />
@@ -129,15 +129,32 @@ const HeroWeb = memo(
       backgroundColor: '#000',
     }}
   >
-   <iframe
-  src={`${video}?autoplay=true&muted=true&loop=true&playsinline=true`}
+  <View
   style={{
     width: '100%',
-    height: '100%',
-    border: 'none',
+    height: 420,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 32,
+    backgroundColor: '#000',
+    position: 'relative',
   }}
-  allow="autoplay; fullscreen; picture-in-picture"
-/>
+>
+  <iframe
+    src={video}
+    style={{
+      position: 'absolute',
+      top: '-20%',
+      left: '-20%',
+      width: '140%',
+      height: '140%',
+      border: 'none',
+      pointerEvents: 'none', // 🔒 prevents interaction
+    }}
+    allow="autoplay; fullscreen"
+  />
+</View>
+
 
   </View>
 ) : (
