@@ -60,37 +60,6 @@ export default function HomeScreen(
   );
 }
 
-/* ─────────────────────────────────────────────
-   MOBILE LAYOUT
-───────────────────────────────────────────── */
-
-function MobileLayout({ images, onOpenAuth }: any) {
-  return (
-    <ScrollView contentContainerStyle={styles.mobileContent}>
-      <HeroMobile image={images.img1} />
-      <ProblemMobile image={images.img2} />
-      <SystemMobile image={images.img3} />
-      {/* Sections 4–10 in PART 2 */}
-      <CTAMobile onOpenAuth={onOpenAuth} />
-    </ScrollView>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   WEB LAYOUT
-───────────────────────────────────────────── */
-
-function WebLayout({ images, onOpenAuth }: any) {
-  return (
-    <ScrollView contentContainerStyle={styles.webContent}>
-      <HeroWeb image={images.img1} />
-      <ProblemWeb image={images.img2} />
-      <SystemWeb image={images.img3} />
-      {/* Sections 4–10 in PART 2 */}
-      <CTAWeb onOpenAuth={onOpenAuth} />
-    </ScrollView>
-  );
-}
 
 /* =========================================================
    SECTION 1 — HERO
