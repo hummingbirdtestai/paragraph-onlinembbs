@@ -1,39 +1,42 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
 import HomeScreen from '@/components/HomeScreen';
 import MainLayout from '@/components/MainLayout';
 
 export default function Index() {
+  /**
+   * MOBILE IMAGES (UNCHANGED)
+   * These are used exactly as-is on mobile layouts.
+   */
   const images = {
-  // HERO
-  img1: "https://paragraph.b-cdn.net/battle/Home%20page%20images/HP1.webp",
+    // HERO
+    img1: "https://paragraph.b-cdn.net/battle/Home%20page%20images/HP1.webp",
 
-  // 🔁 REPLACED AS REQUESTED
-  img2: "https://paragraph.b-cdn.net/ChatGPT%20Image%20Jan%2021%2C%202026%2C%2010_22_19%20PM.webp", // Section2 – CBME mastery that works
-  img3: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM5.webp", // Section3 – Daily AI support
-  img4: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM2.webp", // Section4 – Mistakes → Mastery
-  img6: "https://paragraph.b-cdn.net/final%20image.webp", // Section6 – 24×7 AI Mentor
+    // SECTION IMAGES
+    img2: "https://paragraph.b-cdn.net/ChatGPT%20Image%20Jan%2021%2C%202026%2C%2010_22_19%20PM.webp", // Section 2
+    img3: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM5.webp", // Section 3
+    img4: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM2.webp", // Section 4
+    img5: "https://paragraph.b-cdn.net/ChatGPT%20Image%20Jan%2021%2C%202026%2C%2010_35_27%20PM.webp",
+    img6: "https://paragraph.b-cdn.net/final%20image.webp",
 
-  // ⛔ UNCHANGED (as per your instruction)
-  img5: "https://paragraph.b-cdn.net/ChatGPT%20Image%20Jan%2021%2C%202026%2C%2010_35_27%20PM.webp",
-  img7: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img7.webp",
-  img8: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img8.webp",
-  img9: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img9.webp",
-  img10: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img10.webp",
-  img11: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img11.webp",
-};
+    // UNUSED / FUTURE (LEFT INTACT)
+    img7: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img7.webp",
+    img8: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img8.webp",
+    img9: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img9.webp",
+    img10: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img10.webp",
+    img11: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img11.webp",
+  };
 
+  /**
+   * WEB VIDEOS (Bunny Stream iframe URLs)
+   * These are used ONLY on web layouts.
+   */
+  const videos = {
+    hero: "https://iframe.mediadelivery.net/play/562001/fd252cc5-912d-4134-86f9-9732f883facf",
+  };
 
   return (
     <MainLayout>
-  <HomeScreen images={images} />
-</MainLayout>
-
+      <HomeScreen images={images} videos={videos} />
+    </MainLayout>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
