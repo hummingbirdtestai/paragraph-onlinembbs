@@ -137,7 +137,7 @@ const HeroWeb = memo(({ image }: { image: string }) => (
   </View>
 ));
 
-);
+
 
 
 /* =========================================================
@@ -775,7 +775,6 @@ function WebLayout({ images, onOpenAuth }: any) {
     <ScrollView contentContainerStyle={styles.webContent}>
       <HeroWeb
         image={images.img1}
-        video={videos?.hero}
       />
 
       <ProblemWeb image={images.img2} />
