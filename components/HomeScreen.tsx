@@ -109,59 +109,34 @@ const HeroMobile = memo(({ image }: { image: string }) => (
   </View>
 ));
 
-const HeroWeb = memo(
-  ({ image, video }: { image: string; video?: string }) => (
-    <View style={styles.webSection}>
-      <View style={styles.webVerticalLayout}>
+const HeroWeb = memo(({ image }: { image: string }) => (
+  <View style={styles.webSection}>
+    <View style={styles.webVerticalLayout}>
 
-        {video ? (
-          <View
-            style={{
-              width: '100%',
-              height: 420,
-              borderRadius: 20,
-              overflow: 'hidden',
-              marginBottom: 32,
-              backgroundColor: '#000',
-            }}
-          >
-            <iframe
-              src={video}
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none',
-              }}
-              allow="autoplay; fullscreen"
-              allowFullScreen
-            />
-          </View>
-        ) : (
-          <Image source={{ uri: image }} style={styles.webImage} />
-        )}
+      <Image source={{ uri: image }} style={styles.webImage} />
 
-        <Text style={styles.webHeading}>
-          MBBS Exams Are Not About Reading Everything.
-        </Text>
+      <Text style={styles.webHeading}>
+        MBBS Exams Are Not About Reading Everything.
+      </Text>
 
-        <Text style={styles.webBody}>
-          They are about writing what examiners keep asking.
-        </Text>
+      <Text style={styles.webBody}>
+        They are about writing what examiners keep asking.
+      </Text>
 
-        <View style={styles.bulletGroup}>
-            <Text style={styles.webBullet}>⏱ Very little time</Text>
-            <Text style={styles.webBullet}>📚 Too much syllabus</Text>
-            <Text style={styles.webBullet}>❓ No clarity what to study</Text>
-          </View>
-        </View>
-
-        <Text style={[styles.webBody, styles.emphasis]}>
-          Paragraph fixes this.
-        </Text>
-
+      <View style={styles.bulletGroup}>
+        <Text style={styles.webBullet}>⏱ Very little time</Text>
+        <Text style={styles.webBullet}>📚 Too much syllabus</Text>
+        <Text style={styles.webBullet}>❓ No clarity what to study</Text>
       </View>
+
+      <Text style={[styles.webBody, styles.emphasis]}>
+        Paragraph fixes this.
+      </Text>
+
     </View>
-  )
+  </View>
+));
+
 );
 
 
@@ -795,7 +770,7 @@ function MobileLayout({ images, onOpenAuth }: any) {
   );
 }
 
-function WebLayout({ images, videos, onOpenAuth }: any) {
+function WebLayout({ images, onOpenAuth }: any) {
   return (
     <ScrollView contentContainerStyle={styles.webContent}>
       <HeroWeb
