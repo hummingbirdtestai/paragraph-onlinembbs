@@ -131,7 +131,7 @@ const HeroWeb = memo(
   >
 
 <iframe
-  src={`${video}?autoplay=1&muted=1&loop=1&background=1&controls=0`}
+ src={`${video}?autoplay=true&muted=true&loop=true&background=true&controls=false`}
   style={{
     position: "absolute",
     inset: 0,
