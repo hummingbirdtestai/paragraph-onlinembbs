@@ -1002,12 +1002,13 @@ const styles = StyleSheet.create({
   },
 
   webImage: {
-    width: '100%',
-    height: 360,
-    borderRadius: 16,
-    marginBottom: 32,
-    backgroundColor: '#0d1117',
-  },
+  width: '100%',
+  aspectRatio: 16 / 9,
+  borderRadius: 16,
+  marginBottom: 32,
+  backgroundColor: '#0d1117',
+},
+
 
   webImageTall: {
     width: '100%',
