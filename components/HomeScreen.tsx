@@ -129,15 +129,16 @@ const HeroWeb = memo(
       backgroundColor: '#000',
     }}
   >
-    <iframe
-      src={`${video}?autoplay=true&muted=true&loop=true&playsinline=true`}
-      style={{
-        width: '100%',
-        height: '100%',
-        border: 'none',
-      }}
-      allow="autoplay; fullscreen; picture-in-picture"
-    />
+   <iframe
+  src={`${video}?autoplay=true&muted=true&loop=true&playsinline=true`}
+  style={{
+    width: '100%',
+    height: '100%',
+    border: 'none',
+  }}
+  allow="autoplay; fullscreen; picture-in-picture"
+/>
+
   </View>
 ) : (
   <Image source={{ uri: image }} style={styles.webImage} />
