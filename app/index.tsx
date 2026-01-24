@@ -14,7 +14,7 @@ export default function Index() {
 
     // SECTION IMAGES
     img2: "https://paragraph.b-cdn.net/second%20image.webp",
-    img3: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM5.webp",
+    img3: "https://paragraph.b-cdn.net/THIRD%20IMAGE.webp",
     img4: "https://paragraph.b-cdn.net/battle/paragraph%20mentor/PM2.webp",
     img5: "https://paragraph.b-cdn.net/ChatGPT%20Image%20Jan%2021%2C%202026%2C%2010_35_27%20PM.webp",
     img6: "https://paragraph.b-cdn.net/final%20image.webp",
