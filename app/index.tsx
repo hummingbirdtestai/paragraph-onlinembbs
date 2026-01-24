@@ -17,7 +17,7 @@ export default function Index() {
     img3: "https://paragraph.b-cdn.net/THIRD%20IMAGE.webp",
     img4: "https://paragraph.b-cdn.net/FOURTH%20IMAGE.webp",
     img5: "https://paragraph.b-cdn.net/fifth%20image.webp",
-    img6: "https://paragraph.b-cdn.net/final%20image.webp",
+    img6: "https://paragraph.b-cdn.net/SIXTH%20IMAGE.png",
 
     // UNUSED / FUTURE (safe to keep)
     img7: "https://paragraph.b-cdn.net/battle/Home%20page%20images/img7.webp",
