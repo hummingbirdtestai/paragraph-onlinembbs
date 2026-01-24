@@ -651,3 +651,299 @@ function WebLayout({ images, onOpenAuth }: any) {
     </ScrollView>
   );
 }
+/* =========================================================
+   STYLES — DARK MODE / MONOLITHIC / MOBILE-FIRST
+   EXACT PROD STYLE SHEET
+   ========================================================= */
+
+const styles = StyleSheet.create({
+  /* ───────────── ROOT ───────────── */
+
+  container: {
+    flex: 1,
+    backgroundColor: '#0d1117',
+  },
+
+  /* ───────────── MOBILE ───────────── */
+
+  mobileContent: {
+    paddingBottom: 64,
+  },
+
+  mobileSection: {
+    marginBottom: 32,
+    marginHorizontal: 16,
+  },
+
+  mobilePadding: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 24,
+    backgroundColor: '#161b22',
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+
+  mobileImage: {
+    width: '100%',
+    height: 240,
+    borderRadius: 16,
+    marginBottom: 16,
+    backgroundColor: '#161b22',
+  },
+
+  mobileImageSection1: {
+    width: '100%',
+    height: 260,
+    borderRadius: 16,
+    marginBottom: 16,
+    backgroundColor: '#161b22',
+  },
+
+  mobileImageSection6: {
+    width: '100%',
+    height: 320,
+    borderRadius: 16,
+    marginBottom: 16,
+    backgroundColor: '#161b22',
+  },
+
+  mobileHeading: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#f4e4c1',
+    marginBottom: 16,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
+
+  mobileBody: {
+    fontSize: 16,
+    color: '#c9d1d9',
+    lineHeight: 24,
+    marginBottom: 10,
+    textAlign: 'left',
+  },
+
+  mobileBullet: {
+    fontSize: 15,
+    color: '#8b949e',
+    lineHeight: 22,
+    marginBottom: 8,
+    paddingLeft: 6,
+  },
+
+  mobileStep: {
+    fontSize: 18,
+    color: '#58a6ff',
+    lineHeight: 28,
+    marginBottom: 8,
+    fontWeight: '600',
+  },
+
+  emphasis: {
+    color: '#58a6ff',
+    fontWeight: '600',
+    marginTop: 8,
+  },
+
+  highlight: {
+    color: '#FFD700',
+    fontWeight: '700',
+  },
+
+  /* ───────────── MOBILE CTA ───────────── */
+
+  mobileCTASection: {
+    paddingHorizontal: 20,
+    paddingVertical: 48,
+    marginHorizontal: 16,
+    borderRadius: 16,
+    backgroundColor: '#161b22',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+
+  mobileCTAHeading: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#f4e4c1',
+    marginBottom: 20,
+    textAlign: 'center',
+    lineHeight: 34,
+  },
+
+  mobileCTAText: {
+    fontSize: 16,
+    color: '#c9d1d9',
+    lineHeight: 24,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+
+  mobileCTAButton: {
+    backgroundColor: '#238636',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+
+  mobileCTAButtonText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#f0f6fc',
+  },
+
+  /* ───────────── WEB ───────────── */
+
+  webContent: {
+    paddingBottom: 96,
+  },
+
+  webSection: {
+    maxWidth: 1200,
+    width: '100%',
+    alignSelf: 'center',
+    paddingVertical: 64,
+    paddingHorizontal: 48,
+    borderRadius: 20,
+    marginVertical: 24,
+    backgroundColor: '#161b22',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.45,
+    shadowRadius: 12,
+    elevation: 12,
+  },
+
+  webHero: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+  },
+
+  webReverse: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+  },
+
+  webHeroText: {
+    flex: 1,
+    minWidth: 320,
+    marginHorizontal: 20,
+  },
+
+  webTextBlock: {
+    flex: 1,
+    minWidth: 320,
+    marginHorizontal: 20,
+  },
+
+  webHeroImage: {
+    width: '40%',
+    maxWidth: 480,
+    minWidth: 280,
+    aspectRatio: 4 / 3,
+    borderRadius: 16,
+    backgroundColor: '#161b22',
+  },
+
+  webSideImage: {
+    width: '40%',
+    maxWidth: 420,
+    minWidth: 280,
+    aspectRatio: 4 / 3,
+    borderRadius: 16,
+    backgroundColor: '#161b22',
+  },
+
+  webHeading: {
+    fontSize: 26,
+    fontWeight: '600',
+    color: '#f4e4c1',
+    marginBottom: 20,
+    lineHeight: 34,
+    textAlign: 'center',
+  },
+
+  webSubheading: {
+    fontSize: 22,
+    color: '#f4e4c1',
+    lineHeight: 32,
+    marginBottom: 20,
+  },
+
+  webBody: {
+    fontSize: 18,
+    color: '#c9d1d9',
+    lineHeight: 28,
+    marginBottom: 14,
+  },
+
+  webBullet: {
+    fontSize: 17,
+    color: '#8b949e',
+    lineHeight: 26,
+    marginBottom: 8,
+  },
+
+  /* ───────────── WEB CTA ───────────── */
+
+  webCTASection: {
+    maxWidth: 1200,
+    width: '100%',
+    alignSelf: 'center',
+    paddingVertical: 72,
+    paddingHorizontal: 48,
+    borderRadius: 20,
+    marginVertical: 32,
+    backgroundColor: '#161b22',
+  },
+
+  webCTAContent: {
+    maxWidth: 820,
+    alignSelf: 'center',
+    alignItems: 'center',
+  },
+
+  webCTAHeading: {
+    fontSize: 30,
+    fontWeight: '700',
+    color: '#f4e4c1',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+
+  webCTAText: {
+    fontSize: 20,
+    color: '#c9d1d9',
+    lineHeight: 32,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+
+  webCTAButton: {
+    backgroundColor: '#238636',
+    paddingVertical: 18,
+    paddingHorizontal: 64,
+    borderRadius: 10,
+  },
+
+  webCTAButtonText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#f0f6fc',
+  },
+});
