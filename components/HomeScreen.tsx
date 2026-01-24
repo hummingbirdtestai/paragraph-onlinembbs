@@ -118,29 +118,36 @@ const HeroWeb = memo(
     <View style={styles.webSection}>
       <View style={styles.webVerticalLayout}>
 
-        {video ? (
-          <View
-            style={{
-              width: '100%',
-              height: 360,
-              borderRadius: 16,
-              overflow: 'hidden',
-              marginBottom: 32,
-            }}
-          >
-            <iframe
-              src={`${video}?autoplay=true&muted=true&loop=true&controls=false`}
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none',
-              }}
-              allow="autoplay; fullscreen"
-            />
-          </View>
-        ) : (
-          <Image source={{ uri: image }} style={styles.webImage} />
-        )}
+     {video ? (
+  <View
+    style={{
+      width: '100%',
+      height: 420,                 // HERO HEIGHT
+      borderRadius: 20,
+      overflow: 'hidden',
+      marginBottom: 32,
+      position: 'relative',
+      backgroundColor: '#000',
+    }}
+  >
+    <iframe
+      src={`${video}?autoplay=true&muted=true&loop=true&controls=false`}
+      style={{
+        position: 'absolute',
+        top: '-15%',
+        left: '-15%',
+        width: '130%',
+        height: '130%',
+        border: 'none',
+        pointerEvents: 'none',     // 🔒 disables click/controls
+      }}
+      allow="autoplay; fullscreen"
+    />
+  </View>
+) : (
+  <Image source={{ uri: image }} style={styles.webImage} />
+)}
+
 
       
       <Text style={styles.webHeading}>
