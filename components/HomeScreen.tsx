@@ -34,9 +34,7 @@ interface HomeScreenProps {
     img9: string;
     img10: string;
   };
-  videos?: {
-    hero?: string;
-  };
+ 
   onOpenAuth?: (mode: "login" | "signup") => void;
 }
 
@@ -59,12 +57,9 @@ export default function HomeScreen(
       ) : (
 <WebLayout
   images={images}
-  videos={{
-hero: "https://iframe.mediadelivery.net/play/562001/fd252cc5-912d-4134-86f9-9732f883facf?autoplay=true&muted=yes&loop=yes&controls=0"
-
-  }}
   onOpenAuth={onOpenAuth}
 />
+
 
       )}
       <Footer />
@@ -154,7 +149,6 @@ const HeroWeb = memo(
         </Text>
 
         <View style={styles.bulletGroup}>
-          <View style={styles.bulletColumn}>
             <Text style={styles.webBullet}>⏱ Very little time</Text>
             <Text style={styles.webBullet}>📚 Too much syllabus</Text>
             <Text style={styles.webBullet}>❓ No clarity what to study</Text>
