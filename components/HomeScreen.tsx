@@ -60,7 +60,7 @@ export default function HomeScreen(
 <WebLayout
   images={images}
   videos={{
-hero: "https://iframe.mediadelivery.net/embed/562001/fd252cc5-912d-4134-86f9-9732f883facf?autoplay=1&muted=1&loop=1&background=1&controls=0"
+hero: "https://iframe.mediadelivery.net/embed/562001/fd252cc5-912d-4134-86f9-9732f883facf"
   }}
   onOpenAuth={onOpenAuth}
 />
