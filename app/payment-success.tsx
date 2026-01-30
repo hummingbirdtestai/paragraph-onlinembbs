@@ -85,7 +85,7 @@ const verifyOrderStatus = async () => {
 
   try {
     const res = await fetch(
-      `https://mainonlinembbspy-production.up.railway.app/api/payments/status?order_id=${orderId}`
+      `https://paragraph-pg-production.up.railway.app/api/payments/status?order_id=${orderId}`
     );
 
     const data = await res.json();
@@ -97,60 +97,43 @@ const verifyOrderStatus = async () => {
 };
   
   const checkSubscription = async (isRetry = false) => {
-    const paymentStatus = await verifyOrderStatus();
+  // 1️⃣ Always check DB first
+  const data = await fetchUserSubscription();
 
-    if (paymentStatus === 'CANCELLED') {
-      setFailureReason('CANCELLED');
-      setStatus('failed');
-      return;
-    }
-
-    if (paymentStatus === 'FAILED') {
-      setFailureReason('FAILED');
-      setStatus('failed');
-      return;
-    }
-
-    if (paymentStatus === 'PENDING') {
-      if (retryCount < MAX_RETRIES && !isRetry) {
-        setStatus('processing');
-        setRetryCount((prev) => prev + 1);
-        setTimeout(() => checkSubscription(true), RETRY_DELAY);
-        return;
-      }
-
-      setStatus('processing');
-      return;
-    }
-
-    const data = await fetchUserSubscription();
-
-    if (!data) {
-      setStatus('processing');
-      return;
-    }
-
+  if (data?.is_paid && data?.is_active) {
     setSubscription(data);
+    setStatus('success');
+    confettiRef.current?.start();
+    return;
+  }
 
-    if (paymentStatus === 'SUCCESS' && data.is_paid && data.is_active) {
-      setStatus('success');
-      confettiRef.current?.start();
-      return;
-    }
+  // 2️⃣ Then check Cashfree (secondary)
+  const paymentStatus = await verifyOrderStatus();
 
-    if (paymentStatus === 'SUCCESS' && (!data.is_paid || !data.is_active)) {
-      if (retryCount < MAX_RETRIES && !isRetry) {
-        setStatus('processing');
-        setRetryCount((prev) => prev + 1);
-        setTimeout(() => checkSubscription(true), RETRY_DELAY);
-      } else {
-        setStatus('processing');
-      }
-      return;
-    }
+  if (paymentStatus === 'CANCELLED') {
+    setFailureReason('CANCELLED');
+    setStatus('failed');
+    return;
+  }
 
+  if (paymentStatus === 'FAILED') {
+    setFailureReason('FAILED');
+    setStatus('failed');
+    return;
+  }
+
+  // 3️⃣ Retry window
+  if (retryCount < MAX_RETRIES && !isRetry) {
     setStatus('processing');
-  };
+    setRetryCount((prev) => prev + 1);
+    setTimeout(() => checkSubscription(true), RETRY_DELAY);
+    return;
+  }
+
+  // 4️⃣ Final fallback
+  setStatus('processing');
+};
+
 
   useEffect(() => {
     if (!user) return;
@@ -298,7 +281,6 @@ const verifyOrderStatus = async () => {
           <View style={styles.benefitsList}>
             <Text style={styles.benefitItem}>• Unlimited Concepts & Questions</Text>
             <Text style={styles.benefitItem}>• NEET-PG Full-Scale Mock Tests</Text>
-            <Text style={styles.benefitItem}>• Video Lectures & Image-Based MCQs</Text>
             <Text style={styles.benefitItem}>• Battle Mode & Analytics</Text>
             <Text style={styles.benefitItem}>• AI-Powered Learning Insights</Text>
           </View>
