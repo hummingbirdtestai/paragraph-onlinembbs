@@ -85,7 +85,7 @@ const verifyOrderStatus = async () => {
 
   try {
     const res = await fetch(
-      `https://paragraph-pg-production.up.railway.app/api/payments/status?order_id=${orderId}`
+      `https://mainonlinembbspy-production.up.railway.app/api/payments/status?order_id=${orderId}`
     );
 
     const data = await res.json();
@@ -162,14 +162,6 @@ const verifyOrderStatus = async () => {
   const formatAmount = (amount: number | null) => {
     if (!amount) return 'N/A';
     return `₹${amount.toLocaleString('en-IN')}`;
-  };
-
-  const getPlanDuration = (packageName: string | null) => {
-    if (!packageName) return 'N/A';
-    if (packageName.includes('3')) return '3 Months';
-    if (packageName.includes('6')) return '6 Months';
-    if (packageName.includes('12')) return '12 Months';
-    return packageName;
   };
 
   if (status === 'checking') {
@@ -252,7 +244,7 @@ const verifyOrderStatus = async () => {
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Plan</Text>
             <Text style={styles.detailValue}>
-              {getPlanDuration(subscription?.purchased_package)}
+              1 Year Access
             </Text>
           </View>
 
@@ -280,7 +272,7 @@ const verifyOrderStatus = async () => {
           <Text style={styles.benefitsTitle}>You now have access to:</Text>
           <View style={styles.benefitsList}>
             <Text style={styles.benefitItem}>• Unlimited Concepts & Questions</Text>
-            <Text style={styles.benefitItem}>• NEET-PG Full-Scale Mock Tests</Text>
+            <Text style={styles.benefitItem}>• CBME-aligned MBBS concepts & PYQs</Text>
             <Text style={styles.benefitItem}>• Battle Mode & Analytics</Text>
             <Text style={styles.benefitItem}>• AI-Powered Learning Insights</Text>
           </View>
@@ -291,7 +283,7 @@ const verifyOrderStatus = async () => {
         </Pressable>
 
         <Text style={styles.footerText}>
-          Thank you for choosing Paragraph. Start your NEET-PG preparation now!
+          Thank you for choosing Paragraph. Start mastering your MBBS curriculum now!
         </Text>
       </ScrollView>
     </View>
