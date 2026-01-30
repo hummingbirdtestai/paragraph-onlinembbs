@@ -18,7 +18,8 @@ interface SubscribeModalProps {
   onClose: () => void;
 }
 
-const API_BASE = 'https://paragraph-pg-production.up.railway.app';
+const API_BASE = 'https://mainonlinembbspy-production.up.railway.app';
+
 
 export default function SubscribeModal({ visible, onClose }: SubscribeModalProps) {
   const { user } = useAuth();
@@ -82,7 +83,8 @@ export default function SubscribeModal({ visible, onClose }: SubscribeModalProps
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           student_id: user.id,
-          plan: "1",     // 👈 ALWAYS send 1-month plan
+plan: "12",  // 1 year (hard-locked)
+
         }),
       });
 
@@ -133,28 +135,30 @@ export default function SubscribeModal({ visible, onClose }: SubscribeModalProps
           <View style={styles.cardWrapper}>
             <View style={styles.card}>
               <Text style={styles.planTitle}>Paragraph Pro</Text>
-              <Text style={styles.planDuration}>1 Month Access</Text>
-              <Text style={styles.planPrice}>₹2,000</Text>
+<Text style={styles.planDuration}>1 Year Access</Text>
+<Text style={styles.planPrice}>₹5,000</Text>
 
               {/* CORE */}
               <View style={styles.featuresSection}>
                 <Text style={styles.sectionTitle}>What You Get (Core)</Text>
 
-                <Feature text="633 Major + 206 Minor Topics mapped to NEET-PG" />
-                <Feature text="10,000 PYQs with Conversational AI Tutor" />
-                <Feature text="Every PYQ linked to concepts, mistakes & exam patterns" />
-                <Feature text="Bi-weekly full-length NEET-PG mock tests" />
-                <Feature text="200-hour smart study planner (daily targets)" />
+<Feature text="Complete CBME-mapped MBBS curriculum (all years)" />
+<Feature text="MBBS PYQ question bank with AI tutor" />
+<Feature text="Concept → Recall → Application learning flow" />
+<Feature text="Flashcards with spaced repetition" />
+<Feature text="Daily AI-guided study planning" />
+
               </View>
 
               {/* OPTIONAL */}
               <View style={styles.featuresSection}>
                 <Text style={styles.sectionTitleMuted}>Also Included</Text>
 
-                <Feature text="45,000 Flash Cards for rapid recall" muted />
-                <Feature text="5,000 Clinical Vignette MCQs" muted />
-                <Feature text="Daily group quizzes (exam temperament)" muted />
-                <Feature text="Concise notes & synoptic tables" muted />
+                <Feature text="Clinical case discussions" muted />
+<Feature text="Rapid revision tables & notes" muted />
+<Feature text="Exam-oriented recall drills" muted />
+<Feature text="24×7 AI doubt solving" muted />
+
               </View>
 
               <TouchableOpacity
