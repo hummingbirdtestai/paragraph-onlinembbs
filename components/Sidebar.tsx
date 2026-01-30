@@ -3,7 +3,23 @@ import React, { useState, useEffect } from 'react';
 
 import { View, Text, StyleSheet, Pressable, ScrollView, Image } from 'react-native';
 import { Link, usePathname } from 'expo-router';
-import { Brain, BookOpen, CreditCard, FileText, Swords, ChartBar as BarChart3, Settings, X, Crown, Calendar, Zap, Target } from 'lucide-react-native';
+import {
+  Brain,
+  BookOpen,
+  CreditCard,
+  FileText,
+  Swords,
+  ChartBar as BarChart3,
+  Settings,
+  X,
+  Video,
+  Crown,
+  Image as ImageIcon,
+  Calendar,
+  Bot,
+  Map,
+  Target,
+} from 'lucide-react-native';
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from './NotificationBell';
 import SubscribeModal from './SubscribeModal';
@@ -23,37 +39,43 @@ interface SidebarProps {
 }
 
 const navItems: NavItem[] = [
-  { id: "home", label: "AI powered NEETPG Prep Strategy", href: "/", icon: Brain },
-  {
-  id: "neetpg-topics",
-  label: "839 NEETPG Topics – 100% Strike Rate",
-  href: "/cbme-learning-path",
-  icon: Target,
-},
-  { id: "practice", label: "10000 NEETPG PYQs", href: "/practice", icon: BookOpen },
-  { id: "flash", label: "45000 Flash Cards", href: "/flashcard-feed-demo", icon: CreditCard },
-
-  // 🔁 CHANGE THIS
-  {
-    id: "hyfs",
-    label: "50000 Rapid Revision HYFs",
-    href: "/videos", // keep route SAME to avoid breaking
-    icon: Zap,
+  { 
+    id: "home", 
+    label: "Master NMC CBME Syllabus with AI", 
+    href: "/", 
+    icon: Brain,
   },
 
-  // 🔁 CHANGE THIS
+
+
+
+
   {
-    id: "clinical-mcqs",
-    label: "5000 Clinical Vignette MCQs",
-    href: "/image", // keep route SAME to avoid breaking
-    icon: FileText,
+    id: "uhs-pyq",
+    label: "MBBS UHS PYQ Question Bank",
+    href: "/uhs-pyq-question-bank",
+    icon: Target,
   },
 
-  { id: "mocktests", label: "100 Bi-Weekly NEETPG Mock Tests", href: "/mocktests", icon: FileText },
-  { id: "battle", label: "Daily 15 Live Group Quiz Battles", href: "/battle", icon: Swords },
-  { id: "analytics", label: "1000 Hours NEETPG Study Progress", href: "/analyticspage", icon: BarChart3 },
-  { id: "planner", label: "NEETPG Daily Study Planner", href: "/planner", icon: Calendar },
+
+  {
+    id: "cbme-path",
+    label: "CBME Learning Path",
+    href: "/cbme-learning-path",
+    icon: Map,
+  },
+
+  { 
+    id: "flash", 
+    label: "45,000 Flash Cards", 
+    href: "/flashcard-feed-demo", 
+    icon: CreditCard,
+  },
 ];
+
+
+
+
 
 
 export default function Sidebar({
@@ -67,7 +89,7 @@ export default function Sidebar({
   const isLoggedIn = !!user;
   // 1️⃣ Fetch fresh DB profile
   const userProfile = useUserProfile(user?.id);
-  const isProfileResolved = userProfile !== undefined;
+  
 
   // 2️⃣ Derive UX from Bolt hook
   const subscriptionState = useSubscriptionStatus(userProfile);
@@ -76,7 +98,7 @@ export default function Sidebar({
   const [hasAccess, setHasAccess] = useState(true);
 
   useEffect(() => {
-    if (!isProfileResolved) return;
+
 
     if (!userProfile) {
       setHasAccess(false);
@@ -95,7 +117,7 @@ export default function Sidebar({
       new Date(userProfile.subscription_end_at) > now;
 
     setHasAccess(Boolean(hasValidTrial || hasValidSubscription));
-  }, [isProfileResolved, userProfile]);
+  }, [userProfile]);
 
   const handleSubscribe = (plan: '3' | '6' | '12', finalPrice: number, promoCode?: string) => {
     console.log(`User selected ${plan} month plan`);
@@ -110,9 +132,9 @@ export default function Sidebar({
     return null;
   }
 
-  if (!isProfileResolved && isLoggedIn) {
-    return null;
-  }
+
+
+
 
   const isMobile = !!onClose;
 
@@ -122,59 +144,72 @@ export default function Sidebar({
     }
     return pathname.startsWith(href);
   };
+const renderNavItem = (item: NavItem) => {
+  const active = isActive(item.href);
+  const Icon = item.icon;
 
-  const renderNavItem = (item: NavItem) => {
-    const active = isActive(item.href);
-    const Icon = item.icon;
+  const isProtected =
+    item.href !== '/' &&
+    item.href !== '/settings';
 
-    const isProtected =
-      item.href !== '/' &&
-      item.href !== '/settings';
+  const blocked = isProtected && !hasAccess;
 
-    const blocked = isProtected && isProfileResolved && !hasAccess;
-
-    return (
-      <Pressable
-        key={item.href}
-        style={[
-          active ? styles.navItemActive : styles.navItem,
-          blocked && { opacity: 0.5 },
-        ]}
-        onPress={() => {
-          if (blocked) {
-            if (!isProfileResolved) return;
-            setShowSubscribeModal(true);
-            return;
-          }
-          if (isMobile) onClose?.();
-        }}
-      >
-        {blocked ? (
+  return (
+    <Pressable
+      key={item.href}
+      style={[
+        active ? styles.navItemActive : styles.navItem,
+        blocked && { opacity: 0.5 },
+      ]}
+      onPress={() => {
+        if (blocked) {
+          setShowSubscribeModal(true);
+          return;
+        }
+        if (isMobile) onClose?.();
+      }}
+    >
+      {blocked ? (
+        // 🔒 BLOCKED → NO LINK
+        <View style={styles.navItemContent}>
+          <View style={styles.iconWrapper}>
+            <Icon size={20} color="#555" />
+          </View>
+          <Text style={styles.navLabel}>{item.label}</Text>
+        </View>
+      ) : (
+        // ✅ ALLOWED → LINK ENABLED
+        <Link href={item.href} asChild>
           <View style={styles.navItemContent}>
             <View style={styles.iconWrapper}>
-              <Icon size={20} color="#555" />
+              <Icon
+                size={20}
+                color={active ? '#25D366' : '#9A9A9A'}
+              />
             </View>
-            <Text style={styles.navLabel}>{item.label}</Text>
+            <Text style={active ? styles.navLabelActive : styles.navLabel}>
+              {item.label}
+            </Text>
           </View>
-        ) : (
-          <Link href={item.href} asChild onPress={isMobile ? onClose : undefined}>
-            <View style={styles.navItemContent}>
-              <View style={styles.iconWrapper}>
-                <Icon
-                  size={20}
-                  color={active ? "#25D366" : "#9A9A9A"}
-                />
-              </View>
-              <Text style={active ? styles.navLabelActive : styles.navLabel}>
-                {item.label}
-              </Text>
-            </View>
-          </Link>
-        )}
-        {active && !blocked && <View style={styles.activeIndicator} />}
-      </Pressable>
-    );
-  };
+        </Link>
+      )}
+
+      {active && !blocked && <View style={styles.activeIndicator} />}
+    </Pressable>
+  );
+};
+
+
+
+
+
+
+
+
+
+
+
+
 
   return (
     <View style={styles.container}>
@@ -186,7 +221,7 @@ export default function Sidebar({
               style={styles.logoImage}
               resizeMode="contain"
             />
-            <Text style={styles.tagline}>100% AI-Driven NEETPG Self Prep Platform</Text>
+            <Text style={styles.tagline}>AI-Tutored NMC CBME Curriculum Mastery Platform</Text>
           </Pressable>
         ) : (
           <View style={styles.logoSection}>
@@ -195,7 +230,7 @@ export default function Sidebar({
               style={styles.logoImage}
               resizeMode="contain"
             />
-            <Text style={styles.tagline}>100% AI-Driven NEETPG Self Prep Platform</Text>
+            <Text style={styles.tagline}>AI-Tutored NMC CBME Curriculum Mastery Platform</Text>
           </View>
         )}
 
