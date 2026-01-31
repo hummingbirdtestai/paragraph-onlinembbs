@@ -271,7 +271,7 @@ const verifyOrderStatus = async () => {
         <View style={styles.benefitsCard}>
           <Text style={styles.benefitsTitle}>You now have access to:</Text>
           <View style={styles.benefitsList}>
-            <Text style={styles.benefitItem}>• Unlimited Concepts & Questions</Text>
+            <Text style={styles.benefitItem}>• 200 Sure Shot Questions to Reviae in 40 Hours per Subject to get Gold Medal in MBBS UHS Exams</Text>
             <Text style={styles.benefitItem}>• CBME-aligned MBBS concepts & PYQs</Text>
             <Text style={styles.benefitItem}>• Battle Mode & Analytics</Text>
             <Text style={styles.benefitItem}>• AI-Powered Learning Insights</Text>
