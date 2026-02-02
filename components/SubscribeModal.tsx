@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { X, Check } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { TextInput } from 'react-native';
 
 interface SubscribeModalProps {
   visible: boolean;
@@ -27,7 +28,10 @@ export default function SubscribeModal({ visible, onClose }: SubscribeModalProps
   const isShortScreen = height < 700;
 
   const [paymentError, setPaymentError] = useState<string | null>(null);
-
+  const [promoCode, setPromoCode] = useState('');
+  const [promoError, setPromoError] = useState('');
+  const [finalPrice, setFinalPrice] = useState(5000); // base price
+  const [isCheckingCoupon, setIsCheckingCoupon] = useState(false);
   // ─────────────────────────────────────────────
   // GUARD — USER MUST BE LOGGED IN
   // ─────────────────────────────────────────────
@@ -69,6 +73,42 @@ export default function SubscribeModal({ visible, onClose }: SubscribeModalProps
     });
   }
 
+async function applyPromoCode() {
+  if (!promoCode.trim()) {
+    setPromoError('Please enter a coupon code');
+    return;
+  }
+
+  setIsCheckingCoupon(true);
+  setPromoError('');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/payments/preview`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plan: '12', // hard-locked
+        coupon_code: promoCode.trim().toUpperCase(),
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setPromoError(data?.detail || 'Invalid coupon');
+      setFinalPrice(5000);
+      return;
+    }
+
+    setFinalPrice(data.final_amount);
+  } catch {
+    setPromoError('Unable to validate coupon');
+  } finally {
+    setIsCheckingCoupon(false);
+  }
+}
+
+  
   // ─────────────────────────────────────────────
   // SUBSCRIBE HANDLER
   // ─────────────────────────────────────────────
@@ -82,10 +122,10 @@ export default function SubscribeModal({ visible, onClose }: SubscribeModalProps
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          student_id: user.id,
-plan: "12",  // 1 year (hard-locked)
-
-        }),
+        student_id: user.id,
+        plan: "12",
+        coupon_code: promoCode || null,
+      }),
       });
 
       const data = await res.json();
@@ -136,7 +176,38 @@ plan: "12",  // 1 year (hard-locked)
             <View style={styles.card}>
               <Text style={styles.planTitle}>Paragraph Pro</Text>
 <Text style={styles.planDuration}>1 Year Access</Text>
-<Text style={styles.planPrice}>₹5,000</Text>
+<Text style={styles.planPrice}>
+  ₹{finalPrice.toLocaleString('en-IN')}
+</Text>
+              <View style={styles.couponBox}>
+  <View style={styles.couponRow}>
+    <TextInput
+      style={styles.couponInput}
+      placeholder="Have a coupon?"
+      placeholderTextColor="#6b7280"
+      value={promoCode}
+      onChangeText={(text) => {
+        setPromoCode(text);
+        setPromoError('');
+      }}
+      autoCapitalize="characters"
+    />
+    <TouchableOpacity
+      style={styles.couponApply}
+      onPress={applyPromoCode}
+      disabled={isCheckingCoupon}
+    >
+      <Text style={styles.couponApplyText}>
+        {isCheckingCoupon ? 'Checking...' : 'Apply'}
+      </Text>
+    </TouchableOpacity>
+  </View>
+
+  {promoError ? (
+    <Text style={styles.couponError}>{promoError}</Text>
+  ) : null}
+</View>
+
 
               {/* CORE */}
               <View style={styles.featuresSection}>
@@ -162,8 +233,12 @@ plan: "12",  // 1 year (hard-locked)
               </View>
 
               <TouchableOpacity
-                style={styles.subscribeButton}
+                style={[
+                  styles.subscribeButton,
+                  isCheckingCoupon && { opacity: 0.6 },
+                ]}
                 onPress={handleSubscribe}
+                disabled={isCheckingCoupon}
               >
                 <Text style={styles.subscribeButtonText}>Subscribe Now</Text>
               </TouchableOpacity>
@@ -329,5 +404,45 @@ const styles = StyleSheet.create({
   closeText: {
     color: '#10b981',
     fontSize: 16,
+  },
+
+  couponBox: {
+    marginBottom: 16,
+  },
+  
+  couponRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  
+  couponInput: {
+    flex: 1,
+    backgroundColor: '#1f2937',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: '#fff',
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: '#374151',
+  },
+  
+  couponApply: {
+    backgroundColor: '#10b981',
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
+  
+  couponApplyText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  
+  couponError: {
+    color: '#ef4444',
+    fontSize: 12,
+    marginTop: 6,
   },
 });
