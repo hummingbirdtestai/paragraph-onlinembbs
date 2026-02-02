@@ -32,7 +32,8 @@ export default function SubscribeModal({ visible, onClose }: SubscribeModalProps
   const [promoError, setPromoError] = useState('');
   const BASE_PRICE = 5500;
 
-const [finalPrice, setFinalPrice] = useState(BASE_PRICE);
+  const [finalPrice, setFinalPrice] = useState(BASE_PRICE);
+  const [originalPrice, setOriginalPrice] = useState<number | null>(null);
 
   const [isCheckingCoupon, setIsCheckingCoupon] = useState(false);
   // ─────────────────────────────────────────────
@@ -100,9 +101,11 @@ async function applyPromoCode() {
     if (!res.ok) {
       setPromoError(data?.detail || 'Invalid coupon');
       setFinalPrice(BASE_PRICE);
+      setOriginalPrice(null);
       return;
     }
 
+    setOriginalPrice(BASE_PRICE);
     setFinalPrice(data.final_amount);
   } catch {
     setPromoError('Unable to validate coupon');
@@ -179,9 +182,18 @@ async function applyPromoCode() {
             <View style={styles.card}>
               <Text style={styles.planTitle}>Paragraph Pro</Text>
 <Text style={styles.planDuration}>1 Year Access</Text>
-<Text style={styles.planPrice}>
-  ₹{finalPrice.toLocaleString('en-IN')}
-</Text>
+<View style={{ alignItems: 'center', marginVertical: 16 }}>
+  {originalPrice && originalPrice !== finalPrice && (
+    <Text style={styles.oldPrice}>
+      ₹{originalPrice.toLocaleString('en-IN')}
+    </Text>
+  )}
+
+  <Text style={styles.planPrice}>
+    ₹{finalPrice.toLocaleString('en-IN')}
+  </Text>
+</View>
+
               <View style={styles.couponBox}>
   <View style={styles.couponRow}>
     <TextInput
@@ -192,6 +204,8 @@ async function applyPromoCode() {
       onChangeText={(text) => {
         setPromoCode(text);
         setPromoError('');
+        setFinalPrice(BASE_PRICE);
+        setOriginalPrice(null);
       }}
       autoCapitalize="characters"
     />
@@ -447,5 +461,12 @@ const styles = StyleSheet.create({
     color: '#ef4444',
     fontSize: 12,
     marginTop: 6,
+  },
+
+  oldPrice: {
+    fontSize: 18,
+    color: '#9ca3af',
+    textDecorationLine: 'line-through',
+    marginBottom: 4,
   },
 });
