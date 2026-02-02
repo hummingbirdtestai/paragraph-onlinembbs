@@ -30,7 +30,10 @@ export default function SubscribeModal({ visible, onClose }: SubscribeModalProps
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [promoCode, setPromoCode] = useState('');
   const [promoError, setPromoError] = useState('');
-  const [finalPrice, setFinalPrice] = useState(5000); // base price
+  const BASE_PRICE = 5500;
+
+const [finalPrice, setFinalPrice] = useState(BASE_PRICE);
+
   const [isCheckingCoupon, setIsCheckingCoupon] = useState(false);
   // ─────────────────────────────────────────────
   // GUARD — USER MUST BE LOGGED IN
@@ -96,7 +99,7 @@ async function applyPromoCode() {
 
     if (!res.ok) {
       setPromoError(data?.detail || 'Invalid coupon');
-      setFinalPrice(5000);
+      setFinalPrice(BASE_PRICE);
       return;
     }
 
