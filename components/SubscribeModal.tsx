@@ -204,6 +204,7 @@ async function applyPromoCode() {
       onChangeText={(text) => {
         setPromoCode(text);
         setPromoError('');
+        setOriginalPrice(null);
         setFinalPrice(BASE_PRICE);
         setOriginalPrice(null);
       }}
