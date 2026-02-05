@@ -123,6 +123,14 @@ export default function StudentLiveClassList() {
 
   return (
     <View style={styles.container}>
+      {/* ───────────── Header ───────────── */}
+<View style={styles.header}>
+  <Text style={styles.headerTitle}>🤖 Paragraph AI-Tutored Sessions</Text>
+  <Text style={styles.headerSubtitle}>
+    Live, instructor-guided interactive classes
+  </Text>
+</View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -273,4 +281,24 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '800',
   },
+  header: {
+  paddingTop: 60,
+  paddingBottom: 16,
+  paddingHorizontal: 20,
+  backgroundColor: '#0F0F0F',
+  borderBottomWidth: 1,
+  borderBottomColor: '#1A1A1A',
+},
+headerTitle: {
+  fontSize: 28,
+  fontWeight: '900',
+  color: '#FFFFFF',
+},
+headerSubtitle: {
+  marginTop: 4,
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#9CA3AF',
+},
+
 });
