@@ -1,6 +1,16 @@
 // StudentLiveClassList.tsx
+// -----------------------------------------------------------------------------
+// Paragraph AI — Student Live Class Listing Screen
+// Stable AI-Bot Icon System + RPC Driven Schedule
+// -----------------------------------------------------------------------------
 
-import React, { useEffect, useState } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from 'react';
+
 import {
   View,
   Text,
@@ -10,14 +20,14 @@ import {
   RefreshControl,
   useWindowDimensions,
 } from 'react-native';
+
 import { MotiView } from 'moti';
 import { supabase } from '@/lib/supabaseClient';
 import { router } from 'expo-router';
 
-
-/* ─────────────────────────────────────────────
-   📘 Types (RPC driven)
-───────────────────────────────────────────── */
+// -----------------------------------------------------------------------------
+// 📘 Types (RPC driven — do NOT loosen)
+// -----------------------------------------------------------------------------
 
 interface LiveClass {
   battle_id: string;
@@ -25,6 +35,10 @@ interface LiveClass {
   scheduled_at: string;
   status: 'active' | 'upcoming' | 'completed';
 }
+
+// -----------------------------------------------------------------------------
+// 🔁 Status Normalizer (DB → UI)
+// -----------------------------------------------------------------------------
 
 const normalizeStatus = (status: string): LiveClass['status'] => {
   switch (status) {
@@ -39,35 +53,69 @@ const normalizeStatus = (status: string): LiveClass['status'] => {
   }
 };
 
+// -----------------------------------------------------------------------------
+// 🤖 AI BOT ICON SET (FIXED, STABLE, NO FLICKER)
+// -----------------------------------------------------------------------------
 
-/* ─────────────────────────────────────────────
-   🧩 Component
-───────────────────────────────────────────── */
+const AI_BOT_ICONS = [
+  '🤖',      // classic robot
+  '🧠',      // intelligence
+  '🦾',      // AI strength
+  '🤖‍💻',    // coding bot
+  '🧑‍💻',    // human-AI hybrid
+  '🛰️',      // satellite AI
+  '🧬',      // bio-AI
+  '⚙️',      // engine AI
+  '📡',      // signal AI
+  '🔮',      // future AI
+];
+
+// -----------------------------------------------------------------------------
+// 🧮 Deterministic Hash → Icon Resolver
+// Same battle_id ALWAYS maps to same icon
+// -----------------------------------------------------------------------------
+
+const getBotIconFromBattleId = (battleId: string): string => {
+  let hash = 0;
+
+  for (let i = 0; i < battleId.length; i++) {
+    hash = battleId.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const index = Math.abs(hash) % AI_BOT_ICONS.length;
+  return AI_BOT_ICONS[index];
+};
+
+// -----------------------------------------------------------------------------
+// 🧩 Main Component
+// -----------------------------------------------------------------------------
 
 export default function StudentLiveClassList() {
-
+  // ---------------------------------------------------------------------------
+  // 📐 Responsive
+  // ---------------------------------------------------------------------------
 
   const { width } = useWindowDimensions();
   const isMobile = width < 600;
 
+  // ---------------------------------------------------------------------------
+  // 🧠 State
+  // ---------------------------------------------------------------------------
+
   const [classes, setClasses] = useState<LiveClass[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  /* ─────────────────────────────────────────────
-     📡 Fetch via RPC (battle-style)
-  ────────────────────────────────────────────── */
+  // ---------------------------------------------------------------------------
+  // 📡 Fetch Classes via RPC
+  // ---------------------------------------------------------------------------
 
-  const fetchClasses = async () => {
-    console.log('🟡 fetchClasses() called');
-
+  const fetchClasses = useCallback(async () => {
     const { data, error } = await supabase.rpc('get_battle_schedule_for_now');
 
     if (error) {
-      console.error('❌ RPC ERROR:', error);
+      console.error('❌ get_battle_schedule_for_now failed:', error);
       return;
     }
-
-    console.log('🟣 RAW RPC DATA:', data);
 
     if (!data) return;
 
@@ -78,25 +126,26 @@ export default function StudentLiveClassList() {
       status: normalizeStatus(item.status),
     }));
 
-    console.log('🟠 FORMATTED CLASSES:', formatted);
+    formatted.sort(
+      (a, b) =>
+        new Date(a.scheduled_at).getTime() -
+        new Date(b.scheduled_at).getTime()
+    );
 
-formatted.sort(
-  (a, b) =>
-    new Date(a.scheduled_at).getTime() -
-    new Date(b.scheduled_at).getTime()
-);
-
-    console.log('🔵 SETTING CLASSES LENGTH:', formatted.length);
     setClasses(formatted);
-  };
+  }, []);
+
+  // ---------------------------------------------------------------------------
+  // 🧲 Initial Load
+  // ---------------------------------------------------------------------------
 
   useEffect(() => {
     fetchClasses();
-  }, []);
+  }, [fetchClasses]);
 
-  useEffect(() => {
-    console.log('🟢 classes STATE UPDATED:', classes);
-  }, [classes]);
+  // ---------------------------------------------------------------------------
+  // 🔄 Pull-to-Refresh
+  // ---------------------------------------------------------------------------
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -104,12 +153,15 @@ formatted.sort(
     setRefreshing(false);
   };
 
-  /* ─────────────────────────────────────────────
-     🕒 Helpers
-  ────────────────────────────────────────────── */
+  // ---------------------------------------------------------------------------
+  // 🕒 Date / Time Helpers
+  // ---------------------------------------------------------------------------
 
   const formatTime = (iso: string) =>
-    new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    new Date(iso).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString([], {
@@ -117,6 +169,10 @@ formatted.sort(
       day: 'numeric',
       month: 'short',
     });
+
+  // ---------------------------------------------------------------------------
+  // 🏷 Status Badge Resolver
+  // ---------------------------------------------------------------------------
 
   const getStatusBadge = (status: LiveClass['status']) => {
     switch (status) {
@@ -129,9 +185,9 @@ formatted.sort(
     }
   };
 
-  /* ─────────────────────────────────────────────
-     🚀 Navigation
-  ────────────────────────────────────────────── */
+  // ---------------------------------------------------------------------------
+  // 🚀 Navigation
+  // ---------------------------------------------------------------------------
 
   const handleClassPress = (cls: LiveClass) => {
     router.push({
@@ -140,21 +196,27 @@ formatted.sort(
     });
   };
 
-  /* ─────────────────────────────────────────────
-     🖼️ Render
-  ────────────────────────────────────────────── */
+  // ---------------------------------------------------------------------------
+  // 🖼️ Render
+  // ---------------------------------------------------------------------------
 
   return (
     <View style={styles.container}>
+      {/* ------------------------------------------------------------------- */}
+      {/* Header                                                              */}
+      {/* ------------------------------------------------------------------- */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>🤖 Paragraph AI-Tutored Sessions</Text>
+        <Text style={styles.headerTitle}>
+          🤖 Paragraph AI-Tutored Sessions
+        </Text>
         <Text style={styles.headerSubtitle}>
           Live, instructor-guided interactive classes
         </Text>
       </View>
 
-
-
+      {/* ------------------------------------------------------------------- */}
+      {/* Class List                                                          */}
+      {/* ------------------------------------------------------------------- */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -166,9 +228,11 @@ formatted.sort(
         }
       >
         {classes.map((cls, index) => {
-          console.log('🟧 RENDERING CARD:', cls.title, cls.status);
-
           const badge = getStatusBadge(cls.status);
+          const botIcon = useMemo(
+            () => getBotIconFromBattleId(cls.battle_id),
+            [cls.battle_id]
+          );
 
           return (
             <MotiView
@@ -178,7 +242,7 @@ formatted.sort(
               transition={{ delay: index * 80 }}
             >
               <TouchableOpacity
-                activeOpacity={0.8}
+                activeOpacity={0.85}
                 onPress={
                   cls.status === 'completed'
                     ? undefined
@@ -195,12 +259,16 @@ formatted.sort(
                     },
                   ]}
                 >
+                  {/* ------------------------------------------------------- */}
+                  {/* AI BOT ICON                                             */}
+                  {/* ------------------------------------------------------- */}
                   <View style={styles.iconCircle}>
-                    <Text style={styles.icon}>
-                    CLASS
-                  </Text>
+                    <Text style={styles.icon}>{botIcon}</Text>
                   </View>
 
+                  {/* ------------------------------------------------------- */}
+                  {/* Info                                                    */}
+                  {/* ------------------------------------------------------- */}
                   <View
                     style={[
                       styles.info,
@@ -221,6 +289,9 @@ formatted.sort(
                     </View>
                   </View>
 
+                  {/* ------------------------------------------------------- */}
+                  {/* Status Badge                                            */}
+                  {/* ------------------------------------------------------- */}
                   <View
                     style={[
                       styles.badge,
@@ -241,15 +312,16 @@ formatted.sort(
   );
 }
 
-/* ─────────────────────────────────────────────
-   🎨 Styles
-───────────────────────────────────────────── */
+// -----------------------------------------------------------------------------
+// 🎨 Styles
+// -----------------------------------------------------------------------------
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F0F0F',
   },
+
   header: {
     paddingTop: 60,
     paddingBottom: 16,
@@ -257,24 +329,29 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#1A1A1A',
   },
+
   headerTitle: {
     fontSize: 28,
     fontWeight: '900',
     color: '#FFFFFF',
   },
+
   headerSubtitle: {
     marginTop: 4,
     fontSize: 14,
     fontWeight: '600',
     color: '#9CA3AF',
   },
+
   scrollContent: {
     padding: 16,
     paddingBottom: 100,
   },
+
   cardWrapper: {
     marginBottom: 16,
   },
+
   card: {
     backgroundColor: '#1A1A1A',
     borderRadius: 16,
@@ -283,6 +360,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2D2D2D',
   },
+
   iconCircle: {
     width: 56,
     height: 56,
@@ -291,39 +369,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   icon: {
-    fontSize: 28,
+    fontSize: 30,
+    lineHeight: 32,
   },
+
   info: {
     flex: 1,
     gap: 4,
   },
+
   title: {
     fontSize: 18,
     fontWeight: '800',
     color: '#FFFFFF',
   },
+
   timeRow: {
     flexDirection: 'row',
     gap: 8,
     marginTop: 6,
   },
+
   time: {
     fontSize: 20,
     fontWeight: '800',
     color: '#00D9FF',
   },
+
   date: {
     fontSize: 15,
     fontWeight: '600',
     color: '#BBBBBB',
   },
+
   badge: {
     alignSelf: 'center',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
   },
+
   badgeText: {
     fontSize: 11,
     fontWeight: '800',
