@@ -18,35 +18,36 @@ import { router } from 'expo-router';
    🎨 SUBJECT → ICON POOL (FULL MBBS, WEB-SAFE)
 ───────────────────────────────────────────── */
 
-const SUBJECT_ICON_POOL: Record<string, string[]> = {
-  Anatomy: ['🦴', '🫀', '🧠', '🫁', '🦷'],
-  Physiology: ['⚡', '🫀', '🫁', '🧠', '💓'],
-  Biochemistry: ['🧪', '⚗️', '🧬', '🔬', '🧫'],
+const SUBJECT_ICON_POOL: Record<string, string> = {
+  Anatomy: 'ANATOMY',
+  Physiology: 'PHYSIO',
+  Biochemistry: 'BIOCHEM',
 
-  Pathology: ['🔬', '🩸', '🧫', '🧬', '📊'],
-  Pharmacology: ['💊', '💉', '⚗️', '🧠', '🧴'],
-  Microbiology: ['🦠', '🧫', '🔬', '🧬', '🧪'],
-  Forensic Medicine: ['⚖️', '🔍', '💀', '🧬', '📁'], // ❌ removed 🕵️‍♂️
-  Community Medicine: ['🌍', '👥', '📈', '🏥', '💉'], // ❌ removed 👨‍👩‍👧‍👦
+  Pathology: 'PATH',
+  Pharmacology: 'PHARMA',
+  Microbiology: 'MICRO',
+  'Forensic Medicine': 'FORENSIC',
+  'Community Medicine': 'PSM',
 
-  Medicine: ['🩺', '🫀', '🫁', '🧠', '💊'],
-  Pediatrics: ['🍼', '👶', '🧸', '🧒', '💖'],
-  Psychiatry: ['🧠', '🎭', '🌙', '🧩', '💭'], // ❌ removed 🧘‍♂️
-  Dermatology: ['🧴', '✨', '🧬', '🩻', '🧠'],
-  Radiodiagnosis: ['🩻', '📡', '🔍', '🧠', '⚡'],
-  Radiotherapy: ['☢️', '🩻', '🎯', '🧠', '⚡'],
-  Anaesthesiology: ['💉', '😴', '🫁', '🫀', '⚡'],
+  Medicine: 'MED',
+  Pediatrics: 'PED',
+  Psychiatry: 'PSY',
+  Dermatology: 'DERM',
+  Radiodiagnosis: 'RAD',
+  Radiotherapy: 'RT',
+  Anaesthesiology: 'ANAES',
 
-  Surgery: ['🔪', '⚔️', '🏥', '🩸', '🧤'],
-  'General Surgery': ['🔪', '🏥', '🩸', '🧤', '⚔️'],
-  Orthopaedics: ['🦴', '🏋️', '🦿', '🩻', '⚙️'], // ❌ removed 🏋️‍♂️
-  ENT: ['👂', '👃', '👅', '🎧', '🔊'],
-  Ophthalmology: ['👁️', '🕶️', '🔍', '✨', '🧠'],
+  Surgery: 'SURG',
+  'General Surgery': 'SURG',
+  Orthopaedics: 'ORTHO',
+  ENT: 'ENT',
+  Ophthalmology: 'OPHTH',
 
-  Obstetrics: ['🤰', '👶', '💖', '🌸', '🩺'], // ❌ removed 🫄
-  Gynecology: ['🌸', '👩', '🧬', '💖', '🩺'], // ❌ removed 👩‍⚕️
-  OBGYN: ['🤰', '👶', '🌸', '💖', '🩺'],
+  Obstetrics: 'OBS',
+  Gynecology: 'GYN',
+  OBGYN: 'OBGYN',
 };
+
 
 const getSubjectIcon = (subject?: string) => {
   if (!subject) return '🎓';
