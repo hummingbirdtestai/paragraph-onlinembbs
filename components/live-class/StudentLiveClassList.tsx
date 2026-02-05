@@ -50,10 +50,10 @@ const SUBJECT_ICON_POOL: Record<string, string> = {
 
 
 const getSubjectIcon = (subject?: string) => {
-  if (!subject) return '🎓';
-  const icons = SUBJECT_ICON_POOL[subject] || ['🎓'];
-  return icons[new Date().getDay() % icons.length];
+  if (!subject) return 'CLASS';
+  return SUBJECT_ICON_POOL[subject] || 'CLASS';
 };
+
 
 /* ─────────────────────────────────────────────
    📘 Types (RPC driven)
