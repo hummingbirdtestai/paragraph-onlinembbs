@@ -45,6 +45,8 @@ const normalizeStatus = (status: string): LiveClass['status'] => {
 ───────────────────────────────────────────── */
 
 export default function StudentLiveClassList() {
+  console.log('🟢 StudentLiveClassList MOUNTED');
+
   const { width } = useWindowDimensions();
   const isMobile = width < 600;
 
@@ -56,12 +58,16 @@ export default function StudentLiveClassList() {
   ────────────────────────────────────────────── */
 
   const fetchClasses = async () => {
+    console.log('🟡 fetchClasses() called');
+
     const { data, error } = await supabase.rpc('get_battle_schedule_for_now');
 
     if (error) {
-      console.error('❌ Live class RPC error:', error.message);
+      console.error('❌ RPC ERROR:', error);
       return;
     }
+
+    console.log('🟣 RAW RPC DATA:', data);
 
     if (!data) return;
 
@@ -72,18 +78,25 @@ export default function StudentLiveClassList() {
       status: normalizeStatus(item.status),
     }));
 
+    console.log('🟠 FORMATTED CLASSES:', formatted);
+
 formatted.sort(
   (a, b) =>
     new Date(a.scheduled_at).getTime() -
     new Date(b.scheduled_at).getTime()
 );
 
+    console.log('🔵 SETTING CLASSES LENGTH:', formatted.length);
     setClasses(formatted);
   };
 
   useEffect(() => {
     fetchClasses();
   }, []);
+
+  useEffect(() => {
+    console.log('🟢 classes STATE UPDATED:', classes);
+  }, [classes]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -140,6 +153,10 @@ formatted.sort(
         </Text>
       </View>
 
+      <Text style={{ color: 'white', padding: 10, backgroundColor: '#FF0000', fontSize: 20, fontWeight: 'bold' }}>
+        DEBUG: classes.length = {classes.length}
+      </Text>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -151,6 +168,8 @@ formatted.sort(
         }
       >
         {classes.map((cls, index) => {
+          console.log('🟧 RENDERING CARD:', cls.title, cls.status);
+
           const badge = getStatusBadge(cls.status);
 
           return (
