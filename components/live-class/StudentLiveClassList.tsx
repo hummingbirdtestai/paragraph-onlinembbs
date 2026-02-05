@@ -1,4 +1,5 @@
-//StudentLiveClassList.tsx
+// StudentLiveClassList.tsx
+
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -12,37 +13,57 @@ import {
 import { MotiView } from 'moti';
 import { supabase } from '@/lib/supabaseClient';
 import { router } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
 
 /* ─────────────────────────────────────────────
-   🎨 ICON POOL (same pattern as battles)
+   🎨 SUBJECT → ICON POOL (FULL MBBS)
 ───────────────────────────────────────────── */
 
-const CLASS_ICON_POOL: Record<string, string[]> = {
-  Medicine: ['🩺', '🫀', '🫁', '🧠'],
-  Surgery: ['🔪', '⚔️', '🏥', '🩸'],
-  Pediatrics: ['🍼', '👶', '🧸'],
-  OBGYN: ['🤰', '👶', '🌸'],
-  Orthopedics: ['🦴', '🏋️‍♂️', '🦿'],
-  Psychiatry: ['🧠', '🎭', '🌙'],
+const SUBJECT_ICON_POOL: Record<string, string[]> = {
+  Anatomy: ['🦴', '🫀', '🧠', '🫁', '🦷'],
+  Physiology: ['⚡', '🫀', '🫁', '🧠', '💓'],
+  Biochemistry: ['🧪', '⚗️', '🧬', '🔬', '🧫'],
+
+  Pathology: ['🔬', '🩸', '🧫', '🧬', '📊'],
+  Pharmacology: ['💊', '💉', '⚗️', '🧠', '🧴'],
+  Microbiology: ['🦠', '🧫', '🔬', '🧬', '🧪'],
+  Forensic Medicine: ['⚖️', '🔍', '💀', '🧬', '🕵️‍♂️'],
+  Community Medicine: ['🌍', '👨‍👩‍👧‍👦', '📈', '🏥', '💉'],
+
+  Medicine: ['🩺', '🫀', '🫁', '🧠', '💊'],
+  Pediatrics: ['🍼', '👶', '🧸', '🧒', '💖'],
+  Psychiatry: ['🧠', '🎭', '🌙', '🧘‍♂️', '🧩'],
+  Dermatology: ['🧴', '✨', '🧬', '🩻', '🧠'],
+  Radiodiagnosis: ['🩻', '📡', '🔍', '🧠', '⚡'],
+  Radiotherapy: ['☢️', '🩻', '🎯', '🧠', '⚡'],
+  Anaesthesiology: ['💉', '😴', '🫁', '🫀', '⚡'],
+
+  Surgery: ['🔪', '⚔️', '🏥', '🩸', '🧤'],
+  'General Surgery': ['🔪', '🏥', '🩸', '🧤', '⚔️'],
+  Orthopaedics: ['🦴', '🏋️‍♂️', '🦿', '🩻', '⚙️'],
+  ENT: ['👂', '👃', '👅', '🎧', '🔊'],
+  Ophthalmology: ['👁️', '🕶️', '🔍', '✨', '🧠'],
+
+  Obstetrics: ['🤰', '👶', '🫄', '💖', '🌸'],
+  Gynecology: ['🌸', '👩‍⚕️', '🧬', '💖', '🩺'],
+  OBGYN: ['🤰', '👶', '🌸', '💖', '🩺'],
 };
 
-const getClassIcon = (subject: string) => {
-  const icons = CLASS_ICON_POOL[subject] || ['🎓'];
+const getSubjectIcon = (subject?: string) => {
+  if (!subject) return '🎓';
+  const icons = SUBJECT_ICON_POOL[subject] || ['🎓'];
   return icons[new Date().getDay() % icons.length];
 };
 
 /* ─────────────────────────────────────────────
-   📘 Types
+   📘 Types (RPC driven)
 ───────────────────────────────────────────── */
 
 interface LiveClass {
-  id: string;
+  battle_id: string;
   title: string;
-  subject: string;
-  description: string;
+  subject?: string;
   scheduled_at: string;
-  status: 'scheduled' | 'live' | 'ended';
+  status: 'active' | 'upcoming' | 'completed';
 }
 
 /* ─────────────────────────────────────────────
@@ -56,19 +77,34 @@ export default function StudentLiveClassList() {
   const [classes, setClasses] = useState<LiveClass[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  const { user } = useAuth();
-
   /* ─────────────────────────────────────────────
-     📡 Fetch Live Classes
+     📡 Fetch via RPC (battle-style)
   ────────────────────────────────────────────── */
 
   const fetchClasses = async () => {
-    const { data, error } = await supabase
-      .from('live_classes')
-      .select('*')
-      .order('scheduled_at', { ascending: true });
+    const { data, error } = await supabase.rpc('get_battle_schedule_for_now');
 
-    if (!error && data) setClasses(data);
+    if (error) {
+      console.error('❌ Live class RPC error:', error.message);
+      return;
+    }
+
+    if (!data) return;
+
+    const formatted: LiveClass[] = data.map((item: any) => ({
+      battle_id: item.battle_id,
+      title: item.title,
+      subject: item.subject_1 || item.subject_2 || undefined,
+      scheduled_at: `${item.scheduled_date}T${item.scheduled_time}`,
+      status:
+        item.status === 'Active'
+          ? 'active'
+          : item.status === 'Upcoming'
+          ? 'upcoming'
+          : 'completed',
+    }));
+
+    setClasses(formatted);
   };
 
   useEffect(() => {
@@ -97,9 +133,9 @@ export default function StudentLiveClassList() {
 
   const getStatusBadge = (status: LiveClass['status']) => {
     switch (status) {
-      case 'live':
+      case 'active':
         return { text: '🔴 LIVE', color: '#EF4444' };
-      case 'scheduled':
+      case 'upcoming':
         return { text: '⏳ UPCOMING', color: '#00D9FF' };
       default:
         return { text: '✅ ENDED', color: '#4CAF50' };
@@ -107,13 +143,13 @@ export default function StudentLiveClassList() {
   };
 
   /* ─────────────────────────────────────────────
-     🚀 Entry Handler
+     🚀 Navigation
   ────────────────────────────────────────────── */
 
   const handleClassPress = (cls: LiveClass) => {
     router.push({
       pathname: '/live-class/[id]',
-      params: { id: cls.id },
+      params: { id: cls.battle_id },
     });
   };
 
@@ -123,13 +159,13 @@ export default function StudentLiveClassList() {
 
   return (
     <View style={styles.container}>
-      {/* ───────────── Header ───────────── */}
-<View style={styles.header}>
-  <Text style={styles.headerTitle}>🤖 Paragraph AI-Tutored Sessions</Text>
-  <Text style={styles.headerSubtitle}>
-    Live, instructor-guided interactive classes
-  </Text>
-</View>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>🤖 Paragraph AI-Tutored Sessions</Text>
+        <Text style={styles.headerSubtitle}>
+          Live, instructor-guided interactive classes
+        </Text>
+      </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -146,7 +182,7 @@ export default function StudentLiveClassList() {
 
           return (
             <MotiView
-              key={cls.id}
+              key={cls.battle_id}
               from={{ opacity: 0, translateY: 20, scale: 0.96 }}
               animate={{ opacity: 1, translateY: 0, scale: 1 }}
               transition={{ delay: index * 80 }}
@@ -166,7 +202,9 @@ export default function StudentLiveClassList() {
                   ]}
                 >
                   <View style={styles.iconCircle}>
-                    <Text style={styles.icon}>{getClassIcon(cls.subject)}</Text>
+                    <Text style={styles.icon}>
+                      {getSubjectIcon(cls.subject)}
+                    </Text>
                   </View>
 
                   <View
@@ -179,11 +217,17 @@ export default function StudentLiveClassList() {
                       {cls.title}
                     </Text>
 
-                    <Text style={styles.subject}>{cls.subject}</Text>
+                    {cls.subject && (
+                      <Text style={styles.subject}>{cls.subject}</Text>
+                    )}
 
                     <View style={styles.timeRow}>
-                      <Text style={styles.time}>{formatTime(cls.scheduled_at)}</Text>
-                      <Text style={styles.date}>{formatDate(cls.scheduled_at)}</Text>
+                      <Text style={styles.time}>
+                        {formatTime(cls.scheduled_at)}
+                      </Text>
+                      <Text style={styles.date}>
+                        {formatDate(cls.scheduled_at)}
+                      </Text>
                     </View>
                   </View>
 
@@ -208,13 +252,31 @@ export default function StudentLiveClassList() {
 }
 
 /* ─────────────────────────────────────────────
-   🎨 Styles (mirrors BattleListScreen)
+   🎨 Styles
 ───────────────────────────────────────────── */
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F0F0F',
+  },
+  header: {
+    paddingTop: 60,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1A1A1A',
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  headerSubtitle: {
+    marginTop: 4,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#9CA3AF',
   },
   scrollContent: {
     padding: 16,
@@ -281,24 +343,4 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '800',
   },
-  header: {
-  paddingTop: 60,
-  paddingBottom: 16,
-  paddingHorizontal: 20,
-  backgroundColor: '#0F0F0F',
-  borderBottomWidth: 1,
-  borderBottomColor: '#1A1A1A',
-},
-headerTitle: {
-  fontSize: 28,
-  fontWeight: '900',
-  color: '#FFFFFF',
-},
-headerSubtitle: {
-  marginTop: 4,
-  fontSize: 14,
-  fontWeight: '600',
-  color: '#9CA3AF',
-},
-
 });
