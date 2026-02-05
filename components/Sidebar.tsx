@@ -45,26 +45,24 @@ const navItems: NavItem[] = [
     href: "/", 
     icon: Brain,
   },
-
-
-
-
-
   {
     id: "uhs-pyq",
     label: "MBBS UHS PYQ Question Bank",
     href: "/uhs-pyq-question-bank",
     icon: Target,
   },
-
-
   {
     id: "cbme-path",
     label: "CBME Learning Path",
     href: "/cbme-learning-path",
     icon: Map,
   },
-
+  {
+    id: "live-class",
+    label: "Live Class",
+    href: "/live-class",
+    icon: Bot, // 🤖 AI Live Class
+  },
   { 
     id: "flash", 
     label: "45,000 Flash Cards", 
