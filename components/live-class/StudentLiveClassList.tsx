@@ -229,10 +229,8 @@ export default function StudentLiveClassList() {
       >
         {classes.map((cls, index) => {
           const badge = getStatusBadge(cls.status);
-          const botIcon = useMemo(
-            () => getBotIconFromBattleId(cls.battle_id),
-            [cls.battle_id]
-          );
+const botIcon = getBotIconFromBattleId(cls.battle_id);
+
 
           return (
             <MotiView
