@@ -15,7 +15,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { router } from 'expo-router';
 
 /* ─────────────────────────────────────────────
-   🎨 SUBJECT → ICON POOL (FULL MBBS)
+   🎨 SUBJECT → ICON POOL (FULL MBBS, WEB-SAFE)
 ───────────────────────────────────────────── */
 
 const SUBJECT_ICON_POOL: Record<string, string[]> = {
@@ -26,12 +26,12 @@ const SUBJECT_ICON_POOL: Record<string, string[]> = {
   Pathology: ['🔬', '🩸', '🧫', '🧬', '📊'],
   Pharmacology: ['💊', '💉', '⚗️', '🧠', '🧴'],
   Microbiology: ['🦠', '🧫', '🔬', '🧬', '🧪'],
-  Forensic Medicine: ['⚖️', '🔍', '💀', '🧬', '🕵️‍♂️'],
-  Community Medicine: ['🌍', '👨‍👩‍👧‍👦', '📈', '🏥', '💉'],
+  Forensic Medicine: ['⚖️', '🔍', '💀', '🧬', '📁'], // ❌ removed 🕵️‍♂️
+  Community Medicine: ['🌍', '👥', '📈', '🏥', '💉'], // ❌ removed 👨‍👩‍👧‍👦
 
   Medicine: ['🩺', '🫀', '🫁', '🧠', '💊'],
   Pediatrics: ['🍼', '👶', '🧸', '🧒', '💖'],
-  Psychiatry: ['🧠', '🎭', '🌙', '🧘‍♂️', '🧩'],
+  Psychiatry: ['🧠', '🎭', '🌙', '🧩', '💭'], // ❌ removed 🧘‍♂️
   Dermatology: ['🧴', '✨', '🧬', '🩻', '🧠'],
   Radiodiagnosis: ['🩻', '📡', '🔍', '🧠', '⚡'],
   Radiotherapy: ['☢️', '🩻', '🎯', '🧠', '⚡'],
@@ -39,12 +39,12 @@ const SUBJECT_ICON_POOL: Record<string, string[]> = {
 
   Surgery: ['🔪', '⚔️', '🏥', '🩸', '🧤'],
   'General Surgery': ['🔪', '🏥', '🩸', '🧤', '⚔️'],
-  Orthopaedics: ['🦴', '🏋️‍♂️', '🦿', '🩻', '⚙️'],
+  Orthopaedics: ['🦴', '🏋️', '🦿', '🩻', '⚙️'], // ❌ removed 🏋️‍♂️
   ENT: ['👂', '👃', '👅', '🎧', '🔊'],
   Ophthalmology: ['👁️', '🕶️', '🔍', '✨', '🧠'],
 
-  Obstetrics: ['🤰', '👶', '🫄', '💖', '🌸'],
-  Gynecology: ['🌸', '👩‍⚕️', '🧬', '💖', '🩺'],
+  Obstetrics: ['🤰', '👶', '💖', '🌸', '🩺'], // ❌ removed 🫄
+  Gynecology: ['🌸', '👩', '🧬', '💖', '🩺'], // ❌ removed 👩‍⚕️
   OBGYN: ['🤰', '👶', '🌸', '💖', '🩺'],
 };
 
@@ -159,7 +159,6 @@ export default function StudentLiveClassList() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>🤖 Paragraph AI-Tutored Sessions</Text>
         <Text style={styles.headerSubtitle}>
