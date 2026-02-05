@@ -45,7 +45,7 @@ const normalizeStatus = (status: string): LiveClass['status'] => {
 ───────────────────────────────────────────── */
 
 export default function StudentLiveClassList() {
-  console.log('🟢 StudentLiveClassList MOUNTED');
+
 
   const { width } = useWindowDimensions();
   const isMobile = width < 600;
