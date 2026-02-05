@@ -96,7 +96,7 @@ export default function StudentLiveClassList() {
       battle_id: item.battle_id,
       title: item.title,
       subject: item.subject_1 || item.subject_2 || undefined,
-      scheduled_at: `${item.scheduled_date}T${item.scheduled_time}`,
+      scheduled_at: `${item.scheduled_date}T${item.scheduled_time}+05:30`,
       status:
         item.status === 'Active'
           ? 'active'
