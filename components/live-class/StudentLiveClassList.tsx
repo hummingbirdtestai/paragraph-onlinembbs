@@ -14,46 +14,6 @@ import { MotiView } from 'moti';
 import { supabase } from '@/lib/supabaseClient';
 import { router } from 'expo-router';
 
-/* ─────────────────────────────────────────────
-   🎨 SUBJECT → ICON POOL (FULL MBBS, WEB-SAFE)
-───────────────────────────────────────────── */
-
-const SUBJECT_ICON_POOL: Record<string, string> = {
-  Anatomy: 'ANATOMY',
-  Physiology: 'PHYSIO',
-  Biochemistry: 'BIOCHEM',
-
-  Pathology: 'PATH',
-  Pharmacology: 'PHARMA',
-  Microbiology: 'MICRO',
-  'Forensic Medicine': 'FORENSIC',
-  'Community Medicine': 'PSM',
-
-  Medicine: 'MED',
-  Pediatrics: 'PED',
-  Psychiatry: 'PSY',
-  Dermatology: 'DERM',
-  Radiodiagnosis: 'RAD',
-  Radiotherapy: 'RT',
-  Anaesthesiology: 'ANAES',
-
-  Surgery: 'SURG',
-  'General Surgery': 'SURG',
-  Orthopaedics: 'ORTHO',
-  ENT: 'ENT',
-  Ophthalmology: 'OPHTH',
-
-  Obstetrics: 'OBS',
-  Gynecology: 'GYN',
-  OBGYN: 'OBGYN',
-};
-
-
-const getSubjectIcon = (subject?: string) => {
-  if (!subject) return 'CLASS';
-  return SUBJECT_ICON_POOL[subject] || 'CLASS';
-};
-
 
 /* ─────────────────────────────────────────────
    📘 Types (RPC driven)
@@ -62,10 +22,10 @@ const getSubjectIcon = (subject?: string) => {
 interface LiveClass {
   battle_id: string;
   title: string;
-  subject?: string;
   scheduled_at: string;
-  status: 'active' | 'upcoming' | 'completed';
+  status: 'active' | 'upcoming';
 }
+
 
 /* ─────────────────────────────────────────────
    🧩 Component
@@ -95,15 +55,10 @@ export default function StudentLiveClassList() {
     const formatted: LiveClass[] = data.map((item: any) => ({
       battle_id: item.battle_id,
       title: item.title,
-      subject: item.subject_1 || item.subject_2 || undefined,
       scheduled_at: `${item.scheduled_date}T${item.scheduled_time}+05:30`,
-      status:
-        item.status === 'Active'
-          ? 'active'
-          : item.status === 'Upcoming'
-          ? 'upcoming'
-          : 'completed',
+      status: item.status === 'Active' ? 'active' : 'upcoming',
     }));
+
 
     setClasses(formatted);
   };
@@ -203,8 +158,8 @@ export default function StudentLiveClassList() {
                 >
                   <View style={styles.iconCircle}>
                     <Text style={styles.icon}>
-                      {getSubjectIcon(cls.subject)}
-                    </Text>
+                    CLASS
+                  </Text>
                   </View>
 
                   <View
@@ -216,10 +171,6 @@ export default function StudentLiveClassList() {
                     <Text style={styles.title} numberOfLines={1}>
                       {cls.title}
                     </Text>
-
-                    {cls.subject && (
-                      <Text style={styles.subject}>{cls.subject}</Text>
-                    )}
 
                     <View style={styles.timeRow}>
                       <Text style={styles.time}>
@@ -312,11 +263,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
     color: '#FFFFFF',
-  },
-  subject: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFD93D',
   },
   timeRow: {
     flexDirection: 'row',
