@@ -1,4 +1,5 @@
 //revisionclass.tsx
+//revision.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -9,15 +10,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import ConceptJSONRenderer from "@/components/types/ConceptJSONRenderer";
-import NeetpgMCQChatScreen from "@/components/neetpgMCQChatScreen";
+import { ConceptBubble } from '@/components/ConceptBubble';
+import MCQChatScreen from '@/components/MCQChatScreen';
 import ConfettiCannon from 'react-native-confetti-cannon';
 
 /* ─────────────────────────────────────────────
    CONFIG
 ───────────────────────────────────────────── */
 
-const API_BASE = 'https://revisionmainonlinembbspy-production.up.railway.app';
+const API_BASE = 'https://revisionmainpy-production.up.railway.app';
 const TOTAL_CONCEPTS_FALLBACK = 10;
 const { width, height } = Dimensions.get('window');
 
@@ -66,26 +67,22 @@ interface RenderedItem {
 export default function RevisionScreen() {
   /* ───────────── ROUTER PARAMS ───────────── */
 
-  const params = useLocalSearchParams<{
-  topic_id?: string;
-  topic_name?: string;
-  subject?: string;   // ✅ now available
-}>();
-
+  const params = useLocalSearchParams<{ topic_id?: string; topic_name?: string }>();
   const TOPIC_ID = params.topic_id;
   const router = useRouter();
 
   /* ───────────── SESSION / API ───────────── */
 
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [currentConcept, setCurrentConcept] = useState<Concept | null>(null);
+  const [currentMCQ, setCurrentMCQ] = useState<MCQ | null>(null);
   const [totalConcepts, setTotalConcepts] = useState(TOTAL_CONCEPTS_FALLBACK);
 
   /* ───────────── UI / FLOW ───────────── */
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentConcept, setCurrentConcept] = useState<Concept | null>(null);
+  const [state, setState] = useState<State>('concept');
   const [renderedItems, setRenderedItems] = useState<RenderedItem[]>([]);
-const [state, setState] = useState<State>('concept');
 
   /* ───────────── TIMERS ───────────── */
 
@@ -162,15 +159,13 @@ const [state, setState] = useState<State>('concept');
         setCurrentConcept(data.payload);
         setTotalConcepts(data.total_concepts || TOTAL_CONCEPTS_FALLBACK);
 
-// 👇 ALSO append MCQ immediately if present
-const { concept, mcq } = data.payload;
-
-setRenderedItems([
-  { type: "concept", concept, index: 0 },
-  { type: "mcq", concept, mcq, index: 0 },
-]);
-
-
+        setRenderedItems([
+          {
+            type: 'concept',
+            concept: data.payload,
+            index: 0,
+          },
+        ]);
       } catch (err) {
         console.error("❌ Revision start failed:", err);
       }
@@ -184,14 +179,14 @@ setRenderedItems([
   useEffect(() => {
   if (!feedbackCountdownActive) return;
 
-  setCountdown(4);
+  setCountdown(10);
 
   feedbackCountdownTimerRef.current = setInterval(() => {
     setCountdown((prev) => {
       if (prev <= 1) {
         clearInterval(feedbackCountdownTimerRef.current!);
         setFeedbackCountdownActive(false);
-        loadNextStep();
+        loadNextConcept();
         return 0;
       }
       return prev - 1;
@@ -205,67 +200,191 @@ setRenderedItems([
   /* ─────────────────────────────────────────────
      LOAD MCQ
   ───────────────────────────────────────────── */
-const loadNextStep = async () => {
-  if (!sessionId) return;
 
-  const res = await fetch(`${API_BASE}/revision/next`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ session_id: sessionId }),
-  });
+  const loadMCQ = async () => {
+    console.log("⏭️ loadMCQ called");
+    console.log("🆔 sessionId:", sessionId);
+    console.log("📘 currentConcept:", currentConcept?.concept);
 
-  if (!res.ok) return;
+    if (!sessionId || !currentConcept) {
+      console.warn("⚠️ loadMCQ aborted (missing session or concept)");
+      return;
+    }
 
-  const data = await res.json();
+    try {
+      const res = await fetch(`${API_BASE}/revision/next`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          event: "timer_elapsed",
+        }),
+      });
 
-  if (data.type === "complete") {
-    setState("complete");
-    return;
-  }
+      console.log("📡 /revision/next (MCQ) status:", res.status);
 
-  const { concept, mcq } = data.payload;
+      const raw = await res.text();
+      console.log("📦 raw response:", raw);
 
-  setCurrentIndex(data.index);
+      if (!res.ok) {
+        console.error("❌ API returned error status:", res.status);
+        return;
+      }
 
-  setRenderedItems(items => [
-    ...items,
-    { type: "concept", concept, index: data.index },
-    { type: "mcq", concept, mcq, index: data.index },
-  ]);
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (parseErr) {
+        console.error("❌ Failed to parse JSON:", raw);
+        return;
+      }
 
-  requestAnimationFrame(() =>
-    scrollRef.current?.scrollToEnd({ animated: true })
-  );
-};
+      console.log("📦 Response type:", data.type);
+
+      // Guard: Expecting MCQ
+      if (data.type !== "mcq") {
+        console.warn("⚠️ Expected MCQ but got:", data.type);
+        
+        // Handle completion
+        if (data.type === "complete") {
+          console.log("✅ Revision complete!");
+          setState('complete');
+        }
+        return;
+      }
+
+      console.log("📦 MCQ payload received:", data.payload);
+
+      setCurrentMCQ(data.payload);
+
+
+      setRenderedItems((items) => [
+        ...items,
+        {
+          type: 'mcq',
+          concept: currentConcept,
+          mcq: data.payload,
+          index: currentIndex,
+        },
+      ]);
+
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+    } catch (err) {
+      console.error("❌ loadMCQ failed:", err);
+    }
+  };
 
   /* ─────────────────────────────────────────────
      ANSWER SELECTED (CONFETTI ON CORRECT)
   ───────────────────────────────────────────── */
 
   const handleAnswerSelected = async (
-  selectedOption: 'A' | 'B' | 'C' | 'D'
-) => {
-  if (!sessionId) return;
+    selectedOption: 'A' | 'B' | 'C' | 'D'
+  ) => {
+    if (!sessionId || !currentMCQ) return;
 
-  const lastMCQ = renderedItems.findLast(i => i.type === 'mcq')?.mcq;
-  if (!lastMCQ) return;
+    const isCorrect = selectedOption === currentMCQ.correct_answer;
 
-  const isCorrect = selectedOption === lastMCQ.correct_answer;
-  if (isCorrect) fireCorrectConfetti();
+    if (isCorrect) {
+      fireCorrectConfetti();
+    }
 
-  await fetch(`${API_BASE}/revision/answer`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      session_id: sessionId,
-      mcq_index: currentIndex,
-      selected_option: selectedOption,
-    }),
-  });
+    await fetch(`${API_BASE}/revision/answer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: sessionId,
+        mcq_index: currentIndex,
+        selected_option: selectedOption,
+      }),
+    });
 
-  console.log("⏳ Starting 10s countdown before next concept");
-  setFeedbackCountdownActive(true);
-};
+
+
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 400);
+    setFeedbackCountdownActive(true);
+  };
+
+  /* ─────────────────────────────────────────────
+     LOAD NEXT CONCEPT
+  ───────────────────────────────────────────── */
+
+  const loadNextConcept = async () => {
+    console.log("⏭️ loadNextConcept called");
+    console.log("🆔 sessionId:", sessionId);
+
+    if (!sessionId) {
+      console.warn("⚠️ loadNextConcept aborted (missing sessionId)");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/revision/next`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          event: "timer_elapsed",
+        }),
+      });
+
+      console.log("📡 /revision/next (Concept) status:", res.status);
+
+      const raw = await res.text();
+      console.log("📦 raw response:", raw);
+
+      if (!res.ok) {
+        console.error("❌ API returned error status:", res.status);
+        return;
+      }
+
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (parseErr) {
+        console.error("❌ Failed to parse JSON:", raw);
+        return;
+      }
+
+      console.log("📦 Response type:", data.type);
+
+      // Guard: Handle completion
+      if (data.type === 'complete') {
+        console.log("✅ Revision complete!");
+        setState('complete');
+        return;
+      }
+
+      // Guard: Expecting concept
+      if (data.type !== "concept") {
+        console.warn("⚠️ Expected concept but got:", data.type);
+        return;
+      }
+
+      console.log("📘 Next concept loaded:", data.payload);
+
+      // FIX: Use functional update for currentIndex
+      setCurrentIndex(prev => prev + 1);
+      setCurrentConcept(data.payload);
+      setCurrentMCQ(null);
+
+      setRenderedItems((items) => [
+        ...items,
+        {
+          type: 'concept',
+          concept: data.payload,
+          index: currentIndex + 1 // Use items.length for accurate index
+        },
+      ]);
+
+      setFeedbackCountdownActive(false);
+     
+
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+    } catch (err) {
+      console.error("❌ loadNextConcept failed:", err);
+    }
+  };
 
   /* ─────────────────────────────────────────────
      COMPLETE
@@ -339,36 +458,38 @@ const loadNextStep = async () => {
 </View>
 
 
-{renderedItems.map((item, idx) => (
-  <React.Fragment key={`${item.type}-${item.index}-${idx}`}>
+        {renderedItems.map((item, idx) => (
+          <React.Fragment key={`${item.type}-${item.index}-${idx}`}>
+            {item.type === 'concept' && (
+<ConceptBubble
+  title={item.concept.title}
+  coreIdea={item.concept.core_idea}
+  keyExplanation={item.concept.key_explanation}
+  conceptNumber={item.index + 1}
+  totalConcepts={totalConcepts}
+  onComplete={
+    item.index === currentIndex ? loadMCQ : undefined
+  }
+/>
 
-    {item.type === 'concept' && (
-  <ConceptJSONRenderer
-    data={JSON.stringify(item.concept)}
-    cbmeMeta={{
-      subject: params.subject ?? null,   // ✅ shows General Medicine
-      topic: params.topic_name ?? null,
-    }}
-  />
-)}
+            )}
 
+            {item.type === 'mcq' && item.mcq && (
+              <MCQChatScreen
+                item={item.mcq}
+                studentId="practice-student"
+                conceptId={item.concept.concept.toString()}
+                mcqId={item.mcq.id}
+                correctAnswer={item.mcq.correct_answer}
+                phaseUniqueId={sessionId || 'session'}
+                mode="practice"
+                onAnswerSelected={handleAnswerSelected}
 
-    {item.type === 'mcq' && item.mcq && (
-      <NeetpgMCQChatScreen
-        item={item.mcq}
-        studentId="practice-student"
-        conceptId={item.concept.concept.toString()}
-        mcqId={item.mcq.id}
-        correctAnswer={item.mcq.correct_answer}
-        phaseUniqueId={sessionId || 'session'}
-        mode="practice"
-        onAnswerSelected={handleAnswerSelected}
-      />
-    )}
-
-  </React.Fragment>
-))}
-                            </ScrollView>
+              />
+            )}
+          </React.Fragment>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -380,14 +501,13 @@ const loadNextStep = async () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0A0A0B' },
   scrollView: { flex: 1 },
-contentContainer: {
+ contentContainer: {
   paddingVertical: 20,
   paddingBottom: 40,
-  paddingHorizontal: 12,   // 👈 tiny breathing room
-  maxWidth: 720,           // 👈 sweet spot: wider mobile, not desktop
-  alignSelf: 'center',
+  paddingHorizontal: 12,     // 👈 tighter sides
+  maxWidth: 560,             // 👈 prevents horizontal stretch
+  alignSelf: 'center',       // 👈 centers content column
 },
-
 
 header: {
   flexDirection: 'column',   // 👈 stack vertically
