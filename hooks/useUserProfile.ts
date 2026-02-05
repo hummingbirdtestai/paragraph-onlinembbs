@@ -1,4 +1,3 @@
-//useUserProfile.ts
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -19,6 +18,7 @@ export function useUserProfile(userId?: string) {
         .select(`
           is_active,
           is_paid,
+          is_teacher,
           trial_started_at,
           trial_expires_at,
           subscription_start_at,
