@@ -1,5 +1,6 @@
-//app/live-class/index.tsx
+// app/live-class/index.tsx
 import { View, ActivityIndicator } from 'react-native';
+import MainLayout from '@/components/MainLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 
@@ -11,18 +12,22 @@ export default function LiveClassScreen() {
   const userProfile = useUserProfile(user?.id);
 
   if (!userProfile) {
-    return <ActivityIndicator />;
+    return (
+      <MainLayout>
+        <ActivityIndicator style={{ marginTop: 40 }} />
+      </MainLayout>
+    );
   }
 
   const isTeacher = userProfile.is_teacher === true;
 
   return (
-    <View style={{ flex: 1 }}>
+    <MainLayout>
       {isTeacher ? (
         <TeacherLiveClassDashboard />
       ) : (
         <StudentLiveClassList />
       )}
-    </View>
+    </MainLayout>
   );
 }
