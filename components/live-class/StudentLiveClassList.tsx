@@ -23,8 +23,21 @@ interface LiveClass {
   battle_id: string;
   title: string;
   scheduled_at: string;
-  status: 'active' | 'upcoming';
+  status: 'active' | 'upcoming' | 'completed';
 }
+
+const normalizeStatus = (status: string): LiveClass['status'] => {
+  switch (status) {
+    case 'Active':
+      return 'active';
+    case 'Upcoming':
+      return 'upcoming';
+    case 'Completed':
+      return 'completed';
+    default:
+      return 'upcoming';
+  }
+};
 
 
 /* ─────────────────────────────────────────────
@@ -56,9 +69,14 @@ export default function StudentLiveClassList() {
       battle_id: item.battle_id,
       title: item.title,
       scheduled_at: `${item.scheduled_date}T${item.scheduled_time}+05:30`,
-      status: item.status === 'Active' ? 'active' : 'upcoming',
+      status: normalizeStatus(item.status),
     }));
 
+formatted.sort(
+  (a, b) =>
+    new Date(a.scheduled_at).getTime() -
+    new Date(b.scheduled_at).getTime()
+);
 
     setClasses(formatted);
   };
@@ -144,7 +162,11 @@ export default function StudentLiveClassList() {
             >
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => handleClassPress(cls)}
+                onPress={
+                  cls.status === 'completed'
+                    ? undefined
+                    : () => handleClassPress(cls)
+                }
                 style={styles.cardWrapper}
               >
                 <View
