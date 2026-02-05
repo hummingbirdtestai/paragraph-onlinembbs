@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: '#FFF1D6',
   },
 
   headerSubtitle: {
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#F3EAD7',
   },
 
   timeRow: {
