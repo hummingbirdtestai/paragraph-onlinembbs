@@ -153,7 +153,9 @@ formatted.sort(
         </Text>
       </View>
 
-
+      <Text style={{ color: 'white', padding: 10, backgroundColor: '#FF0000', fontSize: 20, fontWeight: 'bold' }}>
+        DEBUG: classes.length = {classes.length}
+      </Text>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
