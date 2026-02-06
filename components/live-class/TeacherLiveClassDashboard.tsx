@@ -20,6 +20,7 @@ import {
 import { MotiView } from 'moti';
 import { supabase } from '@/lib/supabaseClient';
 import { router } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 
 // -----------------------------------------------------------------------------
 // 📘 Types (RPC driven — do NOT loosen)
@@ -86,7 +87,21 @@ const getBotIconFromBattleId = (battleId: string): string => {
 // 🧩 Main Component
 // -----------------------------------------------------------------------------
 
-export default function StudentLiveClassList() {
+export default function TeacherLiveClassDashboard() {
+  // ---------------------------------------------------------------------------
+  // 🔐 Role Detection
+  // ---------------------------------------------------------------------------
+
+  const { user } = useAuth();
+
+  /**
+   * Adjust this depending on your schema:
+   * - user.role === 'teacher'
+   * - user.is_teacher === true
+   * - user.user_type === 'TEACHER'
+   */
+  const isTeacher = user?.role === 'teacher';
+
   // ---------------------------------------------------------------------------
   // 📐 Responsive
   // ---------------------------------------------------------------------------
@@ -187,7 +202,9 @@ export default function StudentLiveClassList() {
 
   const handleClassPress = (cls: LiveClass) => {
     router.push({
-      pathname: '/live-class/[id]',
+      pathname: isTeacher
+        ? '/teacher/live-class/[id]'
+        : '/live-class/[id]',
       params: { id: cls.battle_id },
     });
   };
@@ -206,7 +223,9 @@ export default function StudentLiveClassList() {
           🤖 Paragraph AI-Tutored Sessions
         </Text>
         <Text style={styles.headerSubtitle}>
-          Live, instructor-guided interactive classes
+          {isTeacher
+            ? 'Manage & conduct AI-tutored live classes'
+            : 'Live, instructor-guided interactive classes'}
         </Text>
       </View>
 
@@ -226,7 +245,7 @@ export default function StudentLiveClassList() {
         {classes.map((cls, index) => {
           const badge = getStatusBadge(cls.status);
 const botIcon = getBotIconFromBattleId(cls.battle_id);
-
+          const disablePress = !isTeacher && cls.status === 'completed';
 
           return (
             <MotiView
@@ -237,11 +256,7 @@ const botIcon = getBotIconFromBattleId(cls.battle_id);
             >
               <TouchableOpacity
                 activeOpacity={0.85}
-                onPress={
-                  cls.status === 'completed'
-                    ? undefined
-                    : () => handleClassPress(cls)
-                }
+                onPress={disablePress ? undefined : () => handleClassPress(cls)}
                 style={styles.cardWrapper}
               >
                 <View
