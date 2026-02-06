@@ -55,6 +55,17 @@ const OPTION_KEYS: (keyof MCQ)[] = [
 ];
 
 // -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
+
+const getSortedConceptKeys = (classJson: Record<string, ConceptBlock>) =>
+  Object.keys(classJson).sort((a, b) => {
+    const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
+    const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+    return numA - numB;
+  });
+
+// -----------------------------------------------------------------------------
 // Screen
 // -----------------------------------------------------------------------------
 
@@ -64,7 +75,6 @@ export default function TeacherLiveClassContent() {
   const [data, setData] = useState<BattleClassItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState(0);
   const [mode, setMode] = useState<Mode>('push');
 
   // ---------------------------------------------------------------------------
@@ -137,17 +147,6 @@ export default function TeacherLiveClassContent() {
   }
 
   // ---------------------------------------------------------------------------
-  // Active item
-  // ---------------------------------------------------------------------------
-
-  const activeItem = data[activeTab];
-  const conceptKeys = Object.keys(activeItem.class_json).sort((a, b) => {
-    const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
-    const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
-    return numA - numB;
-  });
-
-  // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
 
@@ -166,157 +165,152 @@ export default function TeacherLiveClassContent() {
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>Live Class</Text>
           <Text style={styles.headerSub}>
-            Question {activeTab + 1} of {data.length}
+            {data.length} Question{data.length !== 1 ? 's' : ''}
           </Text>
         </View>
         <View style={{ width: 64 }} />
       </View>
 
-      {/* QUESTION TABS */}
-      <View style={styles.tabBarContainer}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabBar}
-        >
-          {data.map((q, i) => {
-            const isActive = i === activeTab;
-            return (
-              <TouchableOpacity
-                key={q.topic_order}
-                onPress={() => setActiveTab(i)}
-                style={[styles.tab, isActive && styles.tabActive]}
-                activeOpacity={0.7}
-              >
-                <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
-                  Q{i + 1}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      {/* QUESTION TITLE */}
-      <View style={styles.questionBanner}>
-        <Text style={styles.questionTitle}>{activeItem.question}</Text>
-      </View>
-
-      {/* CONTENT */}
+      {/* ALL QUESTIONS — SEQUENTIAL VERTICAL SCROLL */}
       <ScrollView
         style={styles.contentScroll}
         contentContainerStyle={styles.contentContainer}
       >
-        {conceptKeys.map((key, ci) => {
-          const concept = activeItem.class_json[key];
-          if (!concept || !concept.title) return null;
+        {data.map((item, qi) => {
+          const conceptKeys = getSortedConceptKeys(item.class_json);
 
           return (
-            <View key={key} style={styles.conceptSection}>
-              {/* CONCEPT HEADER */}
-              <View style={styles.conceptHeader}>
-                <View style={styles.conceptBadge}>
-                  <Text style={styles.conceptBadgeText}>{ci + 1}</Text>
+            <View key={item.topic_order} style={styles.questionBlock}>
+              {/* QUESTION HEADER */}
+              <View style={styles.questionHeader}>
+                <View style={styles.questionNumberBadge}>
+                  <Text style={styles.questionNumberText}>Q{qi + 1}</Text>
                 </View>
-                <Text style={styles.conceptTitle}>{concept.title}</Text>
+                <Text style={styles.questionTitle}>{item.question}</Text>
               </View>
 
-              {/* BULLET POINTS */}
-              {concept.concept && concept.concept.length > 0 && (
-                <View style={styles.bulletSection}>
-                  {concept.concept.map((point, pi) => (
-                    <View key={pi} style={styles.bulletRow}>
-                      <View style={styles.bulletDot} />
-                      <Text style={styles.bulletText}>{point}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
+              {/* CONCEPTS FOR THIS QUESTION */}
+              {conceptKeys.map((key, ci) => {
+                const concept = item.class_json[key];
+                if (!concept || !concept.title) return null;
 
-              {/* MCQ */}
-              {concept.mcq && concept.mcq.stem && (
-                <View style={styles.mcqCard}>
-                  <Text style={styles.mcqLabel}>MCQ</Text>
-                  <Text style={styles.mcqStem}>{concept.mcq.stem}</Text>
-
-                  {OPTION_KEYS.map((optKey, oi) => {
-                    const optText = concept.mcq[optKey];
-                    if (!optText) return null;
-                    const isCorrect =
-                      concept.mcq.correct_option?.toUpperCase() ===
-                      OPTION_LABELS[oi];
-
-                    return (
-                      <View
-                        key={optKey}
-                        style={[
-                          styles.optionRow,
-                          isCorrect && styles.optionCorrect,
-                        ]}
-                      >
-                        <View
-                          style={[
-                            styles.optionLabelCircle,
-                            isCorrect && styles.optionLabelCorrect,
-                          ]}
-                        >
-                          <Text
-                            style={[
-                              styles.optionLabel,
-                              isCorrect && styles.optionLabelTextCorrect,
-                            ]}
-                          >
-                            {OPTION_LABELS[oi]}
-                          </Text>
-                        </View>
-                        <Text
-                          style={[
-                            styles.optionText,
-                            isCorrect && styles.optionTextCorrect,
-                          ]}
-                        >
-                          {optText}
-                        </Text>
+                return (
+                  <View key={key} style={styles.conceptSection}>
+                    {/* CONCEPT HEADER */}
+                    <View style={styles.conceptHeader}>
+                      <View style={styles.conceptBadge}>
+                        <Text style={styles.conceptBadgeText}>{ci + 1}</Text>
                       </View>
-                    );
-                  })}
-
-                  {/* EXAM TRAP */}
-                  {concept.mcq.exam_trap && (
-                    <View style={styles.feedbackBlock}>
-                      <Text style={styles.feedbackLabel}>Exam Trap</Text>
-                      <Text style={styles.feedbackText}>
-                        {concept.mcq.exam_trap}
-                      </Text>
+                      <Text style={styles.conceptTitle}>{concept.title}</Text>
                     </View>
-                  )}
 
-                  {/* EXPLANATION */}
-                  {concept.mcq.explanation && (
-                    <View style={styles.feedbackBlock}>
-                      <Text style={styles.feedbackLabel}>Explanation</Text>
-                      <Text style={styles.feedbackText}>
-                        {concept.mcq.explanation}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              )}
+                    {/* BULLET POINTS */}
+                    {concept.concept && concept.concept.length > 0 && (
+                      <View style={styles.bulletSection}>
+                        {concept.concept.map((point, pi) => (
+                          <View key={pi} style={styles.bulletRow}>
+                            <View style={styles.bulletDot} />
+                            <Text style={styles.bulletText}>{point}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
 
-              {/* STUDENT DOUBTS */}
-              {concept.student_doubts && concept.student_doubts.length > 0 && (
-                <View style={styles.doubtsCard}>
-                  <Text style={styles.doubtsLabel}>Student Doubts</Text>
-                  {concept.student_doubts.map((d, di) => (
-                    <View key={di} style={styles.doubtItem}>
-                      <Text style={styles.doubtQ}>Q: {d.doubt}</Text>
-                      <Text style={styles.doubtA}>A: {d.answer}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
+                    {/* MCQ */}
+                    {concept.mcq && concept.mcq.stem && (
+                      <View style={styles.mcqCard}>
+                        <Text style={styles.mcqLabel}>MCQ</Text>
+                        <Text style={styles.mcqStem}>{concept.mcq.stem}</Text>
 
-              {ci < conceptKeys.length - 1 && <View style={styles.divider} />}
+                        {OPTION_KEYS.map((optKey, oi) => {
+                          const optText = concept.mcq[optKey];
+                          if (!optText) return null;
+                          const isCorrect =
+                            concept.mcq.correct_option?.toUpperCase() ===
+                            OPTION_LABELS[oi];
+
+                          return (
+                            <View
+                              key={optKey}
+                              style={[
+                                styles.optionRow,
+                                isCorrect && styles.optionCorrect,
+                              ]}
+                            >
+                              <View
+                                style={[
+                                  styles.optionLabelCircle,
+                                  isCorrect && styles.optionLabelCorrect,
+                                ]}
+                              >
+                                <Text
+                                  style={[
+                                    styles.optionLabel,
+                                    isCorrect && styles.optionLabelTextCorrect,
+                                  ]}
+                                >
+                                  {OPTION_LABELS[oi]}
+                                </Text>
+                              </View>
+                              <Text
+                                style={[
+                                  styles.optionText,
+                                  isCorrect && styles.optionTextCorrect,
+                                ]}
+                              >
+                                {optText}
+                              </Text>
+                            </View>
+                          );
+                        })}
+
+                        {/* EXAM TRAP */}
+                        {concept.mcq.exam_trap && (
+                          <View style={styles.feedbackBlock}>
+                            <Text style={styles.feedbackLabel}>Exam Trap</Text>
+                            <Text style={styles.feedbackText}>
+                              {concept.mcq.exam_trap}
+                            </Text>
+                          </View>
+                        )}
+
+                        {/* EXPLANATION */}
+                        {concept.mcq.explanation && (
+                          <View style={styles.feedbackBlock}>
+                            <Text style={styles.feedbackLabel}>
+                              Explanation
+                            </Text>
+                            <Text style={styles.feedbackText}>
+                              {concept.mcq.explanation}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    )}
+
+                    {/* STUDENT DOUBTS */}
+                    {concept.student_doubts &&
+                      concept.student_doubts.length > 0 && (
+                        <View style={styles.doubtsCard}>
+                          <Text style={styles.doubtsLabel}>Student Doubts</Text>
+                          {concept.student_doubts.map((d, di) => (
+                            <View key={di} style={styles.doubtItem}>
+                              <Text style={styles.doubtQ}>Q: {d.doubt}</Text>
+                              <Text style={styles.doubtA}>A: {d.answer}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      )}
+
+                    {ci < conceptKeys.length - 1 && (
+                      <View style={styles.conceptDivider} />
+                    )}
+                  </View>
+                );
+              })}
+
+              {/* SEPARATOR BETWEEN QUESTIONS */}
+              {qi < data.length - 1 && <View style={styles.questionDivider} />}
             </View>
           );
         })}
@@ -461,65 +455,6 @@ const styles = StyleSheet.create({
   },
 
   // =========================================================================
-  // Question Tabs
-  // =========================================================================
-
-  tabBarContainer: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#1A1A1A',
-  },
-
-  tabBar: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-
-  tab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: '#1A1A1A',
-    borderWidth: 1,
-    borderColor: '#2D2D2D',
-  },
-
-  tabActive: {
-    backgroundColor: '#00D9FF',
-    borderColor: '#00D9FF',
-  },
-
-  tabText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#777',
-  },
-
-  tabTextActive: {
-    color: '#0F0F0F',
-  },
-
-  // =========================================================================
-  // Question Banner
-  // =========================================================================
-
-  questionBanner: {
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1A1A1A',
-    backgroundColor: '#141414',
-  },
-
-  questionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#F3EAD7',
-    lineHeight: 24,
-  },
-
-  // =========================================================================
   // Content
   // =========================================================================
 
@@ -529,7 +464,52 @@ const styles = StyleSheet.create({
 
   contentContainer: {
     padding: 16,
-    gap: 0,
+  },
+
+  // =========================================================================
+  // Question Block
+  // =========================================================================
+
+  questionBlock: {
+    gap: 14,
+  },
+
+  questionHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    paddingVertical: 8,
+  },
+
+  questionNumberBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#00D9FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  questionNumberText: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#0F0F0F',
+  },
+
+  questionTitle: {
+    flex: 1,
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#F3EAD7',
+    lineHeight: 25,
+    marginTop: 7,
+  },
+
+  questionDivider: {
+    height: 2,
+    backgroundColor: '#2D2D2D',
+    marginVertical: 24,
+    borderRadius: 1,
   },
 
   // =========================================================================
@@ -544,20 +524,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginTop: 8,
+    marginTop: 4,
   },
 
   conceptBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: '#252525',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   conceptBadgeText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '900',
     color: '#00D9FF',
   },
@@ -567,6 +547,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
     color: '#FFF1D6',
+  },
+
+  conceptDivider: {
+    height: 1,
+    backgroundColor: '#1F1F1F',
+    marginVertical: 10,
   },
 
   // =========================================================================
@@ -746,16 +732,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#BBB',
     lineHeight: 21,
-  },
-
-  // =========================================================================
-  // Divider
-  // =========================================================================
-
-  divider: {
-    height: 1,
-    backgroundColor: '#2D2D2D',
-    marginVertical: 16,
   },
 
   // =========================================================================
