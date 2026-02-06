@@ -324,8 +324,14 @@ setLoading(false);
                           <Text style={styles.doubtsLabel}>Student Doubts</Text>
                           {concept.student_doubts.map((d, di) => (
                             <View key={di} style={styles.doubtItem}>
-                              <Text style={styles.doubtQ}>Q: {d.doubt}</Text>
-                              <Text style={styles.doubtA}>A: {d.answer}</Text>
+                         <Text style={styles.doubtQ}>
+  Q: {parseInlineMarkup(d.doubt)}
+</Text>
+
+<Text style={styles.doubtA}>
+  A: {parseInlineMarkup(d.answer)}
+</Text>
+
                             </View>
                           ))}
                         </View>
