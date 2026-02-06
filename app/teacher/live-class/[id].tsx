@@ -231,7 +231,10 @@ setLoading(false);
                         {concept.concept.map((point, pi) => (
                           <View key={pi} style={styles.bulletRow}>
                             <View style={styles.bulletDot} />
-                            <Text style={styles.bulletText}>{point}</Text>
+<Text style={styles.bulletText}>
+  {parseInlineMarkup(point)}
+</Text>
+
                           </View>
                         ))}
                       </View>
