@@ -339,18 +339,24 @@ useEffect(() => {
 
     setCreating(true);
     setCreateError('');
+const questionsJson = Array.from(selectedQuestions).map((index) => ({
+  question: questions[index].question,
+  topic_order: questions[index].topic_order,
+}));
 
     const timeWithSeconds =
       scheduledTime.split(':').length === 2
         ? `${scheduledTime}:00`
         : scheduledTime;
 
-    const { error } = await supabase.rpc('create_battle_schedule', {
-      p_title: classTitle.trim(),
-      p_scheduled_date: scheduledDate,
-      p_scheduled_time: timeWithSeconds,
-      p_subject_1: selectedSubject,
-    });
+   const { error } = await supabase.rpc('create_battle_schedule', {
+  p_title: classTitle.trim(),
+  p_scheduled_date: scheduledDate,
+  p_scheduled_time: timeWithSeconds,
+  p_subject_1: selectedSubject,
+  p_questions_json: questionsJson,
+});
+
 
     if (error) {
       setCreateError(error.message || 'Failed to create class');
