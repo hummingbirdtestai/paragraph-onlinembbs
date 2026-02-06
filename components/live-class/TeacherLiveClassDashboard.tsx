@@ -59,7 +59,7 @@ const normalizeStatus = (status: string): LiveClass['status'] => {
       return 'upcoming';
   }
 };
-const [isTeacher, setIsTeacher] = useState<boolean | null>(null);
+
 
 
 // -----------------------------------------------------------------------------
@@ -127,14 +127,9 @@ export default function TeacherLiveClassDashboard() {
   // ---------------------------------------------------------------------------
 
   const { user } = useAuth();
+const [isTeacher, setIsTeacher] = useState<boolean | null>(null);
 
-  /**
-   * Adjust this depending on your schema:
-   * - user.role === 'teacher'
-   * - user.is_teacher === true
-   * - user.user_type === 'TEACHER'
-   */
-  const isTeacher = user?.role === 'teacher';
+
 
   // ---------------------------------------------------------------------------
   // 📐 Responsive
@@ -201,6 +196,25 @@ export default function TeacherLiveClassDashboard() {
   // ---------------------------------------------------------------------------
   // 🧲 Initial Load
   // ---------------------------------------------------------------------------
+useEffect(() => {
+  const fetchRole = async () => {
+    if (!user?.id) return;
+
+    const { data, error } = await supabase.rpc(
+      'get_signed_in_user_role'
+    );
+
+    if (error) {
+      console.error('❌ Failed to fetch user role', error);
+      setIsTeacher(false);
+      return;
+    }
+
+    setIsTeacher(data?.[0]?.is_teacher === true);
+  };
+
+  fetchRole();
+}, [user?.id]);
 
   useEffect(() => {
     fetchClasses();
@@ -368,6 +382,9 @@ export default function TeacherLiveClassDashboard() {
     const cols = isMobile ? 2 : 3;
     return (width - padding - gap * (cols - 1)) / cols;
   }, [width, isMobile]);
+if (isTeacher === null) {
+  return null; // or loader
+}
 
   // ---------------------------------------------------------------------------
   // 🖼️ Render
