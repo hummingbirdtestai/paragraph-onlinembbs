@@ -273,6 +273,9 @@ export default function TeacherLiveClassContent() {
                 const conceptKey = `concept-${qi}-${ci}`;
                 const mcqKey = `mcq-${qi}-${ci}`;
                 const doubtsKey = `doubts-${qi}-${ci}`;
+                const trapKey = `trap-${qi}-${ci}`;
+                const explanationKey = `explanation-${qi}-${ci}`;
+                const wrongKey = `wrong-${qi}-${ci}`;
 
                 return (
                   <View key={key} style={styles.conceptSection}>
@@ -364,38 +367,61 @@ export default function TeacherLiveClassContent() {
 
                             {concept.mcq.exam_trap && (
                               <View style={styles.feedbackBlock}>
-                                <Text style={styles.feedbackLabel}>Exam Trap</Text>
-                                <Text style={styles.feedbackText}>
-                                  {parseInlineMarkup(concept.mcq.exam_trap)}
-                                </Text>
+                                <View style={styles.cardHeader}>
+                                  <Text style={styles.feedbackLabel}>Exam Trap</Text>
+                                  <ToggleBtn
+                                    isOpen={!!openBlocks[trapKey]}
+                                    onPress={() => toggleBlock(trapKey)}
+                                  />
+                                </View>
+                                {openBlocks[trapKey] && (
+                                  <Text style={styles.feedbackText}>
+                                    {parseInlineMarkup(concept.mcq.exam_trap)}
+                                  </Text>
+                                )}
                               </View>
                             )}
 
                             {concept.mcq.explanation && (
                               <View style={styles.feedbackBlock}>
-                                <Text style={styles.feedbackLabel}>Explanation</Text>
-                                <Text style={styles.feedbackText}>
-                                  {parseInlineMarkup(concept.mcq.explanation)}
-                                </Text>
+                                <View style={styles.cardHeader}>
+                                  <Text style={styles.feedbackLabel}>Explanation</Text>
+                                  <ToggleBtn
+                                    isOpen={!!openBlocks[explanationKey]}
+                                    onPress={() => toggleBlock(explanationKey)}
+                                  />
+                                </View>
+                                {openBlocks[explanationKey] && (
+                                  <Text style={styles.feedbackText}>
+                                    {parseInlineMarkup(concept.mcq.explanation)}
+                                  </Text>
+                                )}
                               </View>
                             )}
 
                             {concept.mcq.wrong_answers_explained &&
                               Object.keys(concept.mcq.wrong_answers_explained).length > 0 && (
                                 <View style={styles.feedbackBlock}>
-                                  <Text style={styles.feedbackLabel}>
-                                    Why Other Options Are Wrong
-                                  </Text>
-                                  {Object.entries(concept.mcq.wrong_answers_explained).map(
-                                    ([label, text]) => (
-                                      <View key={label} style={{ marginTop: 10, paddingLeft: 8 }}>
-                                        <Text style={styles.wrongOptionLabel}>{label}.</Text>
-                                        <Text style={styles.feedbackText}>
-                                          {parseInlineMarkup(text)}
-                                        </Text>
-                                      </View>
-                                    )
-                                  )}
+                                  <View style={styles.cardHeader}>
+                                    <Text style={styles.feedbackLabel}>
+                                      Why Other Options Are Wrong
+                                    </Text>
+                                    <ToggleBtn
+                                      isOpen={!!openBlocks[wrongKey]}
+                                      onPress={() => toggleBlock(wrongKey)}
+                                    />
+                                  </View>
+                                  {openBlocks[wrongKey] &&
+                                    Object.entries(concept.mcq.wrong_answers_explained).map(
+                                      ([label, text]) => (
+                                        <View key={label} style={{ marginTop: 10, paddingLeft: 8 }}>
+                                          <Text style={styles.wrongOptionLabel}>{label}.</Text>
+                                          <Text style={styles.feedbackText}>
+                                            {parseInlineMarkup(text)}
+                                          </Text>
+                                        </View>
+                                      )
+                                    )}
                                 </View>
                               )}
                           </>
