@@ -103,25 +103,19 @@ function parseInlineMarkup(text: string): React.ReactNode {
 }
 
 // -----------------------------------------------------------------------------
-// Toggle Button Component
+// Push Button Component (always green +, triggers broadcast)
 // -----------------------------------------------------------------------------
 
-const ToggleBtn = ({
-  isOpen,
-  onPress,
-}: {
-  isOpen: boolean;
-  onPress: () => void;
-}) => (
+const PushBtn = ({ onPress }: { onPress: () => void }) => (
   <TouchableOpacity
-    onPress={onPress}
+    onPress={(e) => {
+      e.stopPropagation();
+      onPress();
+    }}
     activeOpacity={0.7}
-    style={[
-      styles.toggleBtn,
-      isOpen ? styles.toggleBtnClose : styles.toggleBtnOpen,
-    ]}
+    style={styles.pushBtn}
   >
-    <Text style={styles.toggleBtnText}>{isOpen ? '\u00D7' : '+'}</Text>
+    <Text style={styles.pushBtnText}>+</Text>
   </TouchableOpacity>
 );
 
@@ -139,6 +133,21 @@ export default function TeacherLiveClassContent() {
 
   const toggleBlock = (key: string) => {
     setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const pushToClassroom = async (payload: {
+    type: string;
+    content: unknown;
+    meta?: Record<string, unknown>;
+  }) => {
+    if (!id) return;
+    const channel = supabase.channel(`live-class-${id}`);
+    await channel.send({
+      type: 'broadcast',
+      event: 'teacher-push',
+      payload,
+    });
+    supabase.removeChannel(channel);
   };
 
   // ---------------------------------------------------------------------------
@@ -279,17 +288,25 @@ export default function TeacherLiveClassContent() {
 
                 return (
                   <View key={key} style={styles.conceptSection}>
-                    {/* CONCEPT HEADER + TOGGLE */}
-                    <View style={styles.conceptHeader}>
+                    <TouchableOpacity
+                      activeOpacity={0.85}
+                      onPress={() => toggleBlock(conceptKey)}
+                      style={styles.conceptHeader}
+                    >
                       <View style={styles.conceptBadge}>
                         <Text style={styles.conceptBadgeText}>{ci + 1}</Text>
                       </View>
                       <Text style={styles.conceptTitle}>{concept.title}</Text>
-                      <ToggleBtn
-                        isOpen={!!openBlocks[conceptKey]}
-                        onPress={() => toggleBlock(conceptKey)}
+                      <PushBtn
+                        onPress={() =>
+                          pushToClassroom({
+                            type: 'concept',
+                            content: concept.concept,
+                            meta: { qi, ci, title: concept.title },
+                          })
+                        }
                       />
-                    </View>
+                    </TouchableOpacity>
 
                     {openBlocks[conceptKey] && (
                       <>
@@ -308,16 +325,24 @@ export default function TeacherLiveClassContent() {
                       </>
                     )}
 
-                    {/* MCQ CARD + TOGGLE */}
                     {concept.mcq && concept.mcq.stem && (
                       <View style={styles.mcqCard}>
-                        <View style={styles.cardHeader}>
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          onPress={() => toggleBlock(mcqKey)}
+                          style={styles.cardHeader}
+                        >
                           <Text style={styles.mcqLabel}>MCQ</Text>
-                          <ToggleBtn
-                            isOpen={!!openBlocks[mcqKey]}
-                            onPress={() => toggleBlock(mcqKey)}
+                          <PushBtn
+                            onPress={() =>
+                              pushToClassroom({
+                                type: 'mcq',
+                                content: concept.mcq,
+                                meta: { qi, ci },
+                              })
+                            }
                           />
-                        </View>
+                        </TouchableOpacity>
 
                         {openBlocks[mcqKey] && (
                           <>
@@ -372,13 +397,22 @@ export default function TeacherLiveClassContent() {
 
                     {concept.mcq && concept.mcq.exam_trap && (
                       <View style={styles.feedbackBlock}>
-                        <View style={styles.cardHeader}>
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          onPress={() => toggleBlock(trapKey)}
+                          style={styles.cardHeader}
+                        >
                           <Text style={styles.feedbackLabel}>Exam Trap</Text>
-                          <ToggleBtn
-                            isOpen={!!openBlocks[trapKey]}
-                            onPress={() => toggleBlock(trapKey)}
+                          <PushBtn
+                            onPress={() =>
+                              pushToClassroom({
+                                type: 'exam_trap',
+                                content: concept.mcq.exam_trap,
+                                meta: { qi, ci },
+                              })
+                            }
                           />
-                        </View>
+                        </TouchableOpacity>
                         {openBlocks[trapKey] && (
                           <Text style={styles.feedbackText}>
                             {parseInlineMarkup(concept.mcq.exam_trap)}
@@ -389,13 +423,22 @@ export default function TeacherLiveClassContent() {
 
                     {concept.mcq && concept.mcq.explanation && (
                       <View style={styles.feedbackBlock}>
-                        <View style={styles.cardHeader}>
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          onPress={() => toggleBlock(explanationKey)}
+                          style={styles.cardHeader}
+                        >
                           <Text style={styles.feedbackLabel}>Explanation</Text>
-                          <ToggleBtn
-                            isOpen={!!openBlocks[explanationKey]}
-                            onPress={() => toggleBlock(explanationKey)}
+                          <PushBtn
+                            onPress={() =>
+                              pushToClassroom({
+                                type: 'explanation',
+                                content: concept.mcq.explanation,
+                                meta: { qi, ci },
+                              })
+                            }
                           />
-                        </View>
+                        </TouchableOpacity>
                         {openBlocks[explanationKey] && (
                           <Text style={styles.feedbackText}>
                             {parseInlineMarkup(concept.mcq.explanation)}
@@ -407,15 +450,24 @@ export default function TeacherLiveClassContent() {
                     {concept.mcq && concept.mcq.wrong_answers_explained &&
                       Object.keys(concept.mcq.wrong_answers_explained).length > 0 && (
                         <View style={styles.feedbackBlock}>
-                          <View style={styles.cardHeader}>
+                          <TouchableOpacity
+                            activeOpacity={0.85}
+                            onPress={() => toggleBlock(wrongKey)}
+                            style={styles.cardHeader}
+                          >
                             <Text style={styles.feedbackLabel}>
                               Why Other Options Are Wrong
                             </Text>
-                            <ToggleBtn
-                              isOpen={!!openBlocks[wrongKey]}
-                              onPress={() => toggleBlock(wrongKey)}
+                            <PushBtn
+                              onPress={() =>
+                                pushToClassroom({
+                                  type: 'wrong_answers',
+                                  content: concept.mcq.wrong_answers_explained,
+                                  meta: { qi, ci },
+                                })
+                              }
                             />
-                          </View>
+                          </TouchableOpacity>
                           {openBlocks[wrongKey] &&
                             Object.entries(concept.mcq.wrong_answers_explained).map(
                               ([label, text]) => (
@@ -430,16 +482,24 @@ export default function TeacherLiveClassContent() {
                         </View>
                       )}
 
-                    {/* STUDENT DOUBTS + TOGGLE */}
                     {concept.student_doubts && concept.student_doubts.length > 0 && (
                       <View style={styles.doubtsCard}>
-                        <View style={styles.cardHeader}>
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          onPress={() => toggleBlock(doubtsKey)}
+                          style={styles.cardHeader}
+                        >
                           <Text style={styles.doubtsLabel}>Student Doubts</Text>
-                          <ToggleBtn
-                            isOpen={!!openBlocks[doubtsKey]}
-                            onPress={() => toggleBlock(doubtsKey)}
+                          <PushBtn
+                            onPress={() =>
+                              pushToClassroom({
+                                type: 'student_doubts',
+                                content: concept.student_doubts,
+                                meta: { qi, ci },
+                              })
+                            }
                           />
-                        </View>
+                        </TouchableOpacity>
 
                         {openBlocks[doubtsKey] && (
                           <>
@@ -835,24 +895,16 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
 
-  // Toggle Button
-  toggleBtn: {
+  pushBtn: {
     width: 28,
     height: 28,
     borderRadius: 14,
+    backgroundColor: '#22C55E',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  toggleBtnOpen: {
-    backgroundColor: '#22C55E',
-  },
-
-  toggleBtnClose: {
-    backgroundColor: '#EF4444',
-  },
-
-  toggleBtnText: {
+  pushBtnText: {
     fontSize: 18,
     fontWeight: '900',
     color: '#0F0F0F',
