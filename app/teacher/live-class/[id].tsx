@@ -17,14 +17,18 @@ import { ChevronLeft } from 'lucide-react-native';
 
 interface MCQ {
   stem: string;
-  option_a: string;
-  option_b: string;
-  option_c: string;
-  option_d: string;
-  correct_option: string;
+  options: {
+    A: string;
+    B: string;
+    C: string;
+    D: string;
+  };
+  correct_answer: 'A' | 'B' | 'C' | 'D';
   explanation: string;
   exam_trap: string;
+  wrong_answers_explained?: Record<string, string>;
 }
+
 
 interface StudentDoubt {
   doubt: string;
@@ -47,12 +51,7 @@ interface BattleClassItem {
 type Mode = 'push' | 'over';
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const;
-const OPTION_KEYS: (keyof MCQ)[] = [
-  'option_a',
-  'option_b',
-  'option_c',
-  'option_d',
-];
+
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -244,49 +243,53 @@ setLoading(false);
                     {concept.mcq && concept.mcq.stem && (
                       <View style={styles.mcqCard}>
                         <Text style={styles.mcqLabel}>MCQ</Text>
-                        <Text style={styles.mcqStem}>{concept.mcq.stem}</Text>
+<Text style={styles.mcqStem}>
+  {parseInlineMarkup(concept.mcq.stem)}
+</Text>
 
-                        {OPTION_KEYS.map((optKey, oi) => {
-                          const optText = concept.mcq[optKey];
-                          if (!optText) return null;
-                          const isCorrect =
-                            concept.mcq.correct_option?.toUpperCase() ===
-                            OPTION_LABELS[oi];
 
-                          return (
-                            <View
-                              key={optKey}
-                              style={[
-                                styles.optionRow,
-                                isCorrect && styles.optionCorrect,
-                              ]}
-                            >
-                              <View
-                                style={[
-                                  styles.optionLabelCircle,
-                                  isCorrect && styles.optionLabelCorrect,
-                                ]}
-                              >
-                                <Text
-                                  style={[
-                                    styles.optionLabel,
-                                    isCorrect && styles.optionLabelTextCorrect,
-                                  ]}
-                                >
-                                  {OPTION_LABELS[oi]}
-                                </Text>
-                              </View>
-                              <Text
-                                style={[
-                                  styles.optionText,
-                                  isCorrect && styles.optionTextCorrect,
-                                ]}
-                              >
-                                {optText}
-                              </Text>
-                            </View>
-                          );
-                        })}
+                    {(['A', 'B', 'C', 'D'] as const).map(label => {
+  const optText = concept.mcq.options?.[label];
+  if (!optText) return null;
+
+  const isCorrect = concept.mcq.correct_answer === label;
+
+  return (
+    <View
+      key={label}
+      style={[
+        styles.optionRow,
+        isCorrect && styles.optionCorrect,
+      ]}
+    >
+      <View
+        style={[
+          styles.optionLabelCircle,
+          isCorrect && styles.optionLabelCorrect,
+        ]}
+      >
+        <Text
+          style={[
+            styles.optionLabel,
+            isCorrect && styles.optionLabelTextCorrect,
+          ]}
+        >
+          {label}
+        </Text>
+      </View>
+
+      <Text
+        style={[
+          styles.optionText,
+          isCorrect && styles.optionTextCorrect,
+        ]}
+      >
+        {parseInlineMarkup(optText)}
+      </Text>
+    </View>
+  );
+})}
+
 
                         {/* EXAM TRAP */}
                         {concept.mcq.exam_trap && (
