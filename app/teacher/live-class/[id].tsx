@@ -324,7 +324,7 @@ setLoading(false);
 
       {Object.entries(concept.mcq.wrong_answers_explained).map(
         ([label, text]) => (
-          <View key={label} style={{ marginTop: 8 }}>
+          <View key={label} style={{ marginTop: 10, paddingLeft: 8 }}>
             <Text style={styles.wrongOptionLabel}>
               {label}.
             </Text>
