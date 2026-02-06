@@ -127,8 +127,6 @@ setData(sorted);
 setLoading(false);
 
 
-      setData(sorted);
-      setLoading(false);
     };
 
     fetchContent();
