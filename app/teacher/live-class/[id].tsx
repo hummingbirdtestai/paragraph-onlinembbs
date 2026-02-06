@@ -289,9 +289,10 @@ setLoading(false);
                         {concept.mcq.exam_trap && (
                           <View style={styles.feedbackBlock}>
                             <Text style={styles.feedbackLabel}>Exam Trap</Text>
-                            <Text style={styles.feedbackText}>
-                              {concept.mcq.exam_trap}
-                            </Text>
+                         <Text style={styles.feedbackText}>
+  {parseInlineMarkup(concept.mcq.exam_trap)}
+</Text>
+
                           </View>
                         )}
 
@@ -301,9 +302,10 @@ setLoading(false);
                             <Text style={styles.feedbackLabel}>
                               Explanation
                             </Text>
-                            <Text style={styles.feedbackText}>
-                              {concept.mcq.explanation}
-                            </Text>
+<Text style={styles.feedbackText}>
+  {parseInlineMarkup(concept.mcq.explanation)}
+</Text>
+
                           </View>
                         )}
                       </View>
@@ -713,6 +715,10 @@ const styles = StyleSheet.create({
     color: '#DDD',
     lineHeight: 22,
   },
+bold: {
+  fontWeight: '700',
+  color: '#25D366',
+},
 
   // =========================================================================
   // Doubts
@@ -796,3 +802,46 @@ const styles = StyleSheet.create({
     color: '#0F0F0F',
   },
 });
+function parseInlineMarkup(text: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  let key = 0;
+
+  const regex =
+    /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*_[^_]+_\*|\*[^*]+\*|_[^_]+_)/g;
+
+  const segments = text.split(regex);
+
+  segments.forEach(segment => {
+    if (segment.startsWith('***')) {
+      parts.push(
+        <Text key={key++} style={styles.bold}>
+          {segment.slice(3, -3)}
+        </Text>
+      );
+    } else if (segment.startsWith('**')) {
+      parts.push(
+        <Text key={key++} style={styles.bold}>
+          {segment.slice(2, -2)}
+        </Text>
+      );
+    } else if (segment.startsWith('*_')) {
+      parts.push(
+        <Text key={key++} style={styles.bold}>
+          {segment.slice(2, -2)}
+        </Text>
+      );
+    } else if (segment.startsWith('*')) {
+      parts.push(
+        <Text key={key++} style={styles.bold}>
+          {segment.slice(1, -1)}
+        </Text>
+      );
+    } else if (segment.startsWith('_')) {
+      parts.push(<Text key={key++}>{segment.slice(1, -1)}</Text>);
+    } else {
+      parts.push(<Text key={key++}>{segment}</Text>);
+    }
+  });
+
+  return <>{parts}</>;
+}
