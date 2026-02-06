@@ -314,6 +314,28 @@ setLoading(false);
 
                           </View>
                         )}
+                        {/* WRONG ANSWERS EXPLAINED */}
+{concept.mcq.wrong_answers_explained &&
+  Object.keys(concept.mcq.wrong_answers_explained).length > 0 && (
+    <View style={styles.feedbackBlock}>
+      <Text style={styles.feedbackLabel}>
+        Why Other Options Are Wrong
+      </Text>
+
+      {Object.entries(concept.mcq.wrong_answers_explained).map(
+        ([label, text]) => (
+          <View key={label} style={{ marginTop: 8 }}>
+            <Text style={styles.wrongOptionLabel}>
+              {label}.
+            </Text>
+            <Text style={styles.feedbackText}>
+              {parseInlineMarkup(text)}
+            </Text>
+          </View>
+        )
+      )}
+    </View>
+  )}
                       </View>
                     )}
 
@@ -720,6 +742,11 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     letterSpacing: 0.5,
   },
+wrongOptionLabel: {
+  fontSize: 13,
+  fontWeight: '800',
+  color: '#F59E0B',
+},
 
   feedbackText: {
     fontSize: 14,
