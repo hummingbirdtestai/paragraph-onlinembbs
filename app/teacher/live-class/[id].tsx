@@ -29,7 +29,6 @@ interface MCQ {
   wrong_answers_explained?: Record<string, string>;
 }
 
-
 interface StudentDoubt {
   doubt: string;
   answer: string;
@@ -48,11 +47,6 @@ interface BattleClassItem {
   class_json: Record<string, ConceptBlock>;
 }
 
-type Mode = 'push' | 'over';
-
-const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const;
-
-
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------
@@ -64,6 +58,73 @@ const getSortedConceptKeys = (classJson: Record<string, ConceptBlock>) =>
     return numA - numB;
   });
 
+function parseInlineMarkup(text: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  let key = 0;
+
+  const regex =
+    /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*_[^_]+_\*|\*[^*]+\*|_[^_]+_)/g;
+
+  const segments = text.split(regex);
+
+  segments.forEach(segment => {
+    if (segment.startsWith('***')) {
+      parts.push(
+        <Text key={key++} style={styles.bold}>
+          {segment.slice(3, -3)}
+        </Text>
+      );
+    } else if (segment.startsWith('**')) {
+      parts.push(
+        <Text key={key++} style={styles.bold}>
+          {segment.slice(2, -2)}
+        </Text>
+      );
+    } else if (segment.startsWith('*_')) {
+      parts.push(
+        <Text key={key++} style={styles.bold}>
+          {segment.slice(2, -2)}
+        </Text>
+      );
+    } else if (segment.startsWith('*')) {
+      parts.push(
+        <Text key={key++} style={styles.bold}>
+          {segment.slice(1, -1)}
+        </Text>
+      );
+    } else if (segment.startsWith('_')) {
+      parts.push(<Text key={key++}>{segment.slice(1, -1)}</Text>);
+    } else {
+      parts.push(<Text key={key++}>{segment}</Text>);
+    }
+  });
+
+  return <>{parts}</>;
+}
+
+// -----------------------------------------------------------------------------
+// Toggle Button Component
+// -----------------------------------------------------------------------------
+
+const ToggleBtn = ({
+  isOpen,
+  onPress,
+}: {
+  isOpen: boolean;
+  onPress: () => void;
+}) => (
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.7}
+    style={[
+      styles.toggleBtn,
+      isOpen ? styles.toggleBtnClose : styles.toggleBtnOpen,
+    ]}
+  >
+    <Text style={styles.toggleBtnText}>{isOpen ? '\u00D7' : '+'}</Text>
+  </TouchableOpacity>
+);
+
 // -----------------------------------------------------------------------------
 // Screen
 // -----------------------------------------------------------------------------
@@ -74,7 +135,11 @@ export default function TeacherLiveClassContent() {
   const [data, setData] = useState<BattleClassItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [mode, setMode] = useState<Mode>('push');
+  const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({});
+
+  const toggleBlock = (key: string) => {
+    setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   // ---------------------------------------------------------------------------
   // Fetch
@@ -91,41 +156,36 @@ export default function TeacherLiveClassContent() {
         'get_battle_class_contentv1',
         { p_battle_id: id }
       );
-console.log('📡 RPC raw data:', rpcData);
-console.log('❌ RPC error:', rpcError);
-console.log('🧪 RPC data type:', typeof rpcData);
-console.log('🧪 Is Array?', Array.isArray(rpcData));
+      console.log('RPC raw data:', rpcData);
+      console.log('RPC error:', rpcError);
+      console.log('RPC data type:', typeof rpcData);
+      console.log('Is Array?', Array.isArray(rpcData));
+
       if (rpcError) {
         setError(rpcError.message || 'Failed to load class content');
         setLoading(false);
         return;
       }
 
+      let parsedData: BattleClassItem[] = [];
 
-// 🔁 Normalize RPC output (RPC returns JSONB, not rows)
-let parsedData: BattleClassItem[] = [];
+      if (Array.isArray(rpcData)) {
+        parsedData = rpcData;
+      } else if (rpcData && typeof rpcData === 'object') {
+        parsedData = rpcData as unknown as BattleClassItem[];
+      } else {
+        parsedData = [];
+      }
 
-if (Array.isArray(rpcData)) {
-  // already an array (future-safe)
-  parsedData = rpcData;
-} else if (rpcData && typeof rpcData === 'object') {
-  // jsonb returned as object/array
-  parsedData = rpcData as unknown as BattleClassItem[];
-} else {
-  parsedData = [];
-}
+      console.log('Parsed data:', parsedData);
+      console.log('Parsed length:', parsedData.length);
 
-console.log('✅ Parsed data:', parsedData);
-console.log('🔢 Parsed length:', parsedData.length);
+      const sorted = parsedData.sort(
+        (a, b) => a.topic_order - b.topic_order
+      );
 
-const sorted = parsedData.sort(
-  (a, b) => a.topic_order - b.topic_order
-);
-
-setData(sorted);
-setLoading(false);
-
-
+      setData(sorted);
+      setLoading(false);
     };
 
     fetchContent();
@@ -172,7 +232,6 @@ setLoading(false);
 
   return (
     <View style={styles.container}>
-      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -191,7 +250,6 @@ setLoading(false);
         <View style={{ width: 64 }} />
       </View>
 
-      {/* ALL QUESTIONS — SEQUENTIAL VERTICAL SCROLL */}
       <ScrollView
         style={styles.contentScroll}
         contentContainerStyle={styles.contentContainer}
@@ -201,7 +259,6 @@ setLoading(false);
 
           return (
             <View key={item.topic_order} style={styles.questionBlock}>
-              {/* QUESTION HEADER */}
               <View style={styles.questionHeader}>
                 <View style={styles.questionNumberBadge}>
                   <Text style={styles.questionNumberText}>Q{qi + 1}</Text>
@@ -209,155 +266,170 @@ setLoading(false);
                 <Text style={styles.questionTitle}>{item.question}</Text>
               </View>
 
-              {/* CONCEPTS FOR THIS QUESTION */}
               {conceptKeys.map((key, ci) => {
                 const concept = item.class_json[key];
                 if (!concept || !concept.title) return null;
 
+                const conceptKey = `concept-${qi}-${ci}`;
+                const mcqKey = `mcq-${qi}-${ci}`;
+                const doubtsKey = `doubts-${qi}-${ci}`;
+
                 return (
                   <View key={key} style={styles.conceptSection}>
-                    {/* CONCEPT HEADER */}
+                    {/* CONCEPT HEADER + TOGGLE */}
                     <View style={styles.conceptHeader}>
                       <View style={styles.conceptBadge}>
                         <Text style={styles.conceptBadgeText}>{ci + 1}</Text>
                       </View>
                       <Text style={styles.conceptTitle}>{concept.title}</Text>
+                      <ToggleBtn
+                        isOpen={!!openBlocks[conceptKey]}
+                        onPress={() => toggleBlock(conceptKey)}
+                      />
                     </View>
 
-                    {/* BULLET POINTS */}
-                    {concept.concept && concept.concept.length > 0 && (
-                      <View style={styles.bulletSection}>
-                        {concept.concept.map((point, pi) => (
-                          <View key={pi} style={styles.bulletRow}>
-                            <View style={styles.bulletDot} />
-<Text style={styles.bulletText}>
-  {parseInlineMarkup(point)}
-</Text>
-
+                    {openBlocks[conceptKey] && (
+                      <>
+                        {concept.concept && concept.concept.length > 0 && (
+                          <View style={styles.bulletSection}>
+                            {concept.concept.map((point, pi) => (
+                              <View key={pi} style={styles.bulletRow}>
+                                <View style={styles.bulletDot} />
+                                <Text style={styles.bulletText}>
+                                  {parseInlineMarkup(point)}
+                                </Text>
+                              </View>
+                            ))}
                           </View>
-                        ))}
-                      </View>
+                        )}
+                      </>
                     )}
 
-                    {/* MCQ */}
+                    {/* MCQ CARD + TOGGLE */}
                     {concept.mcq && concept.mcq.stem && (
                       <View style={styles.mcqCard}>
-                        <Text style={styles.mcqLabel}>MCQ</Text>
-<Text style={styles.mcqStem}>
-  {parseInlineMarkup(concept.mcq.stem)}
-</Text>
+                        <View style={styles.cardHeader}>
+                          <Text style={styles.mcqLabel}>MCQ</Text>
+                          <ToggleBtn
+                            isOpen={!!openBlocks[mcqKey]}
+                            onPress={() => toggleBlock(mcqKey)}
+                          />
+                        </View>
 
-
-                    {(['A', 'B', 'C', 'D'] as const).map(label => {
-  const optText = concept.mcq.options?.[label];
-  if (!optText) return null;
-
-  const isCorrect = concept.mcq.correct_answer === label;
-
-  return (
-    <View
-      key={label}
-      style={[
-        styles.optionRow,
-        isCorrect && styles.optionCorrect,
-      ]}
-    >
-      <View
-        style={[
-          styles.optionLabelCircle,
-          isCorrect && styles.optionLabelCorrect,
-        ]}
-      >
-        <Text
-          style={[
-            styles.optionLabel,
-            isCorrect && styles.optionLabelTextCorrect,
-          ]}
-        >
-          {label}
-        </Text>
-      </View>
-
-      <Text
-        style={[
-          styles.optionText,
-          isCorrect && styles.optionTextCorrect,
-        ]}
-      >
-        {parseInlineMarkup(optText)}
-      </Text>
-    </View>
-  );
-})}
-
-
-                        {/* EXAM TRAP */}
-                        {concept.mcq.exam_trap && (
-                          <View style={styles.feedbackBlock}>
-                            <Text style={styles.feedbackLabel}>Exam Trap</Text>
-                         <Text style={styles.feedbackText}>
-  {parseInlineMarkup(concept.mcq.exam_trap)}
-</Text>
-
-                          </View>
-                        )}
-
-                        {/* EXPLANATION */}
-                        {concept.mcq.explanation && (
-                          <View style={styles.feedbackBlock}>
-                            <Text style={styles.feedbackLabel}>
-                              Explanation
+                        {openBlocks[mcqKey] && (
+                          <>
+                            <Text style={styles.mcqStem}>
+                              {parseInlineMarkup(concept.mcq.stem)}
                             </Text>
-<Text style={styles.feedbackText}>
-  {parseInlineMarkup(concept.mcq.explanation)}
-</Text>
 
-                          </View>
+                            {(['A', 'B', 'C', 'D'] as const).map(label => {
+                              const optText = concept.mcq.options?.[label];
+                              if (!optText) return null;
+                              const isCorrect = concept.mcq.correct_answer === label;
+
+                              return (
+                                <View
+                                  key={label}
+                                  style={[
+                                    styles.optionRow,
+                                    isCorrect && styles.optionCorrect,
+                                  ]}
+                                >
+                                  <View
+                                    style={[
+                                      styles.optionLabelCircle,
+                                      isCorrect && styles.optionLabelCorrect,
+                                    ]}
+                                  >
+                                    <Text
+                                      style={[
+                                        styles.optionLabel,
+                                        isCorrect && styles.optionLabelTextCorrect,
+                                      ]}
+                                    >
+                                      {label}
+                                    </Text>
+                                  </View>
+                                  <Text
+                                    style={[
+                                      styles.optionText,
+                                      isCorrect && styles.optionTextCorrect,
+                                    ]}
+                                  >
+                                    {parseInlineMarkup(optText)}
+                                  </Text>
+                                </View>
+                              );
+                            })}
+
+                            {concept.mcq.exam_trap && (
+                              <View style={styles.feedbackBlock}>
+                                <Text style={styles.feedbackLabel}>Exam Trap</Text>
+                                <Text style={styles.feedbackText}>
+                                  {parseInlineMarkup(concept.mcq.exam_trap)}
+                                </Text>
+                              </View>
+                            )}
+
+                            {concept.mcq.explanation && (
+                              <View style={styles.feedbackBlock}>
+                                <Text style={styles.feedbackLabel}>Explanation</Text>
+                                <Text style={styles.feedbackText}>
+                                  {parseInlineMarkup(concept.mcq.explanation)}
+                                </Text>
+                              </View>
+                            )}
+
+                            {concept.mcq.wrong_answers_explained &&
+                              Object.keys(concept.mcq.wrong_answers_explained).length > 0 && (
+                                <View style={styles.feedbackBlock}>
+                                  <Text style={styles.feedbackLabel}>
+                                    Why Other Options Are Wrong
+                                  </Text>
+                                  {Object.entries(concept.mcq.wrong_answers_explained).map(
+                                    ([label, text]) => (
+                                      <View key={label} style={{ marginTop: 10, paddingLeft: 8 }}>
+                                        <Text style={styles.wrongOptionLabel}>{label}.</Text>
+                                        <Text style={styles.feedbackText}>
+                                          {parseInlineMarkup(text)}
+                                        </Text>
+                                      </View>
+                                    )
+                                  )}
+                                </View>
+                              )}
+                          </>
                         )}
-                        {/* WRONG ANSWERS EXPLAINED */}
-{concept.mcq.wrong_answers_explained &&
-  Object.keys(concept.mcq.wrong_answers_explained).length > 0 && (
-    <View style={styles.feedbackBlock}>
-      <Text style={styles.feedbackLabel}>
-        Why Other Options Are Wrong
-      </Text>
-
-      {Object.entries(concept.mcq.wrong_answers_explained).map(
-        ([label, text]) => (
-          <View key={label} style={{ marginTop: 10, paddingLeft: 8 }}>
-            <Text style={styles.wrongOptionLabel}>
-              {label}.
-            </Text>
-            <Text style={styles.feedbackText}>
-              {parseInlineMarkup(text)}
-            </Text>
-          </View>
-        )
-      )}
-    </View>
-  )}
                       </View>
                     )}
 
-                    {/* STUDENT DOUBTS */}
-                    {concept.student_doubts &&
-                      concept.student_doubts.length > 0 && (
-                        <View style={styles.doubtsCard}>
+                    {/* STUDENT DOUBTS + TOGGLE */}
+                    {concept.student_doubts && concept.student_doubts.length > 0 && (
+                      <View style={styles.doubtsCard}>
+                        <View style={styles.cardHeader}>
                           <Text style={styles.doubtsLabel}>Student Doubts</Text>
-                          {concept.student_doubts.map((d, di) => (
-                            <View key={di} style={styles.doubtItem}>
-                         <Text style={styles.doubtQ}>
-  Q: {parseInlineMarkup(d.doubt)}
-</Text>
-
-<Text style={styles.doubtA}>
-  A: {parseInlineMarkup(d.answer)}
-</Text>
-
-                            </View>
-                          ))}
+                          <ToggleBtn
+                            isOpen={!!openBlocks[doubtsKey]}
+                            onPress={() => toggleBlock(doubtsKey)}
+                          />
                         </View>
-                      )}
+
+                        {openBlocks[doubtsKey] && (
+                          <>
+                            {concept.student_doubts.map((d, di) => (
+                              <View key={di} style={styles.doubtItem}>
+                                <Text style={styles.doubtQ}>
+                                  Q: {parseInlineMarkup(d.doubt)}
+                                </Text>
+                                <Text style={styles.doubtA}>
+                                  A: {parseInlineMarkup(d.answer)}
+                                </Text>
+                              </View>
+                            ))}
+                          </>
+                        )}
+                      </View>
+                    )}
 
                     {ci < conceptKeys.length - 1 && (
                       <View style={styles.conceptDivider} />
@@ -366,47 +438,13 @@ setLoading(false);
                 );
               })}
 
-              {/* SEPARATOR BETWEEN QUESTIONS */}
               {qi < data.length - 1 && <View style={styles.questionDivider} />}
             </View>
           );
         })}
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: 40 }} />
       </ScrollView>
-
-      {/* BOTTOM BAR — PUSH / OVER */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity
-          style={[styles.modeBtn, mode === 'push' && styles.modeBtnActive]}
-          onPress={() => setMode('push')}
-          activeOpacity={0.7}
-        >
-          <Text
-            style={[
-              styles.modeBtnText,
-              mode === 'push' && styles.modeBtnTextActive,
-            ]}
-          >
-            PUSH
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.modeBtn, mode === 'over' && styles.modeBtnActive]}
-          onPress={() => setMode('over')}
-          activeOpacity={0.7}
-        >
-          <Text
-            style={[
-              styles.modeBtnText,
-              mode === 'over' && styles.modeBtnTextActive,
-            ]}
-          >
-            OVER
-          </Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -465,10 +503,6 @@ const styles = StyleSheet.create({
     color: '#00D9FF',
   },
 
-  // =========================================================================
-  // Header
-  // =========================================================================
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -511,10 +545,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  // =========================================================================
-  // Content
-  // =========================================================================
-
   contentScroll: {
     flex: 1,
   },
@@ -522,10 +552,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
   },
-
-  // =========================================================================
-  // Question Block
-  // =========================================================================
 
   questionBlock: {
     gap: 14,
@@ -569,10 +595,6 @@ const styles = StyleSheet.create({
     borderRadius: 1,
   },
 
-  // =========================================================================
-  // Concept Section
-  // =========================================================================
-
   conceptSection: {
     gap: 12,
   },
@@ -612,10 +634,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
 
-  // =========================================================================
-  // Bullet Points
-  // =========================================================================
-
   bulletSection: {
     gap: 8,
     paddingLeft: 4,
@@ -642,10 +660,6 @@ const styles = StyleSheet.create({
     color: '#DDD',
     lineHeight: 22,
   },
-
-  // =========================================================================
-  // MCQ Card
-  // =========================================================================
 
   mcqCard: {
     backgroundColor: '#1A1A1A',
@@ -723,10 +737,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // =========================================================================
-  // Feedback (Exam Trap + Explanation)
-  // =========================================================================
-
   feedbackBlock: {
     backgroundColor: '#252525',
     borderRadius: 10,
@@ -742,11 +752,12 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     letterSpacing: 0.5,
   },
-wrongOptionLabel: {
-  fontSize: 13,
-  fontWeight: '800',
-  color: '#F59E0B',
-},
+
+  wrongOptionLabel: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#F59E0B',
+  },
 
   feedbackText: {
     fontSize: 14,
@@ -754,14 +765,11 @@ wrongOptionLabel: {
     color: '#DDD',
     lineHeight: 22,
   },
-bold: {
-  fontWeight: '700',
-  color: '#25D366',
-},
 
-  // =========================================================================
-  // Doubts
-  // =========================================================================
+  bold: {
+    fontWeight: '700',
+    color: '#25D366',
+  },
 
   doubtsCard: {
     backgroundColor: '#1A1A1A',
@@ -800,87 +808,32 @@ bold: {
     lineHeight: 21,
   },
 
-  // =========================================================================
-  // Bottom Bar — Push / Over
-  // =========================================================================
-
-  bottomBar: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderTopWidth: 1,
-    borderTopColor: '#1A1A1A',
-    backgroundColor: '#0F0F0F',
-  },
-
-  modeBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
+  // Toggle Button
+  toggleBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#1A1A1A',
-    borderWidth: 1,
-    borderColor: '#2D2D2D',
   },
 
-  modeBtnActive: {
-    backgroundColor: '#00D9FF',
-    borderColor: '#00D9FF',
+  toggleBtnOpen: {
+    backgroundColor: '#22C55E',
   },
 
-  modeBtnText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#777',
-    letterSpacing: 1,
+  toggleBtnClose: {
+    backgroundColor: '#EF4444',
   },
 
-  modeBtnTextActive: {
+  toggleBtnText: {
+    fontSize: 18,
+    fontWeight: '900',
     color: '#0F0F0F',
   },
+
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
 });
-function parseInlineMarkup(text: string): React.ReactNode {
-  const parts: React.ReactNode[] = [];
-  let key = 0;
-
-  const regex =
-    /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*_[^_]+_\*|\*[^*]+\*|_[^_]+_)/g;
-
-  const segments = text.split(regex);
-
-  segments.forEach(segment => {
-    if (segment.startsWith('***')) {
-      parts.push(
-        <Text key={key++} style={styles.bold}>
-          {segment.slice(3, -3)}
-        </Text>
-      );
-    } else if (segment.startsWith('**')) {
-      parts.push(
-        <Text key={key++} style={styles.bold}>
-          {segment.slice(2, -2)}
-        </Text>
-      );
-    } else if (segment.startsWith('*_')) {
-      parts.push(
-        <Text key={key++} style={styles.bold}>
-          {segment.slice(2, -2)}
-        </Text>
-      );
-    } else if (segment.startsWith('*')) {
-      parts.push(
-        <Text key={key++} style={styles.bold}>
-          {segment.slice(1, -1)}
-        </Text>
-      );
-    } else if (segment.startsWith('_')) {
-      parts.push(<Text key={key++}>{segment.slice(1, -1)}</Text>);
-    } else {
-      parts.push(<Text key={key++}>{segment}</Text>);
-    }
-  });
-
-  return <>{parts}</>;
-}
