@@ -135,17 +135,37 @@ export default function TeacherLiveClassContent() {
     setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const pushToClassroom = async (payload: {
+  const pushToClassroom = async ({
+    type,
+    content,
+    meta,
+  }: {
     type: string;
     content: unknown;
     meta?: Record<string, unknown>;
   }) => {
     if (!id) return;
-    const channel = supabase.channel(`live-class-${id}`);
+
+    const { data: row, error: rpcErr } = await supabase.rpc(
+      'push_battle_class_feed',
+      {
+        p_battle_id: id,
+        p_type: type,
+        p_payload: content,
+        p_meta: meta ?? {},
+      }
+    );
+
+    if (rpcErr) {
+      console.error('Persist failed', rpcErr);
+      return;
+    }
+
+    const channel = supabase.channel(`battle:${id}`);
     await channel.send({
       type: 'broadcast',
-      event: 'teacher-push',
-      payload,
+      event: 'class-feed-push',
+      payload: row,
     });
     supabase.removeChannel(channel);
   };
