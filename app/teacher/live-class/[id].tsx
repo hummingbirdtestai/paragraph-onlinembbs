@@ -90,7 +90,7 @@ export default function TeacherLiveClassContent() {
 
       const { data: rpcData, error: rpcError } = await supabase.rpc(
         'get_battle_class_contentv1',
-        { p_battle_id: Number(id) }
+        { p_battle_id: id }
       );
 console.log('📡 RPC raw data:', rpcData);
 console.log('❌ RPC error:', rpcError);
