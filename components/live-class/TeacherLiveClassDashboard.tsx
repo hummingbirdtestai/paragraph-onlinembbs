@@ -59,6 +59,8 @@ const normalizeStatus = (status: string): LiveClass['status'] => {
       return 'upcoming';
   }
 };
+const [isTeacher, setIsTeacher] = useState<boolean | null>(null);
+
 
 // -----------------------------------------------------------------------------
 // 🤖 AI BOT ICON SET (FIXED, STABLE, NO FLICKER)
