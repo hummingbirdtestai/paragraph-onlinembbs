@@ -1,3 +1,4 @@
+//app/teacher/live-class/[id].tsx
 import React, { useEffect, useState } from 'react';
 import {
   View,
