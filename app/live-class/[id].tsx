@@ -16,13 +16,6 @@ import { supabase } from '@/lib/supabaseClient';
 // Helpers
 // -----------------------------------------------------------------------------
 
-const getSortedConceptKeys = (classJson: Record<string, any>) =>
-  Object.keys(classJson).sort((a, b) => {
-    const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
-    const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
-    return numA - numB;
-  });
-
 function parseInlineMarkup(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let key = 0;
@@ -114,7 +107,11 @@ export default function StudentLiveClassRoom() {
         'broadcast',
         { event: 'class-feed-push' },
         payload => {
-          setFeed(prev => [...prev, payload.payload]);
+          setFeed(prev =>
+            prev.some(p => p.seq === payload.payload.seq)
+              ? prev
+              : [...prev, payload.payload]
+          );
         }
       )
       .subscribe();
@@ -152,7 +149,9 @@ export default function StudentLiveClassRoom() {
                     style={styles.conceptHeader}
                   >
                     <View style={styles.conceptBadge}>
-                      <Text style={styles.conceptBadgeText}>{idx + 1}</Text>
+                      <Text style={styles.conceptBadgeText}>
+                        {item.meta?.ci != null ? item.meta.ci + 1 : ''}
+                      </Text>
                     </View>
                     <Text style={styles.conceptTitle}>
                       {item.meta?.title || 'Concept'}
@@ -268,8 +267,8 @@ export default function StudentLiveClassRoom() {
               );
 
             case 'exam_trap':
-              const mcqSeq = item.meta?.mcqSeq || item.seq;
-              const trapAttempt = mcqAttempts[mcqSeq];
+              const mcqSeq = item.meta?.mcq_feed_seq;
+              const trapAttempt = mcqSeq ? mcqAttempts[mcqSeq] : null;
               const hasAnsweredTrap = !!trapAttempt;
 
               return hasAnsweredTrap ? (
@@ -290,8 +289,8 @@ export default function StudentLiveClassRoom() {
               ) : null;
 
             case 'explanation':
-              const expMcqSeq = item.meta?.mcqSeq || item.seq;
-              const expAttempt = mcqAttempts[expMcqSeq];
+              const expMcqSeq = item.meta?.mcq_feed_seq;
+              const expAttempt = expMcqSeq ? mcqAttempts[expMcqSeq] : null;
               const hasAnsweredExp = !!expAttempt;
 
               return hasAnsweredExp ? (
@@ -312,8 +311,8 @@ export default function StudentLiveClassRoom() {
               ) : null;
 
             case 'wrong_answers':
-              const wrongMcqSeq = item.meta?.mcqSeq || item.seq;
-              const wrongAttempt = mcqAttempts[wrongMcqSeq];
+              const wrongMcqSeq = item.meta?.mcq_feed_seq;
+              const wrongAttempt = wrongMcqSeq ? mcqAttempts[wrongMcqSeq] : null;
               const hasAnsweredWrong = !!wrongAttempt;
 
               return hasAnsweredWrong ? (

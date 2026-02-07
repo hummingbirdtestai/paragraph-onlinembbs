@@ -131,6 +131,7 @@ export default function TeacherLiveClassContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({});
+  const [mcqSeqMap, setMcqSeqMap] = useState<Record<string, number>>({});
 
   const toggleBlock = (key: string) => {
     setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
@@ -145,7 +146,7 @@ export default function TeacherLiveClassContent() {
     content: unknown;
     meta?: Record<string, unknown>;
   }) => {
-    if (!id) return;
+    if (!id) return null;
 
     const { data: row, error: rpcErr } = await supabase.rpc(
       'push_battle_class_feed',
@@ -159,7 +160,7 @@ export default function TeacherLiveClassContent() {
 
     if (rpcErr) {
       console.error('Persist failed', rpcErr);
-      return;
+      return null;
     }
 
     const channel = supabase.channel(`battle:${id}`);
@@ -169,6 +170,8 @@ export default function TeacherLiveClassContent() {
       payload: row,
     });
     supabase.removeChannel(channel);
+
+    return row;
   };
 
   // ---------------------------------------------------------------------------
@@ -355,13 +358,19 @@ export default function TeacherLiveClassContent() {
                         >
                           <Text style={styles.mcqLabel}>MCQ</Text>
                           <PushBtn
-                            onPress={() =>
-                              pushToClassroom({
+                            onPress={async () => {
+                              const row = await pushToClassroom({
                                 type: 'mcq',
                                 content: concept.mcq,
                                 meta: { qi, ci },
-                              })
-                            }
+                              });
+                              if (row?.seq) {
+                                setMcqSeqMap(prev => ({
+                                  ...prev,
+                                  [mcqKey]: row.seq,
+                                }));
+                              }
+                            }}
                           />
                         </TouchableOpacity>
 
@@ -429,7 +438,7 @@ export default function TeacherLiveClassContent() {
                               pushToClassroom({
                                 type: 'exam_trap',
                                 content: concept.mcq.exam_trap,
-                                meta: { qi, ci },
+                                meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
                               })
                             }
                           />
@@ -455,7 +464,7 @@ export default function TeacherLiveClassContent() {
                               pushToClassroom({
                                 type: 'explanation',
                                 content: concept.mcq.explanation,
-                                meta: { qi, ci },
+                                meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
                               })
                             }
                           />
@@ -484,7 +493,7 @@ export default function TeacherLiveClassContent() {
                                 pushToClassroom({
                                   type: 'wrong_answers',
                                   content: concept.mcq.wrong_answers_explained,
-                                  meta: { qi, ci },
+                                  meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
                                 })
                               }
                             />
