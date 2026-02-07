@@ -127,8 +127,29 @@ export default function TeacherLiveClassContent() {
       | 'student_doubts',
   });
 
+  const scrollRef = React.useRef<ScrollView>(null);
+  const blockRefs = React.useRef<Record<string, View>>({});
+
   const toggleBlock = (key: string) => {
     setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const scrollToBlock = (key: string) => {
+    requestAnimationFrame(() => {
+      const node = blockRefs.current[key];
+      if (!node || !scrollRef.current) return;
+
+      node.measureLayout(
+        scrollRef.current as any,
+        (_x, y) => {
+          scrollRef.current?.scrollTo({
+            y: y - 20,
+            animated: true,
+          });
+        },
+        () => {}
+      );
+    });
   };
 
   const pushToClassroom = async ({
@@ -192,6 +213,7 @@ export default function TeacherLiveClassContent() {
         meta: { qi, ci, title: concept.title },
       });
       setOpenBlocks(prev => ({ ...prev, [blockKey]: true }));
+      scrollToBlock(blockKey);
       setCursor(prev => ({ ...prev, step: 'mcq' }));
     } else if (step === 'mcq' && concept.mcq?.stem) {
       const row = await pushToClassroom({
@@ -203,38 +225,47 @@ export default function TeacherLiveClassContent() {
         setMcqSeqMap(prev => ({ ...prev, [mcqKey]: row.seq }));
       }
       setOpenBlocks(prev => ({ ...prev, [mcqKey]: true }));
+      scrollToBlock(mcqKey);
       setCursor(prev => ({ ...prev, step: 'exam_trap' }));
     } else if (step === 'exam_trap' && concept.mcq?.exam_trap) {
+      const trapKey = `trap-${qi}-${ci}`;
       await pushToClassroom({
         type: 'exam_trap',
         content: concept.mcq.exam_trap,
         meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
       });
-      setOpenBlocks(prev => ({ ...prev, [`trap-${qi}-${ci}`]: true }));
+      setOpenBlocks(prev => ({ ...prev, [trapKey]: true }));
+      scrollToBlock(trapKey);
       setCursor(prev => ({ ...prev, step: 'explanation' }));
     } else if (step === 'explanation' && concept.mcq?.explanation) {
+      const explanationKey = `explanation-${qi}-${ci}`;
       await pushToClassroom({
         type: 'explanation',
         content: concept.mcq.explanation,
         meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
       });
-      setOpenBlocks(prev => ({ ...prev, [`explanation-${qi}-${ci}`]: true }));
+      setOpenBlocks(prev => ({ ...prev, [explanationKey]: true }));
+      scrollToBlock(explanationKey);
       setCursor(prev => ({ ...prev, step: 'wrong_answers' }));
     } else if (step === 'wrong_answers' && concept.mcq?.wrong_answers_explained) {
+      const wrongKey = `wrong-${qi}-${ci}`;
       await pushToClassroom({
         type: 'wrong_answers',
         content: concept.mcq.wrong_answers_explained,
         meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
       });
-      setOpenBlocks(prev => ({ ...prev, [`wrong-${qi}-${ci}`]: true }));
+      setOpenBlocks(prev => ({ ...prev, [wrongKey]: true }));
+      scrollToBlock(wrongKey);
       setCursor(prev => ({ ...prev, step: 'student_doubts' }));
     } else if (step === 'student_doubts' && concept.student_doubts?.length > 0) {
+      const doubtsKey = `doubts-${qi}-${ci}`;
       await pushToClassroom({
         type: 'student_doubts',
         content: concept.student_doubts,
         meta: { qi, ci },
       });
-      setOpenBlocks(prev => ({ ...prev, [`doubts-${qi}-${ci}`]: true }));
+      setOpenBlocks(prev => ({ ...prev, [doubtsKey]: true }));
+      scrollToBlock(doubtsKey);
 
       if (ci + 1 < conceptKeys.length) {
         setCursor({ qi, ci: ci + 1, step: 'concept' });
@@ -362,6 +393,7 @@ export default function TeacherLiveClassContent() {
       </View>
 
       <ScrollView
+        ref={scrollRef}
         style={styles.contentScroll}
         contentContainerStyle={styles.contentContainer}
       >
@@ -390,36 +422,47 @@ export default function TeacherLiveClassContent() {
 
                 return (
                   <View key={key} style={styles.conceptSection}>
-                    <TouchableOpacity
-                      activeOpacity={0.85}
-                      onPress={() => toggleBlock(conceptKey)}
-                      style={styles.conceptHeader}
+                    <View
+                      ref={(ref) => {
+                        if (ref) blockRefs.current[conceptKey] = ref;
+                      }}
                     >
-                      <View style={styles.conceptBadge}>
-                        <Text style={styles.conceptBadgeText}>{ci + 1}</Text>
-                      </View>
-                      <Text style={styles.conceptTitle}>{concept.title}</Text>
-                    </TouchableOpacity>
+                      <TouchableOpacity
+                        activeOpacity={0.85}
+                        onPress={() => toggleBlock(conceptKey)}
+                        style={styles.conceptHeader}
+                      >
+                        <View style={styles.conceptBadge}>
+                          <Text style={styles.conceptBadgeText}>{ci + 1}</Text>
+                        </View>
+                        <Text style={styles.conceptTitle}>{concept.title}</Text>
+                      </TouchableOpacity>
 
-                    {openBlocks[conceptKey] && (
-                      <>
-                        {concept.concept && concept.concept.length > 0 && (
-                          <View style={styles.bulletSection}>
-                            {concept.concept.map((point, pi) => (
-                              <View key={pi} style={styles.bulletRow}>
-                                <View style={styles.bulletDot} />
-                                <Text style={styles.bulletText}>
-                                  {parseInlineMarkup(point)}
-                                </Text>
-                              </View>
-                            ))}
-                          </View>
-                        )}
-                      </>
-                    )}
+                      {openBlocks[conceptKey] && (
+                        <>
+                          {concept.concept && concept.concept.length > 0 && (
+                            <View style={styles.bulletSection}>
+                              {concept.concept.map((point, pi) => (
+                                <View key={pi} style={styles.bulletRow}>
+                                  <View style={styles.bulletDot} />
+                                  <Text style={styles.bulletText}>
+                                    {parseInlineMarkup(point)}
+                                  </Text>
+                                </View>
+                              ))}
+                            </View>
+                          )}
+                        </>
+                      )}
+                    </View>
 
                     {concept.mcq && concept.mcq.stem && (
-                      <View style={styles.mcqCard}>
+                      <View
+                        ref={(ref) => {
+                          if (ref) blockRefs.current[mcqKey] = ref;
+                        }}
+                        style={styles.mcqCard}
+                      >
                         <TouchableOpacity
                           activeOpacity={0.85}
                           onPress={() => toggleBlock(mcqKey)}
@@ -480,7 +523,12 @@ export default function TeacherLiveClassContent() {
                     )}
 
                     {concept.mcq && concept.mcq.exam_trap && (
-                      <View style={styles.feedbackBlock}>
+                      <View
+                        ref={(ref) => {
+                          if (ref) blockRefs.current[trapKey] = ref;
+                        }}
+                        style={styles.feedbackBlock}
+                      >
                         <TouchableOpacity
                           activeOpacity={0.85}
                           onPress={() => toggleBlock(trapKey)}
@@ -497,7 +545,12 @@ export default function TeacherLiveClassContent() {
                     )}
 
                     {concept.mcq && concept.mcq.explanation && (
-                      <View style={styles.feedbackBlock}>
+                      <View
+                        ref={(ref) => {
+                          if (ref) blockRefs.current[explanationKey] = ref;
+                        }}
+                        style={styles.feedbackBlock}
+                      >
                         <TouchableOpacity
                           activeOpacity={0.85}
                           onPress={() => toggleBlock(explanationKey)}
@@ -515,7 +568,12 @@ export default function TeacherLiveClassContent() {
 
                     {concept.mcq && concept.mcq.wrong_answers_explained &&
                       Object.keys(concept.mcq.wrong_answers_explained).length > 0 && (
-                        <View style={styles.feedbackBlock}>
+                        <View
+                          ref={(ref) => {
+                            if (ref) blockRefs.current[wrongKey] = ref;
+                          }}
+                          style={styles.feedbackBlock}
+                        >
                           <TouchableOpacity
                             activeOpacity={0.85}
                             onPress={() => toggleBlock(wrongKey)}
@@ -540,7 +598,12 @@ export default function TeacherLiveClassContent() {
                       )}
 
                     {concept.student_doubts && concept.student_doubts.length > 0 && (
-                      <View style={styles.doubtsCard}>
+                      <View
+                        ref={(ref) => {
+                          if (ref) blockRefs.current[doubtsKey] = ref;
+                        }}
+                        style={styles.doubtsCard}
+                      >
                         <TouchableOpacity
                           activeOpacity={0.85}
                           onPress={() => toggleBlock(doubtsKey)}
