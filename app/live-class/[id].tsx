@@ -1,13 +1,15 @@
 // app/live-class/[id].tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  FlatList,
+  ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 
@@ -67,9 +69,12 @@ function parseInlineMarkup(text: string): React.ReactNode {
 
 export default function StudentLiveClassRoom() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
+  const flatListRef = useRef<FlatList>(null);
   const [feed, setFeed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [mcqAttempts, setMcqAttempts] = useState<
     Record<number, { selected: 'A' | 'B' | 'C' | 'D' }>
   >({});
@@ -86,6 +91,10 @@ export default function StudentLiveClassRoom() {
 
       if (!error && data) {
         setFeed(data);
+        // Auto-focus on latest card
+        if (data.length > 0) {
+          setCurrentIndex(data.length - 1);
+        }
       }
       setLoading(false);
     };
@@ -103,11 +112,21 @@ export default function StudentLiveClassRoom() {
         'broadcast',
         { event: 'class-feed-push' },
         payload => {
-          setFeed(prev =>
-            prev.some(p => p.seq === payload.payload.seq)
-              ? prev
-              : [...prev, payload.payload]
-          );
+          setFeed(prev => {
+            const exists = prev.some(p => p.seq === payload.payload.seq);
+            if (exists) return prev;
+
+            const newFeed = [...prev, payload.payload];
+            // Auto-scroll to new card
+            setCurrentIndex(newFeed.length - 1);
+            setTimeout(() => {
+              flatListRef.current?.scrollToIndex({
+                index: newFeed.length - 1,
+                animated: true,
+              });
+            }, 100);
+            return newFeed;
+          });
         }
       )
       .subscribe();
@@ -117,23 +136,20 @@ export default function StudentLiveClassRoom() {
     };
   }, [id]);
 
-  if (loading) {
-    return (
-      <View style={styles.centerScreen}>
-        <ActivityIndicator size="large" color="#00D9FF" />
-        <Text style={styles.loadingText}>Loading class...</Text>
-      </View>
-    );
-  }
+  // 3️⃣ Auto-scroll to current index on initial load
+  useEffect(() => {
+    if (feed.length > 0 && !loading && currentIndex >= 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToIndex({
+          index: currentIndex,
+          animated: false,
+        });
+      }, 100);
+    }
+  }, [loading, feed.length]);
 
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.contentScroll}
-        contentContainerStyle={styles.contentContainer}
-      >
-        {feed.map((item, idx) => {
-          switch (item.type) {
+  const renderCard = (item: any) => {
+    switch (item.type) {
 case 'topic':
   return (
     <View key={item.seq} style={styles.topicBlock}>
@@ -311,13 +327,67 @@ case 'topic':
                 </View>
               );
 
-            default:
-              return null;
-          }
-        })}
+      default:
+        return null;
+    }
+  };
 
-        <View style={{ height: 40 }} />
-      </ScrollView>
+  if (loading) {
+    return (
+      <View style={styles.centerScreen}>
+        <ActivityIndicator size="large" color="#00D9FF" />
+        <Text style={styles.loadingText}>Loading class...</Text>
+      </View>
+    );
+  }
+
+  if (feed.length === 0) {
+    return (
+      <View style={styles.centerScreen}>
+        <Text style={styles.emptyText}>Waiting for class to start...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        ref={flatListRef}
+        data={feed}
+        keyExtractor={(item) => `card-${item.seq}`}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={screenWidth}
+        decelerationRate="fast"
+        onMomentumScrollEnd={(e) => {
+          const newIndex = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
+          setCurrentIndex(newIndex);
+        }}
+        getItemLayout={(data, index) => ({
+          length: screenWidth,
+          offset: screenWidth * index,
+          index,
+        })}
+        renderItem={({ item }) => (
+          <View style={[styles.cardContainer, { width: screenWidth }]}>
+            <ScrollView
+              style={styles.cardScroll}
+              contentContainerStyle={styles.cardContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {renderCard(item)}
+            </ScrollView>
+          </View>
+        )}
+      />
+
+      {/* Card indicator */}
+      <View style={styles.indicatorContainer}>
+        <Text style={styles.indicatorText}>
+          {currentIndex + 1} / {feed.length}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -347,17 +417,62 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
 
-  contentScroll: {
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+
+  cardContainer: {
+    flex: 1,
+    backgroundColor: '#0F0F0F',
+  },
+
+  cardScroll: {
     flex: 1,
   },
 
-  contentContainer: {
-    padding: 16,
+  cardContent: {
+    padding: 20,
+    paddingTop: 40,
+    paddingBottom: 100,
+    minHeight: '100%',
+    justifyContent: 'center',
+  },
+
+  indicatorContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  indicatorText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#6B7280',
+    backgroundColor: '#1A1A1A',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    overflow: 'hidden',
   },
 
   conceptSection: {
     gap: 12,
-    marginBottom: 14,
+    marginBottom: 20,
+    backgroundColor: '#1A1A1A',
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
 
   conceptHeader: {
@@ -418,12 +533,17 @@ const styles = StyleSheet.create({
 
   mcqCard: {
     backgroundColor: '#1A1A1A',
-    borderRadius: 14,
-    padding: 18,
-    gap: 12,
+    borderRadius: 16,
+    padding: 20,
+    gap: 14,
     borderWidth: 1,
     borderColor: '#2D2D2D',
-    marginBottom: 14,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
 
   mcqLabel: {
@@ -492,16 +612,27 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
 topicBlock: {
-  marginBottom: 16,
-  paddingVertical: 10,
-  borderBottomWidth: 2,
-  borderBottomColor: '#2D2D2D',
+  marginBottom: 20,
+  paddingVertical: 24,
+  paddingHorizontal: 20,
+  backgroundColor: '#1A1A1A',
+  borderRadius: 16,
+  borderWidth: 1,
+  borderColor: '#2D2D2D',
+  borderLeftWidth: 4,
+  borderLeftColor: '#FACC15',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.3,
+  shadowRadius: 8,
+  elevation: 5,
 },
 
 topicText: {
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: '900',
   color: '#FACC15',
+  textAlign: 'center',
 },
 
   optionText: {
@@ -524,13 +655,20 @@ topicText: {
   },
 
   feedbackBlock: {
-    backgroundColor: '#252525',
-    borderRadius: 10,
-    padding: 14,
-    gap: 6,
-    borderLeftWidth: 3,
+    backgroundColor: '#1A1A1A',
+    borderRadius: 16,
+    padding: 20,
+    gap: 12,
+    borderLeftWidth: 4,
     borderLeftColor: '#00D9FF',
-    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
 
   feedbackLabel: {
@@ -560,12 +698,17 @@ topicText: {
 
   doubtsCard: {
     backgroundColor: '#1A1A1A',
-    borderRadius: 14,
-    padding: 18,
-    gap: 14,
+    borderRadius: 16,
+    padding: 20,
+    gap: 16,
     borderWidth: 1,
     borderColor: '#2D2D2D',
-    marginBottom: 14,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
 
   doubtsLabel: {
