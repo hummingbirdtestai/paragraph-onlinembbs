@@ -1,6 +1,6 @@
 // app/live-class/[id].tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ function parseInlineMarkup(text: string): React.ReactNode {
 
   const regex =
     /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*_[^_]+_\*|\*[^*]+\*|_[^_]+_)/g;
-const scrollRef = useRef<ScrollView>(null);
+
   const segments = text.split(regex);
 
   segments.forEach(segment => {
@@ -68,6 +68,7 @@ const scrollRef = useRef<ScrollView>(null);
 export default function StudentLiveClassRoom() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
+  const scrollRef = useRef<ScrollView>(null); // ✅ HERE
   const [feed, setFeed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [mcqAttempts, setMcqAttempts] = useState<
@@ -109,9 +110,9 @@ export default function StudentLiveClassRoom() {
   const next = [...prev, payload.payload];
 
   // 🔑 Auto-scroll to latest broadcast
-  requestAnimationFrame(() => {
-    scrollRef.current?.scrollToEnd({ animated: true });
-  });
+  setTimeout(() => {
+  scrollRef.current?.scrollToEnd({ animated: true });
+}, 50);
 
   return next;
 });
