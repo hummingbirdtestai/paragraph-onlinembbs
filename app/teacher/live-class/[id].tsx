@@ -131,6 +131,8 @@ export default function TeacherLiveClassContent() {
   // Build flat timeline from data
   const flatTimeline: FlatItem[] = [];
   data.forEach((item, qi) => {
+      // 🔑 ADD TOPIC FIRST
+  flatTimeline.push({ type: 'topic', qi });
     const conceptKeys = getSortedConceptKeys(item.class_json);
     conceptKeys.forEach((key, ci) => {
       const c = item.class_json[key];
