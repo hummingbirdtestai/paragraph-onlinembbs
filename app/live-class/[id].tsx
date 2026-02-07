@@ -1,16 +1,13 @@
 // app/live-class/[id].tsx
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  FlatList,
-  ScrollView,
-  useWindowDimensions,
-  InteractionManager,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 
@@ -70,14 +67,9 @@ function parseInlineMarkup(text: string): React.ReactNode {
 
 export default function StudentLiveClassRoom() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
-  const flatListRef = useRef<FlatList>(null);
   const [feed, setFeed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [lockToLive, setLockToLive] = useState(false);
-  const [contentHeights, setContentHeights] = useState<Record<number, number>>({});
   const [mcqAttempts, setMcqAttempts] = useState<
     Record<number, { selected: 'A' | 'B' | 'C' | 'D' }>
   >({});
@@ -94,10 +86,6 @@ export default function StudentLiveClassRoom() {
 
       if (!error && data) {
         setFeed(data);
-        // Auto-focus on latest card
-        if (data.length > 0) {
-          setCurrentIndex(data.length - 1);
-        }
       }
       setLoading(false);
     };
@@ -115,15 +103,11 @@ export default function StudentLiveClassRoom() {
         'broadcast',
         { event: 'class-feed-push' },
         payload => {
-          setFeed(prev => {
-            const exists = prev.some(p => p.seq === payload.payload.seq);
-            if (exists) return prev;
-
-            const newFeed = [...prev, payload.payload];
-            setCurrentIndex(newFeed.length - 1);
-            setLockToLive(true);
-            return newFeed;
-          });
+          setFeed(prev =>
+            prev.some(p => p.seq === payload.payload.seq)
+              ? prev
+              : [...prev, payload.payload]
+          );
         }
       )
       .subscribe();
@@ -133,48 +117,35 @@ export default function StudentLiveClassRoom() {
     };
   }, [id]);
 
-  // 3️⃣ Auto-scroll to current index
-  useEffect(() => {
-    if (feed.length > 0 && !loading && currentIndex >= 0 && currentIndex < feed.length) {
-      InteractionManager.runAfterInteractions(() => {
-        flatListRef.current?.scrollToIndex({
-          index: currentIndex,
-          animated: currentIndex === feed.length - 1,
-        });
-      });
-    }
-  }, [currentIndex, loading]);
+  if (loading) {
+    return (
+      <View style={styles.centerScreen}>
+        <ActivityIndicator size="large" color="#00D9FF" />
+        <Text style={styles.loadingText}>Loading class...</Text>
+      </View>
+    );
+  }
 
-  // 4️⃣ Lock to live card logic
-  useEffect(() => {
-    if (!lockToLive || feed.length === 0) return;
-
-    const latestIndex = feed.length - 1;
-    if (currentIndex !== latestIndex) {
-      InteractionManager.runAfterInteractions(() => {
-        flatListRef.current?.scrollToIndex({
-          index: latestIndex,
-          animated: true,
-        });
-        setCurrentIndex(latestIndex);
-      });
-    }
-  }, [lockToLive, currentIndex, feed.length]);
-
-  const renderCard = (item: any) => {
-    switch (item.type) {
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.contentScroll}
+        contentContainerStyle={styles.contentContainer}
+      >
+        {feed.map((item, idx) => {
+          switch (item.type) {
 case 'topic':
   return (
-    <View style={styles.topicBlock}>
+    <View key={item.seq} style={styles.topicBlock}>
       <Text style={styles.topicText}>
         {item.meta?.topic}
       </Text>
     </View>
   );
-
+              
             case 'concept':
               return (
-                <View style={styles.conceptSection}>
+                <View key={item.seq} style={styles.conceptSection}>
                   <View style={styles.conceptHeader}>
                     <View style={styles.conceptBadge}>
                       <Text style={styles.conceptBadgeText}>
@@ -206,7 +177,7 @@ case 'topic':
               const hasAnswered = !!attempt;
 
               return (
-                <View style={styles.mcqCard}>
+                <View key={item.seq} style={styles.mcqCard}>
                   <View style={styles.cardHeader}>
                     <Text style={styles.mcqLabel}>MCQ</Text>
                   </View>
@@ -284,7 +255,7 @@ case 'topic':
 
             case 'exam_trap':
               return (
-                <View style={styles.feedbackBlock}>
+                <View key={item.seq} style={styles.feedbackBlock}>
                   <Text style={styles.feedbackLabel}>Exam Trap</Text>
                   <Text style={styles.feedbackText}>
                     {parseInlineMarkup(item.payload)}
@@ -294,7 +265,7 @@ case 'topic':
 
             case 'explanation':
               return (
-                <View style={styles.feedbackBlock}>
+                <View key={item.seq} style={styles.feedbackBlock}>
                   <Text style={styles.feedbackLabel}>Explanation</Text>
                   <Text style={styles.feedbackText}>
                     {parseInlineMarkup(item.payload)}
@@ -304,7 +275,7 @@ case 'topic':
 
             case 'wrong_answers':
               return (
-                <View style={styles.feedbackBlock}>
+                <View key={item.seq} style={styles.feedbackBlock}>
                   <Text style={styles.feedbackLabel}>
                     Why Other Options Are Wrong
                   </Text>
@@ -323,7 +294,7 @@ case 'topic':
 
             case 'student_doubts':
               return (
-                <View style={styles.doubtsCard}>
+                <View key={item.seq} style={styles.doubtsCard}>
                   <Text style={styles.doubtsLabel}>Student Doubts</Text>
 
                   {Array.isArray(item.payload) &&
@@ -340,97 +311,13 @@ case 'topic':
                 </View>
               );
 
-      default:
-        return null;
-    }
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.centerScreen}>
-        <ActivityIndicator size="large" color="#00D9FF" />
-        <Text style={styles.loadingText}>Loading class...</Text>
-      </View>
-    );
-  }
-
-  if (feed.length === 0) {
-    return (
-      <View style={styles.centerScreen}>
-        <Text style={styles.emptyText}>Waiting for class to start...</Text>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-      <FlatList
-        ref={flatListRef}
-        data={feed}
-        keyExtractor={(item) => `card-${item.seq}`}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={screenWidth}
-        decelerationRate="fast"
-        onMomentumScrollEnd={(e) => {
-          const newIndex = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
-          setCurrentIndex(newIndex);
-        }}
-        onContentSizeChange={(width, height) => {
-          if (currentIndex === feed.length - 1 && feed.length > 0) {
-            InteractionManager.runAfterInteractions(() => {
-              flatListRef.current?.scrollToIndex({
-                index: currentIndex,
-                animated: true,
-              });
-            });
+            default:
+              return null;
           }
-        }}
-        getItemLayout={(data, index) => ({
-          length: screenWidth,
-          offset: screenWidth * index,
-          index,
         })}
-        renderItem={({ item, index }) => {
-          const needsScroll =
-            contentHeights[index] == null ||
-            contentHeights[index] > (screenHeight - 140);
 
-          return (
-            <View style={[styles.cardContainer, { width: screenWidth }]}>
-              {needsScroll ? (
-                <ScrollView
-                  style={styles.cardScroll}
-                  contentContainerStyle={styles.cardContent}
-                  showsVerticalScrollIndicator={false}
-                  scrollEnabled={true}
-                  directionalLockEnabled={true}
-                  onLayout={(e) => {
-                    const height = e.nativeEvent.layout.height;
-                    if (contentHeights[index] == null) {
-                      setContentHeights(prev => ({ ...prev, [index]: height }));
-                    }
-                  }}
-                >
-                  {renderCard(item)}
-                </ScrollView>
-              ) : (
-                <View style={styles.cardContent}>
-                  {renderCard(item)}
-                </View>
-              )}
-            </View>
-          );
-        }}
-      />
-
-      {/* Card indicator */}
-      <View style={styles.indicatorContainer}>
-        <Text style={styles.indicatorText}>
-          {currentIndex + 1} / {feed.length}
-        </Text>
-      </View>
+        <View style={{ height: 40 }} />
+      </ScrollView>
     </View>
   );
 }
@@ -460,62 +347,17 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
 
-  emptyText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6B7280',
-  },
-
-  cardContainer: {
-    flex: 1,
-    backgroundColor: '#0F0F0F',
-  },
-
-  cardScroll: {
+  contentScroll: {
     flex: 1,
   },
 
-  cardContent: {
-    padding: 20,
-    paddingTop: 40,
-    paddingBottom: 100,
-    minHeight: '100%',
-    justifyContent: 'center',
-  },
-
-  indicatorContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  indicatorText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#6B7280',
-    backgroundColor: '#1A1A1A',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    overflow: 'hidden',
+  contentContainer: {
+    padding: 16,
   },
 
   conceptSection: {
     gap: 12,
-    marginBottom: 20,
-    backgroundColor: '#1A1A1A',
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#2D2D2D',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    marginBottom: 14,
   },
 
   conceptHeader: {
@@ -576,17 +418,12 @@ const styles = StyleSheet.create({
 
   mcqCard: {
     backgroundColor: '#1A1A1A',
-    borderRadius: 16,
-    padding: 20,
-    gap: 14,
+    borderRadius: 14,
+    padding: 18,
+    gap: 12,
     borderWidth: 1,
     borderColor: '#2D2D2D',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    marginBottom: 14,
   },
 
   mcqLabel: {
@@ -655,27 +492,16 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
 topicBlock: {
-  marginBottom: 20,
-  paddingVertical: 24,
-  paddingHorizontal: 20,
-  backgroundColor: '#1A1A1A',
-  borderRadius: 16,
-  borderWidth: 1,
-  borderColor: '#2D2D2D',
-  borderLeftWidth: 4,
-  borderLeftColor: '#FACC15',
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.3,
-  shadowRadius: 8,
-  elevation: 5,
+  marginBottom: 16,
+  paddingVertical: 10,
+  borderBottomWidth: 2,
+  borderBottomColor: '#2D2D2D',
 },
 
 topicText: {
-  fontSize: 20,
+  fontSize: 18,
   fontWeight: '900',
   color: '#FACC15',
-  textAlign: 'center',
 },
 
   optionText: {
@@ -698,20 +524,13 @@ topicText: {
   },
 
   feedbackBlock: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 16,
-    padding: 20,
-    gap: 12,
-    borderLeftWidth: 4,
+    backgroundColor: '#252525',
+    borderRadius: 10,
+    padding: 14,
+    gap: 6,
+    borderLeftWidth: 3,
     borderLeftColor: '#00D9FF',
-    borderWidth: 1,
-    borderColor: '#2D2D2D',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    marginBottom: 14,
   },
 
   feedbackLabel: {
@@ -741,17 +560,12 @@ topicText: {
 
   doubtsCard: {
     backgroundColor: '#1A1A1A',
-    borderRadius: 16,
-    padding: 20,
-    gap: 16,
+    borderRadius: 14,
+    padding: 18,
+    gap: 14,
     borderWidth: 1,
     borderColor: '#2D2D2D',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    marginBottom: 14,
   },
 
   doubtsLabel: {
