@@ -10,6 +10,7 @@ import {
   FlatList,
   ScrollView,
   useWindowDimensions,
+  InteractionManager,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 
@@ -75,6 +76,8 @@ export default function StudentLiveClassRoom() {
   const [feed, setFeed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [lockToLive, setLockToLive] = useState(false);
+  const [contentHeights, setContentHeights] = useState<Record<number, number>>({});
   const [mcqAttempts, setMcqAttempts] = useState<
     Record<number, { selected: 'A' | 'B' | 'C' | 'D' }>
   >({});
@@ -117,14 +120,7 @@ export default function StudentLiveClassRoom() {
             if (exists) return prev;
 
             const newFeed = [...prev, payload.payload];
-            // Auto-scroll to new card
             setCurrentIndex(newFeed.length - 1);
-            setTimeout(() => {
-              flatListRef.current?.scrollToIndex({
-                index: newFeed.length - 1,
-                animated: true,
-              });
-            }, 100);
             return newFeed;
           });
         }
@@ -136,32 +132,48 @@ export default function StudentLiveClassRoom() {
     };
   }, [id]);
 
-  // 3️⃣ Auto-scroll to current index on initial load
+  // 3️⃣ Auto-scroll to current index
   useEffect(() => {
-    if (feed.length > 0 && !loading && currentIndex >= 0) {
-      setTimeout(() => {
+    if (feed.length > 0 && !loading && currentIndex >= 0 && currentIndex < feed.length) {
+      InteractionManager.runAfterInteractions(() => {
         flatListRef.current?.scrollToIndex({
           index: currentIndex,
-          animated: false,
+          animated: currentIndex === feed.length - 1,
         });
-      }, 100);
+      });
     }
-  }, [loading, feed.length]);
+  }, [currentIndex, loading]);
+
+  // 4️⃣ Lock to live card logic
+  useEffect(() => {
+    if (!lockToLive || feed.length === 0) return;
+
+    const latestIndex = feed.length - 1;
+    if (currentIndex !== latestIndex) {
+      InteractionManager.runAfterInteractions(() => {
+        flatListRef.current?.scrollToIndex({
+          index: latestIndex,
+          animated: true,
+        });
+        setCurrentIndex(latestIndex);
+      });
+    }
+  }, [lockToLive, currentIndex, feed.length]);
 
   const renderCard = (item: any) => {
     switch (item.type) {
 case 'topic':
   return (
-    <View key={item.seq} style={styles.topicBlock}>
+    <View style={styles.topicBlock}>
       <Text style={styles.topicText}>
         {item.meta?.topic}
       </Text>
     </View>
   );
-              
+
             case 'concept':
               return (
-                <View key={item.seq} style={styles.conceptSection}>
+                <View style={styles.conceptSection}>
                   <View style={styles.conceptHeader}>
                     <View style={styles.conceptBadge}>
                       <Text style={styles.conceptBadgeText}>
@@ -193,7 +205,7 @@ case 'topic':
               const hasAnswered = !!attempt;
 
               return (
-                <View key={item.seq} style={styles.mcqCard}>
+                <View style={styles.mcqCard}>
                   <View style={styles.cardHeader}>
                     <Text style={styles.mcqLabel}>MCQ</Text>
                   </View>
@@ -271,7 +283,7 @@ case 'topic':
 
             case 'exam_trap':
               return (
-                <View key={item.seq} style={styles.feedbackBlock}>
+                <View style={styles.feedbackBlock}>
                   <Text style={styles.feedbackLabel}>Exam Trap</Text>
                   <Text style={styles.feedbackText}>
                     {parseInlineMarkup(item.payload)}
@@ -281,7 +293,7 @@ case 'topic':
 
             case 'explanation':
               return (
-                <View key={item.seq} style={styles.feedbackBlock}>
+                <View style={styles.feedbackBlock}>
                   <Text style={styles.feedbackLabel}>Explanation</Text>
                   <Text style={styles.feedbackText}>
                     {parseInlineMarkup(item.payload)}
@@ -291,7 +303,7 @@ case 'topic':
 
             case 'wrong_answers':
               return (
-                <View key={item.seq} style={styles.feedbackBlock}>
+                <View style={styles.feedbackBlock}>
                   <Text style={styles.feedbackLabel}>
                     Why Other Options Are Wrong
                   </Text>
@@ -310,7 +322,7 @@ case 'topic':
 
             case 'student_doubts':
               return (
-                <View key={item.seq} style={styles.doubtsCard}>
+                <View style={styles.doubtsCard}>
                   <Text style={styles.doubtsLabel}>Student Doubts</Text>
 
                   {Array.isArray(item.payload) &&
@@ -364,22 +376,50 @@ case 'topic':
           const newIndex = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
           setCurrentIndex(newIndex);
         }}
+        onContentSizeChange={(width, height) => {
+          if (currentIndex === feed.length - 1 && feed.length > 0) {
+            InteractionManager.runAfterInteractions(() => {
+              flatListRef.current?.scrollToIndex({
+                index: currentIndex,
+                animated: true,
+              });
+            });
+          }
+        }}
         getItemLayout={(data, index) => ({
           length: screenWidth,
           offset: screenWidth * index,
           index,
         })}
-        renderItem={({ item }) => (
-          <View style={[styles.cardContainer, { width: screenWidth }]}>
-            <ScrollView
-              style={styles.cardScroll}
-              contentContainerStyle={styles.cardContent}
-              showsVerticalScrollIndicator={false}
-            >
-              {renderCard(item)}
-            </ScrollView>
-          </View>
-        )}
+        renderItem={({ item, index }) => {
+          const needsScroll = contentHeights[index] && contentHeights[index] > (screenHeight - 140);
+
+          return (
+            <View style={[styles.cardContainer, { width: screenWidth }]}>
+              {needsScroll ? (
+                <ScrollView
+                  style={styles.cardScroll}
+                  contentContainerStyle={styles.cardContent}
+                  showsVerticalScrollIndicator={false}
+                  scrollEnabled={true}
+                  directionalLockEnabled={true}
+                >
+                  {renderCard(item)}
+                </ScrollView>
+              ) : (
+                <View
+                  style={styles.cardContent}
+                  onLayout={(e) => {
+                    const height = e.nativeEvent.layout.height;
+                    setContentHeights(prev => ({ ...prev, [index]: height }));
+                  }}
+                >
+                  {renderCard(item)}
+                </View>
+              )}
+            </View>
+          );
+        }}
       />
 
       {/* Card indicator */}
