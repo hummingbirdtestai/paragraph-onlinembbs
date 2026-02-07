@@ -70,14 +70,9 @@ export default function StudentLiveClassRoom() {
 
   const [feed, setFeed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({});
   const [mcqAttempts, setMcqAttempts] = useState<
     Record<number, { selected: 'A' | 'B' | 'C' | 'D' }>
   >({});
-
-  const toggleBlock = (key: string) => {
-    setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
-  };
 
   // 1️⃣ Load persisted feed (replay)
   useEffect(() => {
@@ -138,9 +133,6 @@ export default function StudentLiveClassRoom() {
         contentContainerStyle={styles.contentContainer}
       >
         {feed.map((item, idx) => {
-          const blockKey = `block-${item.seq}`;
-
-
           switch (item.type) {
 case 'topic':
   return (
@@ -154,11 +146,7 @@ case 'topic':
             case 'concept':
               return (
                 <View key={item.seq} style={styles.conceptSection}>
-                  <TouchableOpacity
-                    activeOpacity={0.85}
-                    onPress={() => toggleBlock(blockKey)}
-                    style={styles.conceptHeader}
-                  >
+                  <View style={styles.conceptHeader}>
                     <View style={styles.conceptBadge}>
                       <Text style={styles.conceptBadgeText}>
                         {item.meta?.ci != null ? item.meta.ci + 1 : ''}
@@ -167,23 +155,19 @@ case 'topic':
                     <Text style={styles.conceptTitle}>
                       {item.meta?.title || 'Concept'}
                     </Text>
-                  </TouchableOpacity>
+                  </View>
 
-                  {openBlocks[blockKey] && (
-                    <>
-                      {Array.isArray(item.payload) && item.payload.length > 0 && (
-                        <View style={styles.bulletSection}>
-                          {item.payload.map((point: string, pi: number) => (
-                            <View key={pi} style={styles.bulletRow}>
-                              <View style={styles.bulletDot} />
-                              <Text style={styles.bulletText}>
-                                {parseInlineMarkup(point)}
-                              </Text>
-                            </View>
-                          ))}
+                  {Array.isArray(item.payload) && item.payload.length > 0 && (
+                    <View style={styles.bulletSection}>
+                      {item.payload.map((point: string, pi: number) => (
+                        <View key={pi} style={styles.bulletRow}>
+                          <View style={styles.bulletDot} />
+                          <Text style={styles.bulletText}>
+                            {parseInlineMarkup(point)}
+                          </Text>
                         </View>
-                      )}
-                    </>
+                      ))}
+                    </View>
                   )}
                 </View>
               );
@@ -194,177 +178,136 @@ case 'topic':
 
               return (
                 <View key={item.seq} style={styles.mcqCard}>
-                  <TouchableOpacity
-                    activeOpacity={0.85}
-                    onPress={() => toggleBlock(blockKey)}
-                    style={styles.cardHeader}
-                  >
+                  <View style={styles.cardHeader}>
                     <Text style={styles.mcqLabel}>MCQ</Text>
-                  </TouchableOpacity>
+                  </View>
 
-                  {openBlocks[blockKey] && (
-                    <>
-                      <Text style={styles.mcqStem}>
-                        {parseInlineMarkup(item.payload.stem)}
-                      </Text>
+                  <Text style={styles.mcqStem}>
+                    {parseInlineMarkup(item.payload.stem)}
+                  </Text>
 
-                      {(['A', 'B', 'C', 'D'] as const).map(label => {
-                        const optText = item.payload.options?.[label];
-                        if (!optText) return null;
-                        const isCorrect = item.payload.correct_answer === label;
+                  {(['A', 'B', 'C', 'D'] as const).map(label => {
+                    const optText = item.payload.options?.[label];
+                    if (!optText) return null;
+                    const isCorrect = item.payload.correct_answer === label;
 
-                        return (
-                          <TouchableOpacity
-                            key={label}
-                            disabled={hasAnswered}
-                            onPress={() =>
-                              setMcqAttempts(prev => ({
-                                ...prev,
-                                [item.seq]: { selected: label },
-                              }))
-                            }
+                    return (
+                      <TouchableOpacity
+                        key={label}
+                        disabled={hasAnswered}
+                        onPress={() =>
+                          setMcqAttempts(prev => ({
+                            ...prev,
+                            [item.seq]: { selected: label },
+                          }))
+                        }
+                        style={[
+                          styles.optionRow,
+                          hasAnswered && isCorrect && styles.optionCorrect,
+                          hasAnswered &&
+                            attempt?.selected === label &&
+                            !isCorrect &&
+                            styles.optionWrong,
+                        ]}
+                      >
+                        <View
+                          style={[
+                            styles.optionLabelCircle,
+                            hasAnswered && isCorrect && styles.optionLabelCorrect,
+                            hasAnswered &&
+                              attempt?.selected === label &&
+                              !isCorrect &&
+                              styles.optionLabelWrong,
+                          ]}
+                        >
+                          <Text
                             style={[
-                              styles.optionRow,
-                              hasAnswered && isCorrect && styles.optionCorrect,
+                              styles.optionLabel,
+                              hasAnswered &&
+                                isCorrect &&
+                                styles.optionLabelTextCorrect,
                               hasAnswered &&
                                 attempt?.selected === label &&
                                 !isCorrect &&
-                                styles.optionWrong,
+                                styles.optionLabelTextWrong,
                             ]}
                           >
-                            <View
-                              style={[
-                                styles.optionLabelCircle,
-                                hasAnswered && isCorrect && styles.optionLabelCorrect,
-                                hasAnswered &&
-                                  attempt?.selected === label &&
-                                  !isCorrect &&
-                                  styles.optionLabelWrong,
-                              ]}
-                            >
-                              <Text
-                                style={[
-                                  styles.optionLabel,
-                                  hasAnswered &&
-                                    isCorrect &&
-                                    styles.optionLabelTextCorrect,
-                                  hasAnswered &&
-                                    attempt?.selected === label &&
-                                    !isCorrect &&
-                                    styles.optionLabelTextWrong,
-                                ]}
-                              >
-                                {label}
-                              </Text>
-                            </View>
-                            <Text
-                              style={[
-                                styles.optionText,
-                                hasAnswered && isCorrect && styles.optionTextCorrect,
-                                hasAnswered &&
-                                  attempt?.selected === label &&
-                                  !isCorrect &&
-                                  styles.optionTextWrong,
-                              ]}
-                            >
-                              {parseInlineMarkup(optText)}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </>
-                  )}
+                            {label}
+                          </Text>
+                        </View>
+                        <Text
+                          style={[
+                            styles.optionText,
+                            hasAnswered && isCorrect && styles.optionTextCorrect,
+                            hasAnswered &&
+                              attempt?.selected === label &&
+                              !isCorrect &&
+                              styles.optionTextWrong,
+                          ]}
+                        >
+                          {parseInlineMarkup(optText)}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               );
 
             case 'exam_trap':
               return (
                 <View key={item.seq} style={styles.feedbackBlock}>
-                  <TouchableOpacity
-                    activeOpacity={0.85}
-                    onPress={() => toggleBlock(blockKey)}
-                    style={styles.cardHeader}
-                  >
-                    <Text style={styles.feedbackLabel}>Exam Trap</Text>
-                  </TouchableOpacity>
-                  {openBlocks[blockKey] && (
-                    <Text style={styles.feedbackText}>
-                      {parseInlineMarkup(item.payload)}
-                    </Text>
-                  )}
+                  <Text style={styles.feedbackLabel}>Exam Trap</Text>
+                  <Text style={styles.feedbackText}>
+                    {parseInlineMarkup(item.payload)}
+                  </Text>
                 </View>
               );
 
             case 'explanation':
               return (
                 <View key={item.seq} style={styles.feedbackBlock}>
-                  <TouchableOpacity
-                    activeOpacity={0.85}
-                    onPress={() => toggleBlock(blockKey)}
-                    style={styles.cardHeader}
-                  >
-                    <Text style={styles.feedbackLabel}>Explanation</Text>
-                  </TouchableOpacity>
-                  {openBlocks[blockKey] && (
-                    <Text style={styles.feedbackText}>
-                      {parseInlineMarkup(item.payload)}
-                    </Text>
-                  )}
+                  <Text style={styles.feedbackLabel}>Explanation</Text>
+                  <Text style={styles.feedbackText}>
+                    {parseInlineMarkup(item.payload)}
+                  </Text>
                 </View>
               );
 
             case 'wrong_answers':
               return (
                 <View key={item.seq} style={styles.feedbackBlock}>
-                  <TouchableOpacity
-                    activeOpacity={0.85}
-                    onPress={() => toggleBlock(blockKey)}
-                    style={styles.cardHeader}
-                  >
-                    <Text style={styles.feedbackLabel}>
-                      Why Other Options Are Wrong
-                    </Text>
-                  </TouchableOpacity>
-                  {openBlocks[blockKey] &&
-                    Object.entries(item.payload).map(
-                      ([label, text]: [string, any]) => (
-                        <View key={label} style={{ marginTop: 10, paddingLeft: 8 }}>
-                          <Text style={styles.wrongOptionLabel}>{label}.</Text>
-                          <Text style={styles.feedbackText}>
-                            {parseInlineMarkup(text)}
-                          </Text>
-                        </View>
-                      )
-                    )}
+                  <Text style={styles.feedbackLabel}>
+                    Why Other Options Are Wrong
+                  </Text>
+                  {Object.entries(item.payload).map(
+                    ([label, text]: [string, any]) => (
+                      <View key={label} style={{ marginTop: 10, paddingLeft: 8 }}>
+                        <Text style={styles.wrongOptionLabel}>{label}.</Text>
+                        <Text style={styles.feedbackText}>
+                          {parseInlineMarkup(text)}
+                        </Text>
+                      </View>
+                    )
+                  )}
                 </View>
               );
 
             case 'student_doubts':
               return (
                 <View key={item.seq} style={styles.doubtsCard}>
-                  <TouchableOpacity
-                    activeOpacity={0.85}
-                    onPress={() => toggleBlock(blockKey)}
-                    style={styles.cardHeader}
-                  >
-                    <Text style={styles.doubtsLabel}>Student Doubts</Text>
-                  </TouchableOpacity>
+                  <Text style={styles.doubtsLabel}>Student Doubts</Text>
 
-                  {openBlocks[blockKey] && (
-                    <>
-                      {Array.isArray(item.payload) &&
-                        item.payload.map((d: any, di: number) => (
-                          <View key={di} style={styles.doubtItem}>
-                            <Text style={styles.doubtQ}>
-                              Q: {parseInlineMarkup(d.doubt)}
-                            </Text>
-                            <Text style={styles.doubtA}>
-                              A: {parseInlineMarkup(d.answer)}
-                            </Text>
-                          </View>
-                        ))}
-                    </>
-                  )}
+                  {Array.isArray(item.payload) &&
+                    item.payload.map((d: any, di: number) => (
+                      <View key={di} style={styles.doubtItem}>
+                        <Text style={styles.doubtQ}>
+                          Q: {parseInlineMarkup(d.doubt)}
+                        </Text>
+                        <Text style={styles.doubtA}>
+                          A: {parseInlineMarkup(d.answer)}
+                        </Text>
+                      </View>
+                    ))}
                 </View>
               );
 
