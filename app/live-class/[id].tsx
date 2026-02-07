@@ -9,7 +9,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router'; shouldn't
+import { useLocalSearchParams } from 'expo-router';
+
 import { supabase } from '@/lib/supabaseClient';
 
 // -----------------------------------------------------------------------------
@@ -138,6 +139,9 @@ export default function StudentLiveClassRoom() {
       >
         {feed.map((item, idx) => {
           const blockKey = `block-${item.seq}`;
+
+
+          switch (item.type) {
 case 'topic':
   return (
     <View key={item.seq} style={styles.topicBlock}>
@@ -146,8 +150,7 @@ case 'topic':
       </Text>
     </View>
   );
-
-          switch (item.type) {
+              
             case 'concept':
               return (
                 <View key={item.seq} style={styles.conceptSection}>
