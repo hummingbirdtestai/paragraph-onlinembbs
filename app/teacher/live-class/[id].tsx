@@ -49,6 +49,7 @@ interface BattleClassItem {
 }
 
 type FlatItem =
+    | { type: 'topic'; qi: number }
   | { type: 'concept'; qi: number; ci: number }
   | { type: 'mcq'; qi: number; ci: number }
   | { type: 'exam_trap'; qi: number; ci: number }
@@ -132,22 +133,23 @@ export default function TeacherLiveClassContent() {
   const flatTimeline: FlatItem[] = [];
   data.forEach((item, qi) => {
       // 🔑 ADD TOPIC FIRST
-  flatTimeline.push({ type: 'topic', qi });
-    const conceptKeys = getSortedConceptKeys(item.class_json);
-    conceptKeys.forEach((key, ci) => {
-      const c = item.class_json[key];
-      if (!c) return;
 
-      flatTimeline.push({ type: 'concept', qi, ci });
-      if (c.mcq?.stem) flatTimeline.push({ type: 'mcq', qi, ci });
-      if (c.mcq?.exam_trap) flatTimeline.push({ type: 'exam_trap', qi, ci });
-      if (c.mcq?.explanation) flatTimeline.push({ type: 'explanation', qi, ci });
-      if (c.mcq?.wrong_answers_explained)
-        flatTimeline.push({ type: 'wrong_answers', qi, ci });
-      if (c.student_doubts?.length)
-        flatTimeline.push({ type: 'student_doubts', qi, ci });
-    });
-  });
+ // ❌ NO topic in flatTimeline
+const conceptKeys = getSortedConceptKeys(item.class_json);
+conceptKeys.forEach((key, ci) => {
+  const c = item.class_json[key];
+  if (!c) return;
+
+  flatTimeline.push({ type: 'concept', qi, ci });
+  if (c.mcq?.stem) flatTimeline.push({ type: 'mcq', qi, ci });
+  if (c.mcq?.exam_trap) flatTimeline.push({ type: 'exam_trap', qi, ci });
+  if (c.mcq?.explanation) flatTimeline.push({ type: 'explanation', qi, ci });
+  if (c.mcq?.wrong_answers_explained)
+    flatTimeline.push({ type: 'wrong_answers', qi, ci });
+  if (c.student_doubts?.length)
+    flatTimeline.push({ type: 'student_doubts', qi, ci });
+});
+
 
   const toggleBlock = (key: string) => {
     setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
@@ -210,8 +212,32 @@ export default function TeacherLiveClassContent() {
   };
 
   const handleNext = async () => {
+    const isFirstConceptOfTopic =
+  cursorIndex === 0 ||
+  (flatTimeline[cursorIndex - 1]?.qi !== flatTimeline[cursorIndex]?.qi);
+
   const item = flatTimeline[cursorIndex];
   if (!item) return;
+ const isFirstConceptOfTopic =
+  item.type === 'concept' &&
+  (cursorIndex === 0 ||
+    flatTimeline[cursorIndex - 1]?.qi !== item.qi);
+
+if (isFirstConceptOfTopic) {
+  const topicItem = data[item.qi];
+
+  // 🔔 Broadcast topic ONCE
+  pushToClassroom({
+    type: 'topic',
+    content: null,
+    meta: {
+      topic: topicItem.question,
+      topic_order: topicItem.topic_order,
+    },
+  });
+}
+
+
 
   const { qi, ci, type } = item;
   const conceptKeys = getSortedConceptKeys(data[qi].class_json);
