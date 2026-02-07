@@ -23,7 +23,7 @@ function parseInlineMarkup(text: string): React.ReactNode {
 
   const regex =
     /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*_[^_]+_\*|\*[^*]+\*|_[^_]+_)/g;
-
+const scrollRef = useRef<ScrollView>(null);
   const segments = text.split(regex);
 
   segments.forEach(segment => {
@@ -103,11 +103,19 @@ export default function StudentLiveClassRoom() {
         'broadcast',
         { event: 'class-feed-push' },
         payload => {
-          setFeed(prev =>
-            prev.some(p => p.seq === payload.payload.seq)
-              ? prev
-              : [...prev, payload.payload]
-          );
+          setFeed(prev => {
+  if (prev.some(p => p.seq === payload.payload.seq)) return prev;
+
+  const next = [...prev, payload.payload];
+
+  // 🔑 Auto-scroll to latest broadcast
+  requestAnimationFrame(() => {
+    scrollRef.current?.scrollToEnd({ animated: true });
+  });
+
+  return next;
+});
+
         }
       )
       .subscribe();
@@ -129,9 +137,11 @@ export default function StudentLiveClassRoom() {
   return (
     <View style={styles.container}>
       <ScrollView
-        style={styles.contentScroll}
-        contentContainerStyle={styles.contentContainer}
-      >
+  ref={scrollRef}
+  style={styles.contentScroll}
+  contentContainerStyle={styles.contentContainer}
+>
+
         {feed.map((item, idx) => {
           switch (item.type) {
 case 'topic':
