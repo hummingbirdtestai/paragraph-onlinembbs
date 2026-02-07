@@ -121,6 +121,7 @@ export default function StudentLiveClassRoom() {
 
             const newFeed = [...prev, payload.payload];
             setCurrentIndex(newFeed.length - 1);
+            setLockToLive(true);
             return newFeed;
           });
         }
@@ -392,7 +393,9 @@ case 'topic':
           index,
         })}
         renderItem={({ item, index }) => {
-          const needsScroll = contentHeights[index] && contentHeights[index] > (screenHeight - 140);
+          const needsScroll =
+            contentHeights[index] == null ||
+            contentHeights[index] > (screenHeight - 140);
 
           return (
             <View style={[styles.cardContainer, { width: screenWidth }]}>
@@ -403,17 +406,17 @@ case 'topic':
                   showsVerticalScrollIndicator={false}
                   scrollEnabled={true}
                   directionalLockEnabled={true}
+                  onLayout={(e) => {
+                    const height = e.nativeEvent.layout.height;
+                    if (contentHeights[index] == null) {
+                      setContentHeights(prev => ({ ...prev, [index]: height }));
+                    }
+                  }}
                 >
                   {renderCard(item)}
                 </ScrollView>
               ) : (
-                <View
-                  style={styles.cardContent}
-                  onLayout={(e) => {
-                    const height = e.nativeEvent.layout.height;
-                    setContentHeights(prev => ({ ...prev, [index]: height }));
-                  }}
-                >
+                <View style={styles.cardContent}>
                   {renderCard(item)}
                 </View>
               )}
