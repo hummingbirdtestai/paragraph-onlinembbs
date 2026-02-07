@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router'; shouldn't
 import { supabase } from '@/lib/supabaseClient';
 
 // -----------------------------------------------------------------------------
@@ -138,6 +138,14 @@ export default function StudentLiveClassRoom() {
       >
         {feed.map((item, idx) => {
           const blockKey = `block-${item.seq}`;
+case 'topic':
+  return (
+    <View key={item.seq} style={styles.topicBlock}>
+      <Text style={styles.topicText}>
+        {item.meta?.topic}
+      </Text>
+    </View>
+  );
 
           switch (item.type) {
             case 'concept':
@@ -537,6 +545,18 @@ const styles = StyleSheet.create({
   optionLabelTextWrong: {
     color: '#FFF',
   },
+topicBlock: {
+  marginBottom: 16,
+  paddingVertical: 10,
+  borderBottomWidth: 2,
+  borderBottomColor: '#2D2D2D',
+},
+
+topicText: {
+  fontSize: 18,
+  fontWeight: '900',
+  color: '#FACC15',
+},
 
   optionText: {
     flex: 1,
