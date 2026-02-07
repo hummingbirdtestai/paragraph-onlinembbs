@@ -267,11 +267,7 @@ export default function StudentLiveClassRoom() {
               );
 
             case 'exam_trap':
-              const mcqSeq = item.meta?.mcq_feed_seq;
-              const trapAttempt = mcqSeq ? mcqAttempts[mcqSeq] : null;
-              const hasAnsweredTrap = !!trapAttempt;
-
-              return hasAnsweredTrap ? (
+              return (
                 <View key={item.seq} style={styles.feedbackBlock}>
                   <TouchableOpacity
                     activeOpacity={0.85}
@@ -286,14 +282,10 @@ export default function StudentLiveClassRoom() {
                     </Text>
                   )}
                 </View>
-              ) : null;
+              );
 
             case 'explanation':
-              const expMcqSeq = item.meta?.mcq_feed_seq;
-              const expAttempt = expMcqSeq ? mcqAttempts[expMcqSeq] : null;
-              const hasAnsweredExp = !!expAttempt;
-
-              return hasAnsweredExp ? (
+              return (
                 <View key={item.seq} style={styles.feedbackBlock}>
                   <TouchableOpacity
                     activeOpacity={0.85}
@@ -308,14 +300,10 @@ export default function StudentLiveClassRoom() {
                     </Text>
                   )}
                 </View>
-              ) : null;
+              );
 
             case 'wrong_answers':
-              const wrongMcqSeq = item.meta?.mcq_feed_seq;
-              const wrongAttempt = wrongMcqSeq ? mcqAttempts[wrongMcqSeq] : null;
-              const hasAnsweredWrong = !!wrongAttempt;
-
-              return hasAnsweredWrong ? (
+              return (
                 <View key={item.seq} style={styles.feedbackBlock}>
                   <TouchableOpacity
                     activeOpacity={0.85}
@@ -338,7 +326,7 @@ export default function StudentLiveClassRoom() {
                       )
                     )}
                 </View>
-              ) : null;
+              );
 
             case 'student_doubts':
               return (
