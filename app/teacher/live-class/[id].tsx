@@ -208,51 +208,55 @@ export default function TeacherLiveClassContent() {
   };
 
   const handleNext = async () => {
-    const item = flatTimeline[cursorIndex];
-    if (!item) return;
+  const item = flatTimeline[cursorIndex];
+  if (!item) return;
 
-    const { qi, ci, type } = item;
-    const conceptKeys = getSortedConceptKeys(data[qi].class_json);
-    const concept = data[qi].class_json[conceptKeys[ci]];
-    if (!concept) return;
+  const { qi, ci, type } = item;
+  const conceptKeys = getSortedConceptKeys(data[qi].class_json);
+  const concept = data[qi].class_json[conceptKeys[ci]];
+  if (!concept) return;
 
-    // Map type to blockKey prefix to match render section
-    let blockKeyPrefix = type;
-    if (type === 'exam_trap') blockKeyPrefix = 'trap';
-    if (type === 'wrong_answers') blockKeyPrefix = 'wrong';
-    if (type === 'student_doubts') blockKeyPrefix = 'doubts';
+  let blockKeyPrefix = type;
+  if (type === 'exam_trap') blockKeyPrefix = 'trap';
+  if (type === 'wrong_answers') blockKeyPrefix = 'wrong';
+  if (type === 'student_doubts') blockKeyPrefix = 'doubts';
 
-    const blockKey = `${blockKeyPrefix}-${qi}-${ci}`;
+  const blockKey = `${blockKeyPrefix}-${qi}-${ci}`;
 
-    let payload: any = null;
-    let meta: Record<string, any> = { qi, ci };
+  // 1️⃣ OPEN UI IMMEDIATELY
+  setOpenBlocks(prev => ({ ...prev, [blockKey]: true }));
+  setTimeout(() => scrollToBlock(blockKey), 0);
 
-    if (type === 'concept') {
-      payload = concept.concept;
-      meta.title = concept.title;
-    } else if (type === 'mcq') {
-      payload = concept.mcq;
-    } else if (type === 'exam_trap') {
-      payload = concept.mcq.exam_trap;
-    } else if (type === 'explanation') {
-      payload = concept.mcq.explanation;
-    } else if (type === 'wrong_answers') {
-      payload = concept.mcq.wrong_answers_explained;
-    } else if (type === 'student_doubts') {
-      payload = concept.student_doubts;
-    }
+  // 2️⃣ MOVE CURSOR IMMEDIATELY
+  setCursorIndex(prev => prev + 1);
 
-    await pushToClassroom({
-      type,
-      content: payload,
-      meta,
-    });
+  // 3️⃣ PUSH TO CLASSROOM (ASYNC, NON-BLOCKING)
+  let payload: any = null;
+  let meta: Record<string, any> = { qi, ci };
 
-    setOpenBlocks(prev => ({ ...prev, [blockKey]: true }));
-    setTimeout(() => scrollToBlock(blockKey), 50);
+  if (type === 'concept') {
+    payload = concept.concept;
+    meta.title = concept.title;
+  } else if (type === 'mcq') {
+    payload = concept.mcq;
+  } else if (type === 'exam_trap') {
+    payload = concept.mcq.exam_trap;
+  } else if (type === 'explanation') {
+    payload = concept.mcq.explanation;
+  } else if (type === 'wrong_answers') {
+    payload = concept.mcq.wrong_answers_explained;
+  } else if (type === 'student_doubts') {
+    payload = concept.student_doubts;
+  }
 
-    setCursorIndex(prev => prev + 1);
-  };
+  // fire-and-forget
+  pushToClassroom({
+    type,
+    content: payload,
+    meta,
+  });
+};
+
 
   // ---------------------------------------------------------------------------
   // Fetch
