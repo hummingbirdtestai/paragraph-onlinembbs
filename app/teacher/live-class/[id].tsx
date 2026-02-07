@@ -128,6 +128,7 @@ export default function TeacherLiveClassContent() {
   });
 
   const scrollRef = React.useRef<ScrollView>(null);
+  const contentRef = React.useRef<View>(null);
   const blockRefs = React.useRef<Record<string, View>>({});
 
   const toggleBlock = (key: string) => {
@@ -137,17 +138,18 @@ export default function TeacherLiveClassContent() {
   const scrollToBlock = (key: string) => {
     requestAnimationFrame(() => {
       const node = blockRefs.current[key];
-      if (!node || !scrollRef.current) return;
+      const content = contentRef.current;
+      if (!node || !content || !scrollRef.current) return;
 
       node.measureLayout(
-        scrollRef.current as any,
+        content as any,
         (_x, y) => {
           scrollRef.current?.scrollTo({
-            y: y - 20,
+            y: Math.max(0, y - 20),
             animated: true,
           });
         },
-        () => {}
+        (err) => console.warn('measure failed', err)
       );
     });
   };
@@ -213,7 +215,7 @@ export default function TeacherLiveClassContent() {
         meta: { qi, ci, title: concept.title },
       });
       setOpenBlocks(prev => ({ ...prev, [blockKey]: true }));
-      scrollToBlock(blockKey);
+      setTimeout(() => scrollToBlock(blockKey), 50);
       setCursor(prev => ({ ...prev, step: 'mcq' }));
     } else if (step === 'mcq' && concept.mcq?.stem) {
       const row = await pushToClassroom({
@@ -225,7 +227,7 @@ export default function TeacherLiveClassContent() {
         setMcqSeqMap(prev => ({ ...prev, [mcqKey]: row.seq }));
       }
       setOpenBlocks(prev => ({ ...prev, [mcqKey]: true }));
-      scrollToBlock(mcqKey);
+      setTimeout(() => scrollToBlock(mcqKey), 50);
       setCursor(prev => ({ ...prev, step: 'exam_trap' }));
     } else if (step === 'exam_trap' && concept.mcq?.exam_trap) {
       const trapKey = `trap-${qi}-${ci}`;
@@ -235,7 +237,7 @@ export default function TeacherLiveClassContent() {
         meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
       });
       setOpenBlocks(prev => ({ ...prev, [trapKey]: true }));
-      scrollToBlock(trapKey);
+      setTimeout(() => scrollToBlock(trapKey), 50);
       setCursor(prev => ({ ...prev, step: 'explanation' }));
     } else if (step === 'explanation' && concept.mcq?.explanation) {
       const explanationKey = `explanation-${qi}-${ci}`;
@@ -245,7 +247,7 @@ export default function TeacherLiveClassContent() {
         meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
       });
       setOpenBlocks(prev => ({ ...prev, [explanationKey]: true }));
-      scrollToBlock(explanationKey);
+      setTimeout(() => scrollToBlock(explanationKey), 50);
       setCursor(prev => ({ ...prev, step: 'wrong_answers' }));
     } else if (step === 'wrong_answers' && concept.mcq?.wrong_answers_explained) {
       const wrongKey = `wrong-${qi}-${ci}`;
@@ -255,7 +257,7 @@ export default function TeacherLiveClassContent() {
         meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
       });
       setOpenBlocks(prev => ({ ...prev, [wrongKey]: true }));
-      scrollToBlock(wrongKey);
+      setTimeout(() => scrollToBlock(wrongKey), 50);
       setCursor(prev => ({ ...prev, step: 'student_doubts' }));
     } else if (step === 'student_doubts' && concept.student_doubts?.length > 0) {
       const doubtsKey = `doubts-${qi}-${ci}`;
@@ -265,7 +267,7 @@ export default function TeacherLiveClassContent() {
         meta: { qi, ci },
       });
       setOpenBlocks(prev => ({ ...prev, [doubtsKey]: true }));
-      scrollToBlock(doubtsKey);
+      setTimeout(() => scrollToBlock(doubtsKey), 50);
 
       if (ci + 1 < conceptKeys.length) {
         setCursor({ qi, ci: ci + 1, step: 'concept' });
@@ -397,6 +399,7 @@ export default function TeacherLiveClassContent() {
         style={styles.contentScroll}
         contentContainerStyle={styles.contentContainer}
       >
+        <View ref={contentRef}>
         {data.map((item, qi) => {
           const conceptKeys = getSortedConceptKeys(item.class_json);
 
@@ -642,6 +645,7 @@ export default function TeacherLiveClassContent() {
         })}
 
         <View style={{ height: 40 }} />
+        </View>
       </ScrollView>
     </View>
   );
