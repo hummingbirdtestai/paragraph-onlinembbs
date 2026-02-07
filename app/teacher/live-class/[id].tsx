@@ -104,23 +104,6 @@ function parseInlineMarkup(text: string): React.ReactNode {
 }
 
 // -----------------------------------------------------------------------------
-// Push Button Component (always green +, triggers broadcast)
-// -----------------------------------------------------------------------------
-
-const PushBtn = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity
-    onPress={(e) => {
-      e.stopPropagation();
-      onPress();
-    }}
-    activeOpacity={0.7}
-    style={styles.pushBtn}
-  >
-    <Text style={styles.pushBtnText}>+</Text>
-  </TouchableOpacity>
-);
-
-// -----------------------------------------------------------------------------
 // Screen
 // -----------------------------------------------------------------------------
 
@@ -132,6 +115,17 @@ export default function TeacherLiveClassContent() {
   const [error, setError] = useState('');
   const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({});
   const [mcqSeqMap, setMcqSeqMap] = useState<Record<string, number>>({});
+  const [cursor, setCursor] = useState({
+    qi: 0,
+    ci: 0,
+    step: 'concept' as
+      | 'concept'
+      | 'mcq'
+      | 'exam_trap'
+      | 'explanation'
+      | 'wrong_answers'
+      | 'student_doubts',
+  });
 
   const toggleBlock = (key: string) => {
     setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
@@ -172,6 +166,88 @@ export default function TeacherLiveClassContent() {
     supabase.removeChannel(channel);
 
     return row;
+  };
+
+  const handleNext = async () => {
+    if (data.length === 0) return;
+
+    const { qi, ci, step } = cursor;
+    if (qi >= data.length) return;
+
+    const item = data[qi];
+    const conceptKeys = getSortedConceptKeys(item.class_json);
+    if (ci >= conceptKeys.length) return;
+
+    const conceptKey = conceptKeys[ci];
+    const concept = item.class_json[conceptKey];
+    if (!concept) return;
+
+    const mcqKey = `mcq-${qi}-${ci}`;
+    const blockKey = `concept-${qi}-${ci}`;
+
+    if (step === 'concept') {
+      await pushToClassroom({
+        type: 'concept',
+        content: concept.concept,
+        meta: { qi, ci, title: concept.title },
+      });
+      setOpenBlocks(prev => ({ ...prev, [blockKey]: true }));
+      setCursor(prev => ({ ...prev, step: 'mcq' }));
+    } else if (step === 'mcq' && concept.mcq?.stem) {
+      const row = await pushToClassroom({
+        type: 'mcq',
+        content: concept.mcq,
+        meta: { qi, ci },
+      });
+      if (row?.seq) {
+        setMcqSeqMap(prev => ({ ...prev, [mcqKey]: row.seq }));
+      }
+      setOpenBlocks(prev => ({ ...prev, [mcqKey]: true }));
+      setCursor(prev => ({ ...prev, step: 'exam_trap' }));
+    } else if (step === 'exam_trap' && concept.mcq?.exam_trap) {
+      await pushToClassroom({
+        type: 'exam_trap',
+        content: concept.mcq.exam_trap,
+        meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
+      });
+      setOpenBlocks(prev => ({ ...prev, [`trap-${qi}-${ci}`]: true }));
+      setCursor(prev => ({ ...prev, step: 'explanation' }));
+    } else if (step === 'explanation' && concept.mcq?.explanation) {
+      await pushToClassroom({
+        type: 'explanation',
+        content: concept.mcq.explanation,
+        meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
+      });
+      setOpenBlocks(prev => ({ ...prev, [`explanation-${qi}-${ci}`]: true }));
+      setCursor(prev => ({ ...prev, step: 'wrong_answers' }));
+    } else if (step === 'wrong_answers' && concept.mcq?.wrong_answers_explained) {
+      await pushToClassroom({
+        type: 'wrong_answers',
+        content: concept.mcq.wrong_answers_explained,
+        meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
+      });
+      setOpenBlocks(prev => ({ ...prev, [`wrong-${qi}-${ci}`]: true }));
+      setCursor(prev => ({ ...prev, step: 'student_doubts' }));
+    } else if (step === 'student_doubts' && concept.student_doubts?.length > 0) {
+      await pushToClassroom({
+        type: 'student_doubts',
+        content: concept.student_doubts,
+        meta: { qi, ci },
+      });
+      setOpenBlocks(prev => ({ ...prev, [`doubts-${qi}-${ci}`]: true }));
+
+      if (ci + 1 < conceptKeys.length) {
+        setCursor({ qi, ci: ci + 1, step: 'concept' });
+      } else if (qi + 1 < data.length) {
+        setCursor({ qi: qi + 1, ci: 0, step: 'concept' });
+      }
+    } else {
+      if (ci + 1 < conceptKeys.length) {
+        setCursor({ qi, ci: ci + 1, step: 'concept' });
+      } else if (qi + 1 < data.length) {
+        setCursor({ qi: qi + 1, ci: 0, step: 'concept' });
+      }
+    }
   };
 
   // ---------------------------------------------------------------------------
@@ -280,7 +356,9 @@ export default function TeacherLiveClassContent() {
             {data.length} Question{data.length !== 1 ? 's' : ''}
           </Text>
         </View>
-        <View style={{ width: 64 }} />
+        <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
+          <Text style={styles.nextBtnText}>▶ Next</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -321,15 +399,6 @@ export default function TeacherLiveClassContent() {
                         <Text style={styles.conceptBadgeText}>{ci + 1}</Text>
                       </View>
                       <Text style={styles.conceptTitle}>{concept.title}</Text>
-                      <PushBtn
-                        onPress={() =>
-                          pushToClassroom({
-                            type: 'concept',
-                            content: concept.concept,
-                            meta: { qi, ci, title: concept.title },
-                          })
-                        }
-                      />
                     </TouchableOpacity>
 
                     {openBlocks[conceptKey] && (
@@ -357,21 +426,6 @@ export default function TeacherLiveClassContent() {
                           style={styles.cardHeader}
                         >
                           <Text style={styles.mcqLabel}>MCQ</Text>
-                          <PushBtn
-                            onPress={async () => {
-                              const row = await pushToClassroom({
-                                type: 'mcq',
-                                content: concept.mcq,
-                                meta: { qi, ci },
-                              });
-                              if (row?.seq) {
-                                setMcqSeqMap(prev => ({
-                                  ...prev,
-                                  [mcqKey]: row.seq,
-                                }));
-                              }
-                            }}
-                          />
                         </TouchableOpacity>
 
                         {openBlocks[mcqKey] && (
@@ -433,15 +487,6 @@ export default function TeacherLiveClassContent() {
                           style={styles.cardHeader}
                         >
                           <Text style={styles.feedbackLabel}>Exam Trap</Text>
-                          <PushBtn
-                            onPress={() =>
-                              pushToClassroom({
-                                type: 'exam_trap',
-                                content: concept.mcq.exam_trap,
-                                meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
-                              })
-                            }
-                          />
                         </TouchableOpacity>
                         {openBlocks[trapKey] && (
                           <Text style={styles.feedbackText}>
@@ -459,15 +504,6 @@ export default function TeacherLiveClassContent() {
                           style={styles.cardHeader}
                         >
                           <Text style={styles.feedbackLabel}>Explanation</Text>
-                          <PushBtn
-                            onPress={() =>
-                              pushToClassroom({
-                                type: 'explanation',
-                                content: concept.mcq.explanation,
-                                meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
-                              })
-                            }
-                          />
                         </TouchableOpacity>
                         {openBlocks[explanationKey] && (
                           <Text style={styles.feedbackText}>
@@ -488,15 +524,6 @@ export default function TeacherLiveClassContent() {
                             <Text style={styles.feedbackLabel}>
                               Why Other Options Are Wrong
                             </Text>
-                            <PushBtn
-                              onPress={() =>
-                                pushToClassroom({
-                                  type: 'wrong_answers',
-                                  content: concept.mcq.wrong_answers_explained,
-                                  meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
-                                })
-                              }
-                            />
                           </TouchableOpacity>
                           {openBlocks[wrongKey] &&
                             Object.entries(concept.mcq.wrong_answers_explained).map(
@@ -520,15 +547,6 @@ export default function TeacherLiveClassContent() {
                           style={styles.cardHeader}
                         >
                           <Text style={styles.doubtsLabel}>Student Doubts</Text>
-                          <PushBtn
-                            onPress={() =>
-                              pushToClassroom({
-                                type: 'student_doubts',
-                                content: concept.student_doubts,
-                                meta: { qi, ci },
-                              })
-                            }
-                          />
                         </TouchableOpacity>
 
                         {openBlocks[doubtsKey] && (
@@ -925,18 +943,16 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
 
-  pushBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+  nextBtn: {
     backgroundColor: '#22C55E',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
 
-  pushBtnText: {
-    fontSize: 18,
-    fontWeight: '900',
+  nextBtnText: {
+    fontSize: 14,
+    fontWeight: '800',
     color: '#0F0F0F',
   },
 
