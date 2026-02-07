@@ -48,6 +48,14 @@ interface BattleClassItem {
   class_json: Record<string, ConceptBlock>;
 }
 
+type FlatItem =
+  | { type: 'concept'; qi: number; ci: number }
+  | { type: 'mcq'; qi: number; ci: number }
+  | { type: 'exam_trap'; qi: number; ci: number }
+  | { type: 'explanation'; qi: number; ci: number }
+  | { type: 'wrong_answers'; qi: number; ci: number }
+  | { type: 'student_doubts'; qi: number; ci: number };
+
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------
@@ -114,22 +122,30 @@ export default function TeacherLiveClassContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({});
-  const [mcqSeqMap, setMcqSeqMap] = useState<Record<string, number>>({});
-  const [cursor, setCursor] = useState({
-    qi: 0,
-    ci: 0,
-    step: 'concept' as
-      | 'concept'
-      | 'mcq'
-      | 'exam_trap'
-      | 'explanation'
-      | 'wrong_answers'
-      | 'student_doubts',
-  });
+  const [cursorIndex, setCursorIndex] = useState(0);
 
   const scrollRef = React.useRef<ScrollView>(null);
   const contentRef = React.useRef<View>(null);
   const blockRefs = React.useRef<Record<string, View>>({});
+
+  // Build flat timeline from data
+  const flatTimeline: FlatItem[] = [];
+  data.forEach((item, qi) => {
+    const conceptKeys = getSortedConceptKeys(item.class_json);
+    conceptKeys.forEach((key, ci) => {
+      const c = item.class_json[key];
+      if (!c) return;
+
+      flatTimeline.push({ type: 'concept', qi, ci });
+      if (c.mcq?.stem) flatTimeline.push({ type: 'mcq', qi, ci });
+      if (c.mcq?.exam_trap) flatTimeline.push({ type: 'exam_trap', qi, ci });
+      if (c.mcq?.explanation) flatTimeline.push({ type: 'explanation', qi, ci });
+      if (c.mcq?.wrong_answers_explained)
+        flatTimeline.push({ type: 'wrong_answers', qi, ci });
+      if (c.student_doubts?.length)
+        flatTimeline.push({ type: 'student_doubts', qi, ci });
+    });
+  });
 
   const toggleBlock = (key: string) => {
     setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
@@ -192,95 +208,50 @@ export default function TeacherLiveClassContent() {
   };
 
   const handleNext = async () => {
-    if (data.length === 0) return;
+    const item = flatTimeline[cursorIndex];
+    if (!item) return;
 
-    const { qi, ci, step } = cursor;
-    if (qi >= data.length) return;
-
-    const item = data[qi];
-    const conceptKeys = getSortedConceptKeys(item.class_json);
-    if (ci >= conceptKeys.length) return;
-
-    const conceptKey = conceptKeys[ci];
-    const concept = item.class_json[conceptKey];
+    const { qi, ci, type } = item;
+    const conceptKeys = getSortedConceptKeys(data[qi].class_json);
+    const concept = data[qi].class_json[conceptKeys[ci]];
     if (!concept) return;
 
-    const mcqKey = `mcq-${qi}-${ci}`;
-    const blockKey = `concept-${qi}-${ci}`;
+    // Map type to blockKey prefix to match render section
+    let blockKeyPrefix = type;
+    if (type === 'exam_trap') blockKeyPrefix = 'trap';
+    if (type === 'wrong_answers') blockKeyPrefix = 'wrong';
+    if (type === 'student_doubts') blockKeyPrefix = 'doubts';
 
-    if (step === 'concept') {
-      await pushToClassroom({
-        type: 'concept',
-        content: concept.concept,
-        meta: { qi, ci, title: concept.title },
-      });
-      setOpenBlocks(prev => ({ ...prev, [blockKey]: true }));
-      setTimeout(() => scrollToBlock(blockKey), 50);
-      setCursor(prev => ({ ...prev, step: 'mcq' }));
-    } else if (step === 'mcq' && concept.mcq?.stem) {
-      const row = await pushToClassroom({
-        type: 'mcq',
-        content: concept.mcq,
-        meta: { qi, ci },
-      });
-      if (row?.seq) {
-        setMcqSeqMap(prev => ({ ...prev, [mcqKey]: row.seq }));
-      }
-      setOpenBlocks(prev => ({ ...prev, [mcqKey]: true }));
-      setTimeout(() => scrollToBlock(mcqKey), 50);
-      setCursor(prev => ({ ...prev, step: 'exam_trap' }));
-    } else if (step === 'exam_trap' && concept.mcq?.exam_trap) {
-      const trapKey = `trap-${qi}-${ci}`;
-      await pushToClassroom({
-        type: 'exam_trap',
-        content: concept.mcq.exam_trap,
-        meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
-      });
-      setOpenBlocks(prev => ({ ...prev, [trapKey]: true }));
-      setTimeout(() => scrollToBlock(trapKey), 50);
-      setCursor(prev => ({ ...prev, step: 'explanation' }));
-    } else if (step === 'explanation' && concept.mcq?.explanation) {
-      const explanationKey = `explanation-${qi}-${ci}`;
-      await pushToClassroom({
-        type: 'explanation',
-        content: concept.mcq.explanation,
-        meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
-      });
-      setOpenBlocks(prev => ({ ...prev, [explanationKey]: true }));
-      setTimeout(() => scrollToBlock(explanationKey), 50);
-      setCursor(prev => ({ ...prev, step: 'wrong_answers' }));
-    } else if (step === 'wrong_answers' && concept.mcq?.wrong_answers_explained) {
-      const wrongKey = `wrong-${qi}-${ci}`;
-      await pushToClassroom({
-        type: 'wrong_answers',
-        content: concept.mcq.wrong_answers_explained,
-        meta: { qi, ci, mcq_feed_seq: mcqSeqMap[mcqKey] },
-      });
-      setOpenBlocks(prev => ({ ...prev, [wrongKey]: true }));
-      setTimeout(() => scrollToBlock(wrongKey), 50);
-      setCursor(prev => ({ ...prev, step: 'student_doubts' }));
-    } else if (step === 'student_doubts' && concept.student_doubts?.length > 0) {
-      const doubtsKey = `doubts-${qi}-${ci}`;
-      await pushToClassroom({
-        type: 'student_doubts',
-        content: concept.student_doubts,
-        meta: { qi, ci },
-      });
-      setOpenBlocks(prev => ({ ...prev, [doubtsKey]: true }));
-      setTimeout(() => scrollToBlock(doubtsKey), 50);
+    const blockKey = `${blockKeyPrefix}-${qi}-${ci}`;
 
-      if (ci + 1 < conceptKeys.length) {
-        setCursor({ qi, ci: ci + 1, step: 'concept' });
-      } else if (qi + 1 < data.length) {
-        setCursor({ qi: qi + 1, ci: 0, step: 'concept' });
-      }
-    } else {
-      if (ci + 1 < conceptKeys.length) {
-        setCursor({ qi, ci: ci + 1, step: 'concept' });
-      } else if (qi + 1 < data.length) {
-        setCursor({ qi: qi + 1, ci: 0, step: 'concept' });
-      }
+    let payload: any = null;
+    let meta: Record<string, any> = { qi, ci };
+
+    if (type === 'concept') {
+      payload = concept.concept;
+      meta.title = concept.title;
+    } else if (type === 'mcq') {
+      payload = concept.mcq;
+    } else if (type === 'exam_trap') {
+      payload = concept.mcq.exam_trap;
+    } else if (type === 'explanation') {
+      payload = concept.mcq.explanation;
+    } else if (type === 'wrong_answers') {
+      payload = concept.mcq.wrong_answers_explained;
+    } else if (type === 'student_doubts') {
+      payload = concept.student_doubts;
     }
+
+    await pushToClassroom({
+      type,
+      content: payload,
+      meta,
+    });
+
+    setOpenBlocks(prev => ({ ...prev, [blockKey]: true }));
+    setTimeout(() => scrollToBlock(blockKey), 50);
+
+    setCursorIndex(prev => prev + 1);
   };
 
   // ---------------------------------------------------------------------------
