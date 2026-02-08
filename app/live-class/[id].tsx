@@ -115,12 +115,20 @@ export default function StudentLiveClassRoom() {
   useEffect(() => {
     if (Platform.OS !== 'web') return;
 
+    let rafId: number | null = null;
+
     const handler = () => {
-      setIsMobile(window.innerWidth < 768);
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        setIsMobile(window.innerWidth < 768);
+      });
     };
 
     window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
+    return () => {
+      window.removeEventListener('resize', handler);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // 0️⃣ Load user profile
@@ -454,7 +462,12 @@ export default function StudentLiveClassRoom() {
   placeholderTextColor="#6B7280"
   multiline
   maxLength={500}
-  onSubmitEditing={sendChatMessage}
+  onKeyPress={e => {
+    if (Platform.OS === 'web' && e.nativeEvent.key === 'Enter' && !e.nativeEvent.shiftKey) {
+      e.preventDefault();
+      sendChatMessage();
+    }
+  }}
   blurOnSubmit={false}
   editable={!sendingMessage && !!userId}
 />
