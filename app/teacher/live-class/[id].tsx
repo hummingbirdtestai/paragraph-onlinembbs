@@ -7,10 +7,14 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  TextInput,
+  Platform,
+  Keyboard,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { supabase } from '@/lib/supabaseClient';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, MessageCircle, Send, X } from 'lucide-react-native';
 
 // -----------------------------------------------------------------------------
 // Types
@@ -46,6 +50,15 @@ interface BattleClassItem {
   question: string;
   topic_order: number;
   class_json: Record<string, ConceptBlock>;
+}
+
+interface ChatMessage {
+  id: string;
+  battle_id: string;
+  user_id: string;
+  user_name: string;
+  message: string;
+  created_at: string;
 }
 
 type FlatItem =
@@ -124,9 +137,27 @@ export default function TeacherLiveClassContent() {
   const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({});
   const [cursorIndex, setCursorIndex] = useState(0);
 
+  // Chat state (teacher)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [userId, setUserId] = useState('');
+  const [userName, setUserName] = useState('Teacher');
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
+
+  // Platform detection
+  const [isMobile, setIsMobile] = useState(
+    Platform.OS !== 'web' ? true : typeof window !== 'undefined' && window.innerWidth < 768
+  );
+  const isWeb = Platform.OS === 'web';
+
   const scrollRef = React.useRef<ScrollView>(null);
   const contentRef = React.useRef<View>(null);
   const blockRefs = React.useRef<Record<string, View>>({});
+  const chatScrollRef = React.useRef<ScrollView>(null);
+  const chatChannelRef = React.useRef<any>(null);
+  const chatDrawerOpenRef = React.useRef(false);
 
   const flatTimeline = React.useMemo<FlatItem[]>(() => {
     const timeline: FlatItem[] = [];
@@ -258,6 +289,203 @@ export default function TeacherLiveClassContent() {
     setCursorIndex(prev => prev + 1);
   };
 
+  // ---------------------------------------------------------------------------
+  // Send chat message
+  // ---------------------------------------------------------------------------
+
+  const sendChatMessage = async () => {
+    if (
+      !chatInput.trim() ||
+      !id ||
+      !userId ||
+      !userName ||
+      userName === 'Teacher' ||
+      sendingMessage
+    ) {
+      if (!userName || userName === 'Teacher') {
+        console.warn('Teacher name not loaded yet');
+      }
+      return;
+    }
+
+    const text = chatInput.trim();
+    setChatInput('');
+    setSendingMessage(true);
+    Keyboard.dismiss();
+
+    const optimistic: ChatMessage = {
+      id: `local-${Date.now()}-${Math.random()}`,
+      battle_id: id,
+      user_id: userId,
+      user_name: userName,
+      message: text,
+      created_at: new Date().toISOString(),
+    };
+
+    setChatMessages(prev =>
+      [...prev, optimistic].sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() -
+          new Date(b.created_at).getTime()
+      )
+    );
+
+    setTimeout(() => {
+      chatScrollRef.current?.scrollToEnd({ animated: true });
+    }, 50);
+
+    try {
+      const { data } = await supabase.rpc('insert_battle_chat_message', {
+        p_battle_id: id,
+        p_user_name: userName,
+        p_message: text,
+      });
+
+      if (data?.[0]) {
+        setChatMessages(prev =>
+          prev.map(m => (m.id === optimistic.id ? data[0] : m))
+        );
+
+        try {
+          await chatChannelRef.current?.send({
+            type: 'broadcast',
+            event: 'chat-message',
+            payload: data[0],
+          });
+        } catch {
+          // no-op: DB persistence guarantees eventual consistency
+        }
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setChatMessages(prev =>
+        prev.filter(m => m.id !== optimistic.id)
+      );
+      setChatInput(text);
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+  // Toggle chat drawer
+  // ---------------------------------------------------------------------------
+
+  const toggleChatDrawer = () => {
+    const newState = !chatDrawerOpen;
+    setChatDrawerOpen(newState);
+    chatDrawerOpenRef.current = newState;
+
+    if (newState) {
+      setHasUnreadMessages(false);
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+  // Window resize handler (web)
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+
+    let rafId: number | null = null;
+
+    const handler = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        setIsMobile(window.innerWidth < 768);
+      });
+    };
+
+    window.addEventListener('resize', handler);
+    return () => {
+      window.removeEventListener('resize', handler);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  // ---------------------------------------------------------------------------
+  // Load teacher profile
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    const loadTeacherProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      setUserId(user.id);
+
+      const { data: profile } = await supabase
+        .from('users')
+        .select('name')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (profile?.name) {
+        setUserName(profile.name);
+      }
+    };
+
+    loadTeacherProfile();
+  }, []);
+
+  // ---------------------------------------------------------------------------
+  // Load chat history
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!id) return;
+
+    supabase
+      .rpc('get_battle_chat_messages', { p_battle_id: id })
+      .then(({ data }) => {
+        if (data) setChatMessages(data);
+      });
+  }, [id]);
+
+  // ---------------------------------------------------------------------------
+  // Subscribe to chat
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!id || chatChannelRef.current) return;
+
+    const channel = supabase
+      .channel(`battle-chat:${id}`)
+      .on(
+        'broadcast',
+        { event: 'chat-message' },
+        payload => {
+          setChatMessages(prev => {
+            if (prev.some(m => m.id === payload.payload.id)) return prev;
+
+            const updated = [...prev, payload.payload].sort(
+              (a, b) =>
+                new Date(a.created_at).getTime() -
+                new Date(b.created_at).getTime()
+            );
+
+            if (!chatDrawerOpenRef.current) {
+              setHasUnreadMessages(true);
+            }
+
+            setTimeout(() => {
+              chatScrollRef.current?.scrollToEnd({ animated: true });
+            }, 50);
+
+            return updated;
+          });
+        }
+      )
+      .subscribe();
+
+    chatChannelRef.current = channel;
+
+    return () => {
+      supabase.removeChannel(channel);
+      chatChannelRef.current = null;
+    };
+  }, [id]);
 
   // ---------------------------------------------------------------------------
   // Fetch
@@ -345,36 +573,254 @@ export default function TeacherLiveClassContent() {
   }
 
   // ---------------------------------------------------------------------------
+  // Render chat UI
+  // ---------------------------------------------------------------------------
+
+  const renderChatUI = () => {
+    // Mobile: WhatsApp-style layout
+    if (isMobile) {
+      return (
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            style={styles.overlayDismiss}
+            activeOpacity={1}
+            onPress={toggleChatDrawer}
+          />
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.chatRoot}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+          >
+            <View style={styles.chatContainer}>
+              {/* HEADER */}
+              <View style={styles.chatHeader}>
+                <MessageCircle size={20} color="#00D9FF" />
+                <Text style={styles.chatHeaderText}>Class Chat</Text>
+                <TouchableOpacity onPress={toggleChatDrawer} style={styles.closeButton}>
+                  <X size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+              </View>
+
+              {/* MESSAGES — FLEX 1 */}
+              <ScrollView
+                ref={chatScrollRef}
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.chatMessagesContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+              >
+                {chatMessages.length === 0 && (
+                  <View style={styles.emptyChat}>
+                    <Text style={styles.emptyChatText}>No messages yet</Text>
+                    <Text style={styles.emptyChatSubtext}>
+                      Chat with your students
+                    </Text>
+                  </View>
+                )}
+
+                {chatMessages.map(msg => {
+                  const isOwnMessage = msg.user_id === userId;
+
+                  return (
+                    <View
+                      key={msg.id}
+                      style={[
+                        styles.chatMessageBubble,
+                        isOwnMessage && styles.chatMessageBubbleOwn,
+                      ]}
+                    >
+                      {!isOwnMessage && (
+                        <Text style={styles.chatMessageSender}>{msg.user_name}</Text>
+                      )}
+                      <Text
+                        style={[
+                          styles.chatMessageText,
+                          isOwnMessage && styles.chatMessageTextOwn,
+                        ]}
+                      >
+                        {msg.message}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.chatMessageTime,
+                          isOwnMessage && styles.chatMessageTimeOwn,
+                        ]}
+                      >
+                        {new Date(msg.created_at).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+
+              {/* INPUT — FIXED */}
+              <View style={styles.chatInputContainer}>
+                <TextInput
+                  style={styles.chatInput}
+                  value={chatInput}
+                  onChangeText={setChatInput}
+                  placeholder={!userId ? 'Loading profile…' : 'Message students...'}
+                  placeholderTextColor="#6B7280"
+                  multiline
+                  maxLength={500}
+                  blurOnSubmit={false}
+                  keyboardShouldPersistTaps="handled"
+                  editable={!sendingMessage && !!userId}
+                />
+                <TouchableOpacity
+                  onPress={sendChatMessage}
+                  disabled={!chatInput.trim() || sendingMessage}
+                  style={[
+                    styles.sendButton,
+                    (!chatInput.trim() || sendingMessage) && styles.sendButtonDisabled,
+                  ]}
+                >
+                  <Send
+                    size={20}
+                    color={chatInput.trim() && !sendingMessage ? '#00D9FF' : '#4B5563'}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      );
+    }
+
+    // Web: Sidebar
+    return (
+      <View style={[styles.chatContainer, styles.chatSidebar]}>
+        <View style={styles.chatHeader}>
+          <MessageCircle size={20} color="#00D9FF" />
+          <Text style={styles.chatHeaderText}>Class Chat</Text>
+        </View>
+
+        <ScrollView
+          ref={chatScrollRef}
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.chatMessagesContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {chatMessages.length === 0 && (
+            <View style={styles.emptyChat}>
+              <Text style={styles.emptyChatText}>No messages yet</Text>
+              <Text style={styles.emptyChatSubtext}>
+                Chat with your students
+              </Text>
+            </View>
+          )}
+
+          {chatMessages.map(msg => {
+            const isOwnMessage = msg.user_id === userId;
+
+            return (
+              <View
+                key={msg.id}
+                style={[
+                  styles.chatMessageBubble,
+                  isOwnMessage && styles.chatMessageBubbleOwn,
+                ]}
+              >
+                {!isOwnMessage && (
+                  <Text style={styles.chatMessageSender}>{msg.user_name}</Text>
+                )}
+                <Text
+                  style={[
+                    styles.chatMessageText,
+                    isOwnMessage && styles.chatMessageTextOwn,
+                  ]}
+                >
+                  {msg.message}
+                </Text>
+                <Text
+                  style={[
+                    styles.chatMessageTime,
+                    isOwnMessage && styles.chatMessageTimeOwn,
+                  ]}
+                >
+                  {new Date(msg.created_at).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </Text>
+              </View>
+            );
+          })}
+        </ScrollView>
+
+        <View style={styles.chatInputContainer}>
+          <TextInput
+            style={styles.chatInput}
+            value={chatInput}
+            onChangeText={setChatInput}
+            placeholder={!userId ? 'Loading profile…' : 'Message students...'}
+            placeholderTextColor="#6B7280"
+            multiline
+            maxLength={500}
+            onKeyPress={e => {
+              if (Platform.OS === 'web' && e.nativeEvent.key === 'Enter' && !e.nativeEvent.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+              }
+            }}
+            blurOnSubmit={false}
+            editable={!sendingMessage && !!userId}
+          />
+          <TouchableOpacity
+            onPress={sendChatMessage}
+            disabled={!chatInput.trim() || sendingMessage}
+            style={[
+              styles.sendButton,
+              (!chatInput.trim() || sendingMessage) && styles.sendButtonDisabled,
+            ]}
+          >
+            <Send
+              size={20}
+              color={chatInput.trim() && !sendingMessage ? '#00D9FF' : '#4B5563'}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backBtn}
-          activeOpacity={0.7}
-        >
-          <ChevronLeft size={22} color="#00D9FF" />
-          <Text style={styles.backText}>Back</Text>
-        </TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Live Class</Text>
-          <Text style={styles.headerSub}>
-            {data.length} Question{data.length !== 1 ? 's' : ''}
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
-          <Text style={styles.nextBtnText}>▶ Next</Text>
-        </TouchableOpacity>
-      </View>
+      <View style={[styles.mainContent, isWeb && !isMobile && styles.mainContentWithSidebar]}>
+        {/* FEED COLUMN */}
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backBtn}
+              activeOpacity={0.7}
+            >
+              <ChevronLeft size={22} color="#00D9FF" />
+              <Text style={styles.backText}>Back</Text>
+            </TouchableOpacity>
+            <View style={styles.headerCenter}>
+              <Text style={styles.headerTitle}>Live Class</Text>
+              <Text style={styles.headerSub}>
+                {data.length} Question{data.length !== 1 ? 's' : ''}
+              </Text>
+            </View>
+            <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
+              <Text style={styles.nextBtnText}>▶ Next</Text>
+            </TouchableOpacity>
+          </View>
 
-      <ScrollView
-        ref={scrollRef}
-        style={styles.contentScroll}
-        contentContainerStyle={styles.contentContainer}
-      >
+          <ScrollView
+            ref={scrollRef}
+            style={styles.contentScroll}
+            contentContainerStyle={styles.contentContainer}
+          >
         <View ref={contentRef}>
         {data.map((item, qi) => {
           const conceptKeys = getSortedConceptKeys(item.class_json);
@@ -623,6 +1069,22 @@ export default function TeacherLiveClassContent() {
         <View style={{ height: 40 }} />
         </View>
       </ScrollView>
+
+          {/* Mobile: Floating chat button */}
+          {isMobile && !chatDrawerOpen && (
+            <TouchableOpacity
+              style={styles.floatingChatButton}
+              onPress={toggleChatDrawer}
+            >
+              <MessageCircle size={24} color="#FFF" />
+              {hasUnreadMessages && <View style={styles.chatBadgeDot} />}
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* CHAT COLUMN */}
+        {(isWeb && !isMobile) || chatDrawerOpen ? renderChatUI() : null}
+      </View>
     </View>
   );
 }
@@ -1003,5 +1465,210 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+
+  // Chat styles
+  mainContent: {
+    flex: 1,
+  },
+
+  mainContentWithSidebar: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+
+  floatingChatButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#00D9FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+
+  chatBadgeDot: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#EF4444',
+    borderWidth: 2,
+    borderColor: '#00D9FF',
+  },
+
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+  },
+
+  overlayDismiss: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  chatRoot: {
+    flex: 1,
+    backgroundColor: '#1A1A1A',
+    marginTop: 'auto',
+    maxHeight: '80%',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: 'hidden',
+  },
+
+  chatContainer: {
+    flex: 1,
+    backgroundColor: '#1A1A1A',
+  },
+
+  chatSidebar: {
+    width: 350,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderLeftWidth: 1,
+    borderLeftColor: '#2D2D2D',
+  },
+
+  chatHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2D2D2D',
+    backgroundColor: '#252525',
+  },
+
+  chatHeaderText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+
+  closeButton: {
+    padding: 4,
+  },
+
+  chatMessagesContent: {
+    padding: 12,
+    paddingBottom: 8,
+    gap: 12,
+  },
+
+  emptyChat: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+
+  emptyChatText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 6,
+  },
+
+  emptyChatSubtext: {
+    fontSize: 13,
+    color: '#4B5563',
+  },
+
+  chatMessageBubble: {
+    backgroundColor: '#2A2A2A',
+    borderRadius: 12,
+    padding: 12,
+    maxWidth: '85%',
+    alignSelf: 'flex-start',
+    gap: 4,
+  },
+
+  chatMessageBubbleOwn: {
+    backgroundColor: '#DCF8C6',
+    alignSelf: 'flex-end',
+    borderWidth: 0,
+  },
+
+  chatMessageSender: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#34B7F1',
+    marginBottom: 2,
+  },
+
+  chatMessageText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#EDEDED',
+    lineHeight: 20,
+  },
+
+  chatMessageTextOwn: {
+    color: '#000',
+  },
+
+  chatMessageTime: {
+    fontSize: 11,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+
+  chatMessageTimeOwn: {
+    color: '#666',
+  },
+
+  chatInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 10,
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#2D2D2D',
+    backgroundColor: '#1F1F1F',
+  },
+
+  chatInput: {
+    flex: 1,
+    backgroundColor: '#252525',
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#FFF',
+    maxHeight: 120,
+  },
+
+  sendButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#252525',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
+  },
+
+  sendButtonDisabled: {
+    opacity: 0.5,
   },
 });
