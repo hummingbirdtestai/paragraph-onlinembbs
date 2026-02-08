@@ -205,7 +205,13 @@ export default function StudentLiveClassRoom() {
           setChatMessages(prev => {
             // Deduplicate by id
             if (prev.some(m => m.id === payload.payload.id)) return prev;
-            const updated = [...prev, payload.payload];
+
+            // Add and sort by created_at to handle network jitter
+            const updated = [...prev, payload.payload].sort(
+              (a, b) =>
+                new Date(a.created_at).getTime() -
+                new Date(b.created_at).getTime()
+            );
 
             // Mark as unread if drawer is closed
             if (!chatDrawerOpenRef.current) {
@@ -226,8 +232,13 @@ export default function StudentLiveClassRoom() {
     chatChannelRef.current = chatChannel;
 
     return () => {
-      supabase.removeChannel(feedChannel);
-      supabase.removeChannel(chatChannel);
+      // Safely remove channels if they exist
+      if (feedChannel) {
+        supabase.removeChannel(feedChannel);
+      }
+      if (chatChannel) {
+        supabase.removeChannel(chatChannel);
+      }
       chatChannelRef.current = null;
     };
   }, [id]);
@@ -262,8 +273,14 @@ export default function StudentLiveClassRoom() {
       created_at: new Date().toISOString(),
     };
 
-    // 2️⃣ Add to UI immediately (WhatsApp behavior)
-    setChatMessages(prev => [...prev, optimisticMessage]);
+    // 2️⃣ Add to UI immediately (WhatsApp behavior) and sort
+    setChatMessages(prev =>
+      [...prev, optimisticMessage].sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() -
+          new Date(b.created_at).getTime()
+      )
+    );
 
     setTimeout(() => {
       chatScrollRef.current?.scrollToEnd({ animated: true });
@@ -403,12 +420,13 @@ export default function StudentLiveClassRoom() {
             style={styles.chatInput}
             value={chatInput}
             onChangeText={setChatInput}
-            placeholder="Ask a doubt..."
+            placeholder={!userId ? 'Loading profile…' : 'Ask a doubt...'}
             placeholderTextColor="#6B7280"
             multiline
             maxLength={500}
             onSubmitEditing={sendChatMessage}
             blurOnSubmit={false}
+            editable={!sendingMessage && !!userId}
             editable={!sendingMessage}
           />
           <TouchableOpacity
