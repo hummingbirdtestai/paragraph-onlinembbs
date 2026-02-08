@@ -504,212 +504,215 @@ export default function StudentLiveClassRoom() {
   return (
     <View style={styles.container}>
       <View style={[styles.mainContent, isWeb && !isMobile && styles.mainContentWithSidebar]}>
-        <ScrollView
-          ref={scrollRef}
-          style={styles.contentScroll}
-          contentContainerStyle={styles.contentContainer}
-        >
-          {feed.map((item, idx) => {
-          switch (item.type) {
-case 'topic':
-  return (
-    <View key={item.seq} style={styles.topicBlock}>
-      <Text style={styles.topicText}>
-        {item.meta?.topic}
-      </Text>
-    </View>
-  );
-              
-            case 'concept':
-              return (
-                <View key={item.seq} style={styles.conceptSection}>
-                  <View style={styles.conceptHeader}>
-                    <View style={styles.conceptBadge}>
-                      <Text style={styles.conceptBadgeText}>
-                        {item.meta?.ci != null ? item.meta.ci + 1 : ''}
+        {/* FEED COLUMN */}
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <ScrollView
+            ref={scrollRef}
+            style={styles.contentScroll}
+            contentContainerStyle={styles.contentContainer}
+          >
+            {feed.map((item, idx) => {
+            switch (item.type) {
+  case 'topic':
+    return (
+      <View key={item.seq} style={styles.topicBlock}>
+        <Text style={styles.topicText}>
+          {item.meta?.topic}
+        </Text>
+      </View>
+    );
+
+              case 'concept':
+                return (
+                  <View key={item.seq} style={styles.conceptSection}>
+                    <View style={styles.conceptHeader}>
+                      <View style={styles.conceptBadge}>
+                        <Text style={styles.conceptBadgeText}>
+                          {item.meta?.ci != null ? item.meta.ci + 1 : ''}
+                        </Text>
+                      </View>
+                      <Text style={styles.conceptTitle}>
+                        {item.meta?.title || 'Concept'}
                       </Text>
                     </View>
-                    <Text style={styles.conceptTitle}>
-                      {item.meta?.title || 'Concept'}
-                    </Text>
-                  </View>
 
-                  {Array.isArray(item.payload) && item.payload.length > 0 && (
-                    <View style={styles.bulletSection}>
-                      {item.payload.map((point: string, pi: number) => (
-                        <View key={pi} style={styles.bulletRow}>
-                          <View style={styles.bulletDot} />
-                          <Text style={styles.bulletText}>
-                            {parseInlineMarkup(point)}
-                          </Text>
-                        </View>
-                      ))}
+                    {Array.isArray(item.payload) && item.payload.length > 0 && (
+                      <View style={styles.bulletSection}>
+                        {item.payload.map((point: string, pi: number) => (
+                          <View key={pi} style={styles.bulletRow}>
+                            <View style={styles.bulletDot} />
+                            <Text style={styles.bulletText}>
+                              {parseInlineMarkup(point)}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                );
+
+              case 'mcq':
+                const attempt = mcqAttempts[item.seq];
+                const hasAnswered = !!attempt;
+
+                return (
+                  <View key={item.seq} style={styles.mcqCard}>
+                    <View style={styles.cardHeader}>
+                      <Text style={styles.mcqLabel}>MCQ</Text>
                     </View>
-                  )}
-                </View>
-              );
 
-            case 'mcq':
-              const attempt = mcqAttempts[item.seq];
-              const hasAnswered = !!attempt;
+                    <Text style={styles.mcqStem}>
+                      {parseInlineMarkup(item.payload.stem)}
+                    </Text>
 
-              return (
-                <View key={item.seq} style={styles.mcqCard}>
-                  <View style={styles.cardHeader}>
-                    <Text style={styles.mcqLabel}>MCQ</Text>
-                  </View>
+                    {(['A', 'B', 'C', 'D'] as const).map(label => {
+                      const optText = item.payload.options?.[label];
+                      if (!optText) return null;
+                      const isCorrect = item.payload.correct_answer === label;
 
-                  <Text style={styles.mcqStem}>
-                    {parseInlineMarkup(item.payload.stem)}
-                  </Text>
-
-                  {(['A', 'B', 'C', 'D'] as const).map(label => {
-                    const optText = item.payload.options?.[label];
-                    if (!optText) return null;
-                    const isCorrect = item.payload.correct_answer === label;
-
-                    return (
-                      <TouchableOpacity
-                        key={label}
-                        disabled={hasAnswered}
-                        onPress={() =>
-                          setMcqAttempts(prev => ({
-                            ...prev,
-                            [item.seq]: { selected: label },
-                          }))
-                        }
-                        style={[
-                          styles.optionRow,
-                          hasAnswered && isCorrect && styles.optionCorrect,
-                          hasAnswered &&
-                            attempt?.selected === label &&
-                            !isCorrect &&
-                            styles.optionWrong,
-                        ]}
-                      >
-                        <View
+                      return (
+                        <TouchableOpacity
+                          key={label}
+                          disabled={hasAnswered}
+                          onPress={() =>
+                            setMcqAttempts(prev => ({
+                              ...prev,
+                              [item.seq]: { selected: label },
+                            }))
+                          }
                           style={[
-                            styles.optionLabelCircle,
-                            hasAnswered && isCorrect && styles.optionLabelCorrect,
+                            styles.optionRow,
+                            hasAnswered && isCorrect && styles.optionCorrect,
                             hasAnswered &&
                               attempt?.selected === label &&
                               !isCorrect &&
-                              styles.optionLabelWrong,
+                              styles.optionWrong,
                           ]}
                         >
-                          <Text
+                          <View
                             style={[
-                              styles.optionLabel,
-                              hasAnswered &&
-                                isCorrect &&
-                                styles.optionLabelTextCorrect,
+                              styles.optionLabelCircle,
+                              hasAnswered && isCorrect && styles.optionLabelCorrect,
                               hasAnswered &&
                                 attempt?.selected === label &&
                                 !isCorrect &&
-                                styles.optionLabelTextWrong,
+                                styles.optionLabelWrong,
                             ]}
                           >
-                            {label}
+                            <Text
+                              style={[
+                                styles.optionLabel,
+                                hasAnswered &&
+                                  isCorrect &&
+                                  styles.optionLabelTextCorrect,
+                                hasAnswered &&
+                                  attempt?.selected === label &&
+                                  !isCorrect &&
+                                  styles.optionLabelTextWrong,
+                              ]}
+                            >
+                              {label}
+                            </Text>
+                          </View>
+                          <Text
+                            style={[
+                              styles.optionText,
+                              hasAnswered && isCorrect && styles.optionTextCorrect,
+                              hasAnswered &&
+                                attempt?.selected === label &&
+                                !isCorrect &&
+                                styles.optionTextWrong,
+                            ]}
+                          >
+                            {parseInlineMarkup(optText)}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                );
+
+              case 'exam_trap':
+                return (
+                  <View key={item.seq} style={styles.feedbackBlock}>
+                    <Text style={styles.feedbackLabel}>Exam Trap</Text>
+                    <Text style={styles.feedbackText}>
+                      {parseInlineMarkup(item.payload)}
+                    </Text>
+                  </View>
+                );
+
+              case 'explanation':
+                return (
+                  <View key={item.seq} style={styles.feedbackBlock}>
+                    <Text style={styles.feedbackLabel}>Explanation</Text>
+                    <Text style={styles.feedbackText}>
+                      {parseInlineMarkup(item.payload)}
+                    </Text>
+                  </View>
+                );
+
+              case 'wrong_answers':
+                return (
+                  <View key={item.seq} style={styles.feedbackBlock}>
+                    <Text style={styles.feedbackLabel}>
+                      Why Other Options Are Wrong
+                    </Text>
+                    {Object.entries(item.payload).map(
+                      ([label, text]: [string, any]) => (
+                        <View key={label} style={{ marginTop: 10, paddingLeft: 8 }}>
+                          <Text style={styles.wrongOptionLabel}>{label}.</Text>
+                          <Text style={styles.feedbackText}>
+                            {parseInlineMarkup(text)}
                           </Text>
                         </View>
-                        <Text
-                          style={[
-                            styles.optionText,
-                            hasAnswered && isCorrect && styles.optionTextCorrect,
-                            hasAnswered &&
-                              attempt?.selected === label &&
-                              !isCorrect &&
-                              styles.optionTextWrong,
-                          ]}
-                        >
-                          {parseInlineMarkup(optText)}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              );
+                      )
+                    )}
+                  </View>
+                );
 
-            case 'exam_trap':
-              return (
-                <View key={item.seq} style={styles.feedbackBlock}>
-                  <Text style={styles.feedbackLabel}>Exam Trap</Text>
-                  <Text style={styles.feedbackText}>
-                    {parseInlineMarkup(item.payload)}
-                  </Text>
-                </View>
-              );
+              case 'student_doubts':
+                return (
+                  <View key={item.seq} style={styles.doubtsCard}>
+                    <Text style={styles.doubtsLabel}>Student Doubts</Text>
 
-            case 'explanation':
-              return (
-                <View key={item.seq} style={styles.feedbackBlock}>
-                  <Text style={styles.feedbackLabel}>Explanation</Text>
-                  <Text style={styles.feedbackText}>
-                    {parseInlineMarkup(item.payload)}
-                  </Text>
-                </View>
-              );
+                    {Array.isArray(item.payload) &&
+                      item.payload.map((d: any, di: number) => (
+                        <View key={di} style={styles.doubtItem}>
+                          <Text style={styles.doubtQ}>
+                            Q: {parseInlineMarkup(d.doubt)}
+                          </Text>
+                          <Text style={styles.doubtA}>
+                            A: {parseInlineMarkup(d.answer)}
+                          </Text>
+                        </View>
+                      ))}
+                  </View>
+                );
 
-            case 'wrong_answers':
-              return (
-                <View key={item.seq} style={styles.feedbackBlock}>
-                  <Text style={styles.feedbackLabel}>
-                    Why Other Options Are Wrong
-                  </Text>
-                  {Object.entries(item.payload).map(
-                    ([label, text]: [string, any]) => (
-                      <View key={label} style={{ marginTop: 10, paddingLeft: 8 }}>
-                        <Text style={styles.wrongOptionLabel}>{label}.</Text>
-                        <Text style={styles.feedbackText}>
-                          {parseInlineMarkup(text)}
-                        </Text>
-                      </View>
-                    )
-                  )}
-                </View>
-              );
+              default:
+                return null;
+            }
+            })}
 
-            case 'student_doubts':
-              return (
-                <View key={item.seq} style={styles.doubtsCard}>
-                  <Text style={styles.doubtsLabel}>Student Doubts</Text>
+            <View style={{ height: 40 }} />
+          </ScrollView>
 
-                  {Array.isArray(item.payload) &&
-                    item.payload.map((d: any, di: number) => (
-                      <View key={di} style={styles.doubtItem}>
-                        <Text style={styles.doubtQ}>
-                          Q: {parseInlineMarkup(d.doubt)}
-                        </Text>
-                        <Text style={styles.doubtA}>
-                          A: {parseInlineMarkup(d.answer)}
-                        </Text>
-                      </View>
-                    ))}
-                </View>
-              );
+          {/* Mobile: Floating chat button */}
+          {isMobile && !chatDrawerOpen && (
+            <TouchableOpacity
+              style={styles.floatingChatButton}
+              onPress={toggleChatDrawer}
+            >
+              <MessageCircle size={24} color="#FFF" />
+              {hasUnreadMessages && <View style={styles.chatBadgeDot} />}
+            </TouchableOpacity>
+          )}
+        </View>
 
-            default:
-              return null;
-          }
-          })}
-
-          <View style={{ height: 40 }} />
-        </ScrollView>
-
-        {/* Mobile: Floating chat button */}
-        {isMobile && !chatDrawerOpen && (
-          <TouchableOpacity
-            style={styles.floatingChatButton}
-            onPress={toggleChatDrawer}
-          >
-            <MessageCircle size={24} color="#FFF" />
-            {hasUnreadMessages && <View style={styles.chatBadgeDot} />}
-          </TouchableOpacity>
-        )}
+        {/* CHAT COLUMN */}
+        {(isWeb && !isMobile) || chatDrawerOpen ? renderChatUI() : null}
       </View>
-
-      {/* Web: Sidebar or Mobile: Drawer */}
-      {(isWeb && !isMobile) || chatDrawerOpen ? renderChatUI() : null}
     </View>
   );
 }
