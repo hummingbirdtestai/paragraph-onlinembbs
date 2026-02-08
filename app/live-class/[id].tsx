@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { MessageCircle, Send, X } from 'lucide-react-native';
+import * as Linking from 'expo-linking';
 
 import { supabase } from '@/lib/supabaseClient';
 
@@ -104,9 +105,9 @@ export default function StudentLiveClassRoom() {
   const [userId, setUserId] = useState('');
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
-  // 🎧 Live audio state
+  // 🎧 Live audio state (Mixlr)
   const [liveEmbedUrl, setLiveEmbedUrl] = useState<string | null>(null);
-  const [audioEnabled, setAudioEnabled] = useState(true); // 🔊 DEFAULT ON
+  const [audioMuted, setAudioMuted] = useState(false); // UI-only state
 
   // Platform detection (stable on web to prevent unmounting)
   const [isMobile, setIsMobile] = useState(
@@ -195,7 +196,7 @@ if (!error && profile?.name) {
     loadChatHistory();
   }, [id]);
 
-  // 🎧 STEP 2 — Fetch live_embed_url
+  // 🎧 Fetch Mixlr live audio URL
   useEffect(() => {
     if (!id) return;
 
@@ -213,31 +214,6 @@ if (!error && profile?.name) {
 
     loadLiveEmbed();
   }, [id]);
-
-  // 🎧 STEP 3 — Autoplay attempt (browser-safe)
-  useEffect(() => {
-    if (!isWeb || !liveEmbedUrl) return;
-
-    // Attempt autoplay on load
-    setAudioEnabled(true);
-  }, [liveEmbedUrl, isWeb]);
-
-  // 🎧 STEP 4 — Control audio (play / pause)
-  useEffect(() => {
-    if (!isWeb) return;
-
-    const iframe = document.getElementById(
-      'yt-audio-player'
-    ) as HTMLIFrameElement | null;
-
-    if (!iframe || !iframe.contentWindow) return;
-
-    const command = audioEnabled
-      ? '{"event":"command","func":"playVideo","args":""}'
-      : '{"event":"command","func":"pauseVideo","args":""}';
-
-    iframe.contentWindow.postMessage(command, '*');
-  }, [audioEnabled, isWeb]);
 
   // 2️⃣ Subscribe to feed updates
   useEffect(() => {
@@ -653,32 +629,60 @@ if (!error && profile?.name) {
       <View style={[styles.mainContent, isWeb && !isMobile && styles.mainContentWithSidebar]}>
         {/* FEED COLUMN */}
         <View style={{ flex: 1, minWidth: 0 }}>
-          {/* 🎧 STEP 5 — Hidden audio iframe (web only) */}
+          {/* 🎧 Mixlr live audio — WEB ONLY */}
           {isWeb && liveEmbedUrl && (
-            <View style={{ height: 0, overflow: 'hidden' }}>
-              <iframe
-                id="yt-audio-player"
-                src={`${liveEmbedUrl}?enablejsapi=1&autoplay=1`}
-                allow="autoplay"
-                style={{ width: 0, height: 0, border: 0 }}
-              />
-            </View>
+            <>
+              {/* Hidden audio player */}
+              <View style={{ height: 0, overflow: 'hidden' }}>
+                <iframe
+                  id="live-audio-player"
+                  src={`${liveEmbedUrl}?autoplay=1`}
+                  allow="autoplay"
+                  style={{ width: 0, height: 0, border: 0 }}
+                />
+              </View>
+
+              {/* Audio status bar (UI-only control) */}
+              <View style={styles.audioBar}>
+                <TouchableOpacity
+                  onPress={() => setAudioMuted(v => !v)}
+                  style={styles.audioButton}
+                >
+                  <Text style={styles.audioButtonText}>
+                    {audioMuted ? '🔇 Audio Muted' : '🔊 Live Audio Playing'}
+                  </Text>
+                </TouchableOpacity>
+
+                <Text style={styles.audioHint}>
+                  🔈 Mixlr audio
+                </Text>
+              </View>
+            </>
           )}
 
-          {/* 🎧 STEP 6 — Audio control UI */}
-          {isWeb && liveEmbedUrl && (
+          {/* 🎧 Mixlr live audio — MOBILE: External link */}
+          {!isWeb && liveEmbedUrl && (
             <View style={styles.audioBar}>
               <TouchableOpacity
-                onPress={() => setAudioEnabled(v => !v)}
-                style={styles.audioButton}
+                onPress={() => Linking.openURL(liveEmbedUrl)}
+                style={styles.audioButtonMobile}
               >
                 <Text style={styles.audioButtonText}>
-                  {audioEnabled ? '🔇 Mute Audio' : '🔊 Unmute Audio'}
+                  🎧 Join Live Audio
                 </Text>
               </TouchableOpacity>
 
-              <Text style={styles.audioHint}>
-                🔈 Live class audio
+              <Text style={styles.audioHintMobile}>
+                Opens in browser
+              </Text>
+            </View>
+          )}
+
+          {/* No audio available yet */}
+          {!liveEmbedUrl && (
+            <View style={styles.audioPlaceholder}>
+              <Text style={styles.audioPlaceholderText}>
+                Live audio not started yet
               </Text>
             </View>
           )}
@@ -1379,7 +1383,7 @@ topicText: {
     opacity: 0.5,
   },
 
-  // 🎧 STEP 7 — Audio control styles
+  // 🎧 Mixlr audio control styles
   audioBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1400,6 +1404,13 @@ topicText: {
     backgroundColor: '#252525',
   },
 
+  audioButtonMobile: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#00D9FF',
+  },
+
   audioButtonText: {
     color: '#00D9FF',
     fontWeight: '800',
@@ -1407,6 +1418,27 @@ topicText: {
   },
 
   audioHint: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+
+  audioHintMobile: {
+    fontSize: 11,
+    color: '#6B7280',
+  },
+
+  audioPlaceholder: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
+    alignItems: 'center',
+  },
+
+  audioPlaceholderText: {
     fontSize: 12,
     color: '#9CA3AF',
   },
