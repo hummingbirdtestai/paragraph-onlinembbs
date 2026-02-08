@@ -104,6 +104,9 @@ export default function StudentLiveClassRoom() {
   const [userId, setUserId] = useState('');
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
+  // Audio panel state
+  const [audioOpen, setAudioOpen] = useState(false);
+
   // Platform detection (stable on web to prevent unmounting)
   const [isMobile, setIsMobile] = useState(
     Platform.OS !== 'web' ? true : typeof window !== 'undefined' && window.innerWidth < 768
@@ -129,6 +132,11 @@ export default function StudentLiveClassRoom() {
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
+
+  // Auto-close audio when chat opens (mobile)
+  useEffect(() => {
+    if (chatDrawerOpen) setAudioOpen(false);
+  }, [chatDrawerOpen]);
 
   // 0️⃣ Load user profile
   useEffect(() => {
@@ -605,23 +613,13 @@ if (!error && profile?.name) {
       <View style={[styles.mainContent, isWeb && !isMobile && styles.mainContentWithSidebar]}>
         {/* FEED COLUMN */}
         <View style={{ flex: 1, minWidth: 0 }}>
-          {/* 🎧 Live Audio — Mixlr Embed (Web + Mobile Web) */}
-          {Platform.OS === 'web' && (
-            <View style={styles.mixlrContainer}>
-              <iframe
-                src="https://dreamzhr.mixlr.com/embed"
-                frameBorder="0"
-                scrolling="no"
-                allow="autoplay"
-                style={{
-                  width: '100%',
-                  height: 200,
-                  borderRadius: 12,
-                  backgroundColor: '#000',
-                }}
-              />
-            </View>
-          )}
+          {/* 🎧 Floating Audio Button */}
+          <TouchableOpacity
+            style={styles.floatingAudioButton}
+            onPress={() => setAudioOpen(true)}
+          >
+            <Text style={styles.floatingAudioIcon}>🎧</Text>
+          </TouchableOpacity>
 
           <ScrollView
             ref={scrollRef}
@@ -830,6 +828,41 @@ if (!error && profile?.name) {
         {/* CHAT COLUMN */}
         {(isWeb && !isMobile) || chatDrawerOpen ? renderChatUI() : null}
       </View>
+
+      {/* 🎧 Floating Audio Panel */}
+      {audioOpen && Platform.OS === 'web' && (
+        <View style={styles.audioOverlay}>
+          <TouchableOpacity
+            style={styles.audioBackdrop}
+            activeOpacity={1}
+            onPress={() => setAudioOpen(false)}
+          />
+
+          <View style={styles.audioPanel}>
+            {/* Header */}
+            <View style={styles.audioPanelHeader}>
+              <Text style={styles.audioPanelTitle}>Live Audio</Text>
+              <TouchableOpacity onPress={() => setAudioOpen(false)}>
+                <X size={18} color="#9CA3AF" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Mixlr Embed */}
+            <iframe
+              src="https://dreamzhr.mixlr.com/embed"
+              frameBorder="0"
+              scrolling="no"
+              allow="autoplay"
+              style={{
+                width: '100%',
+                height: 160,
+                borderRadius: 10,
+                backgroundColor: '#000',
+              }}
+            />
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -1319,13 +1352,59 @@ topicText: {
     opacity: 0.5,
   },
 
-  // 🎧 Mixlr embed container
-  mixlrContainer: {
-    marginBottom: 12,
-    borderRadius: 12,
-    overflow: 'hidden',
+  // 🎧 Floating Audio Button & Panel
+  floatingAudioButton: {
+    position: 'absolute',
+    left: 20,
+    bottom: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#1F2937',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#374151',
+    zIndex: 20,
+  },
+
+  floatingAudioIcon: {
+    fontSize: 24,
+  },
+
+  audioOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+  },
+
+  audioBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+
+  audioPanel: {
+    backgroundColor: '#0F0F0F',
+    padding: 12,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     borderWidth: 1,
     borderColor: '#2D2D2D',
-    backgroundColor: '#000',
+  },
+
+  audioPanelHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+
+  audioPanelTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#00D9FF',
   },
 });
