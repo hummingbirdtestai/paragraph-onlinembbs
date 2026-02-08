@@ -87,6 +87,7 @@ export default function StudentLiveClassRoom() {
 
   const scrollRef = useRef<ScrollView>(null);
   const chatScrollRef = useRef<ScrollView>(null);
+  const feedChannelRef = useRef<any>(null);
   const chatChannelRef = useRef<any>(null);
   const chatDrawerOpenRef = useRef(false);
 
@@ -172,7 +173,7 @@ export default function StudentLiveClassRoom() {
 
   // 2️⃣ Subscribe to realtime updates (feed + chat)
   useEffect(() => {
-    if (!id) return;
+    if (!id || feedChannelRef.current) return;
 
     const feedChannel = supabase
       .channel(`battle:${id}`)
@@ -195,6 +196,8 @@ export default function StudentLiveClassRoom() {
         }
       )
       .subscribe();
+
+    feedChannelRef.current = feedChannel;
 
     const chatChannel = supabase
       .channel(`battle-chat:${id}`)
@@ -232,14 +235,15 @@ export default function StudentLiveClassRoom() {
     chatChannelRef.current = chatChannel;
 
     return () => {
-      // Safely remove channels if they exist
-      if (feedChannel) {
-        supabase.removeChannel(feedChannel);
+      // Guard cleanup to prevent double unsubscribe
+      if (feedChannelRef.current) {
+        supabase.removeChannel(feedChannelRef.current);
+        feedChannelRef.current = null;
       }
-      if (chatChannel) {
-        supabase.removeChannel(chatChannel);
+      if (chatChannelRef.current) {
+        supabase.removeChannel(chatChannelRef.current);
+        chatChannelRef.current = null;
       }
-      chatChannelRef.current = null;
     };
   }, [id]);
 
