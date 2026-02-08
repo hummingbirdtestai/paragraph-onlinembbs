@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
-  Dimensions,
   Platform,
   Modal,
   Keyboard,
@@ -106,10 +105,23 @@ export default function StudentLiveClassRoom() {
   const [userId, setUserId] = useState('');
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
-  // Platform detection
-  const screenWidth = Dimensions.get('window').width;
+  // Platform detection (stable on web to prevent unmounting)
+  const [isMobile, setIsMobile] = useState(
+    Platform.OS !== 'web' ? true : typeof window !== 'undefined' && window.innerWidth < 768
+  );
   const isWeb = Platform.OS === 'web';
-  const isMobile = screenWidth < 768;
+
+  // Handle window resize on web (stable layout detection)
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+
+    const handler = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
 
   // 0️⃣ Load user profile
   useEffect(() => {
@@ -123,7 +135,7 @@ export default function StudentLiveClassRoom() {
           .from('user_profiles')
           .select('user_name')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (profile?.user_name) {
           setUserName(profile.user_name);
@@ -195,7 +207,9 @@ export default function StudentLiveClassRoom() {
           });
         }
       )
-      .subscribe();
+      .subscribe(status => {
+        console.log('📡 Feed channel status:', status);
+      });
 
     feedChannelRef.current = channel;
 
