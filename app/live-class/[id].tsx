@@ -640,8 +640,7 @@ useEffect(() => {
               <View style={{ height: 0, overflow: 'hidden' }}>
                 <iframe
                   id="live-audio-player"
-src={liveEmbedUrlWeb}
-
+                  src={liveEmbedUrlWeb}
                   allow="autoplay"
                   style={{ width: 0, height: 0, border: 0 }}
                 />
@@ -684,13 +683,13 @@ src={liveEmbedUrlWeb}
 )}
 
           {/* No audio available yet */}
-          {!liveEmbedUrl && (
-            <View style={styles.audioPlaceholder}>
-              <Text style={styles.audioPlaceholderText}>
-                Live audio not started yet
-              </Text>
-            </View>
-          )}
+{!liveEmbedUrlWeb && !liveEventUrlMobile && (
+  <View style={styles.audioPlaceholder}>
+    <Text style={styles.audioPlaceholderText}>
+      Live audio not started yet
+    </Text>
+  </View>
+)}
 
           <ScrollView
             ref={scrollRef}
