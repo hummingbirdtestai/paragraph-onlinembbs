@@ -88,6 +88,7 @@ export default function StudentLiveClassRoom() {
   const scrollRef = useRef<ScrollView>(null);
   const chatScrollRef = useRef<ScrollView>(null);
   const chatChannelRef = useRef<any>(null);
+  const chatDrawerOpenRef = useRef(false);
 
   const [feed, setFeed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -207,7 +208,7 @@ export default function StudentLiveClassRoom() {
             const updated = [...prev, payload.payload];
 
             // Mark as unread if drawer is closed
-            if (!chatDrawerOpen) {
+            if (!chatDrawerOpenRef.current) {
               setHasUnreadMessages(true);
             }
 
@@ -229,7 +230,7 @@ export default function StudentLiveClassRoom() {
       supabase.removeChannel(chatChannel);
       chatChannelRef.current = null;
     };
-  }, [id, chatDrawerOpen]);
+  }, [id]);
 
   // Send chat message
   const sendChatMessage = async () => {
@@ -241,31 +242,21 @@ export default function StudentLiveClassRoom() {
     Keyboard.dismiss();
 
     try {
-      // 1️⃣ Insert to DB first
-      await supabase.rpc('insert_battle_chat_message', {
+      // 1️⃣ Insert to DB and get returned row
+      const { data, error } = await supabase.rpc('insert_battle_chat_message', {
         p_battle_id: id,
         p_user_name: userName,
         p_message: messageText,
       });
 
-      // 2️⃣ Fetch the inserted message to get real DB data
-      const { data: insertedMessages, error: fetchError } = await supabase
-        .from('battle_group_messages')
-        .select('*')
-        .eq('battle_id', id)
-        .eq('user_id', userId)
-        .eq('message', messageText)
-        .order('created_at', { ascending: false })
-        .limit(1);
+      if (error) throw error;
 
-      if (fetchError) throw fetchError;
-
-      // 3️⃣ Broadcast using real DB row
-      if (insertedMessages && insertedMessages.length > 0) {
+      // 2️⃣ Broadcast using real DB row
+      if (data && data.length > 0) {
         await chatChannelRef.current.send({
           type: 'broadcast',
           event: 'chat-message',
-          payload: insertedMessages[0],
+          payload: data[0],
         });
       }
     } catch (error) {
@@ -278,8 +269,11 @@ export default function StudentLiveClassRoom() {
 
   // Toggle chat drawer
   const toggleChatDrawer = () => {
-    setChatDrawerOpen(!chatDrawerOpen);
-    if (!chatDrawerOpen) {
+    const newState = !chatDrawerOpen;
+    setChatDrawerOpen(newState);
+    chatDrawerOpenRef.current = newState;
+
+    if (newState) {
       // Clear unread when opening
       setHasUnreadMessages(false);
     }
