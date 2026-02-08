@@ -830,36 +830,44 @@ if (!error && profile?.name) {
       </View>
 
       {/* 🎧 Floating Audio Panel */}
-      {audioOpen && Platform.OS === 'web' && (
-        <View style={styles.audioOverlay}>
-          <TouchableOpacity
-            style={styles.audioBackdrop}
-            activeOpacity={1}
-            onPress={() => setAudioOpen(false)}
-          />
+{Platform.OS === 'web' && (
+  <View
+    style={[
+      styles.audioOverlay,
+      { display: audioOpen ? 'flex' : 'none' }
+    ]}
+  >
+    <TouchableOpacity
+      style={styles.audioBackdrop}
+      activeOpacity={1}
+      onPress={() => setAudioOpen(false)}
+    />
 
-          <View style={styles.audioPanel}>
-            {/* Header */}
-            <View style={styles.audioPanelHeader}>
-              <Text style={styles.audioPanelTitle}>Live Audio</Text>
-              <TouchableOpacity onPress={() => setAudioOpen(false)}>
-                <X size={18} color="#9CA3AF" />
-              </TouchableOpacity>
-            </View>
+    <View style={styles.audioPanel}>
+      <View style={styles.audioPaneHeader}>
+        <Text style={styles.audioPaneTitle}>Live Audio</Text>
+        <TouchableOpacity onPress={() => setAudioOpen(false)}>
+          <X size={18} color="#9CA3AF" />
+        </TouchableOpacity>
+      </View>
 
-            {/* Mixlr Embed */}
-            <iframe
-              src="https://dreamzhr.mixlr.com/embed"
-              frameBorder="0"
-              scrolling="no"
-              allow="autoplay"
-              style={{
-                width: '100%',
-                height: 160,
-                borderRadius: 10,
-                backgroundColor: '#000',
-              }}
-            />
+      {/* 🔒 DO NOT EVER UNMOUNT THIS */}
+      <iframe
+        src="https://dreamzhr.mixlr.com/embed"
+        frameBorder="0"
+        scrolling="no"
+        allow="autoplay"
+        style={{
+          width: '100%',
+          height: 160,
+          borderRadius: 10,
+          backgroundColor: '#000',
+        }}
+      />
+    </View>
+  </View>
+)}
+
           </View>
         </View>
       )}
