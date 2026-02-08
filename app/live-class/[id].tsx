@@ -171,11 +171,11 @@ export default function StudentLiveClassRoom() {
     loadChatHistory();
   }, [id]);
 
-  // 2️⃣ Subscribe to realtime updates (feed + chat)
+  // 2️⃣ Subscribe to feed updates
   useEffect(() => {
     if (!id || feedChannelRef.current) return;
 
-    const feedChannel = supabase
+    const channel = supabase
       .channel(`battle:${id}`)
       .on(
         'broadcast',
@@ -197,9 +197,21 @@ export default function StudentLiveClassRoom() {
       )
       .subscribe();
 
-    feedChannelRef.current = feedChannel;
+    feedChannelRef.current = channel;
 
-    const chatChannel = supabase
+    return () => {
+      if (feedChannelRef.current) {
+        supabase.removeChannel(feedChannelRef.current);
+        feedChannelRef.current = null;
+      }
+    };
+  }, [id]);
+
+  // 3️⃣ Subscribe to chat updates (separate effect)
+  useEffect(() => {
+    if (!id || chatChannelRef.current) return;
+
+    const channel = supabase
       .channel(`battle-chat:${id}`)
       .on(
         'broadcast',
@@ -232,14 +244,9 @@ export default function StudentLiveClassRoom() {
       )
       .subscribe();
 
-    chatChannelRef.current = chatChannel;
+    chatChannelRef.current = channel;
 
     return () => {
-      // Guard cleanup to prevent double unsubscribe
-      if (feedChannelRef.current) {
-        supabase.removeChannel(feedChannelRef.current);
-        feedChannelRef.current = null;
-      }
       if (chatChannelRef.current) {
         supabase.removeChannel(chatChannelRef.current);
         chatChannelRef.current = null;
