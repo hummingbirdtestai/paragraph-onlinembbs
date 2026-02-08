@@ -829,21 +829,12 @@ if (!error && profile?.name) {
         {(isWeb && !isMobile) || chatDrawerOpen ? renderChatUI() : null}
       </View>
 
-      {/* 🎧 Floating Audio Panel */}
+      {/* 🎧 Floating Audio Panel - Always rendered for low latency */}
       {Platform.OS === 'web' && (
-       <View
-  style={[
-    styles.audioOverlay,
-    audioOpen ? styles.audioVisible : styles.audioHidden
-  ]}
->
-
-          <TouchableOpacity
-            style={styles.audioBackdrop}
-            activeOpacity={1}
-            onPress={() => setAudioOpen(false)}
-          />
-
+        <View style={[
+          styles.audioOverlay,
+          audioOpen ? styles.audioVisible : styles.audioHidden
+        ]}>
           <View style={styles.audioPanel}>
             <View style={styles.audioPanelHeader}>
               <Text style={styles.audioPanelTitle}>Live Audio</Text>
@@ -1098,13 +1089,14 @@ topicText: {
 audioVisible: {
   opacity: 1,
   pointerEvents: 'auto',
-  transform: [{ translateY: 0 }],
+  height: 180,
 },
 
 audioHidden: {
   opacity: 0,
   pointerEvents: 'none',
-  transform: [{ translateY: 300 }], // slide off screen
+  height: 1,
+  overflow: 'hidden',
 },
 
   feedbackText: {
@@ -1390,16 +1382,10 @@ audioHidden: {
 
   audioOverlay: {
     position: 'absolute',
-    top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     zIndex: 1000,
-  },
-
-  audioBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
   },
 
   audioPanel: {
