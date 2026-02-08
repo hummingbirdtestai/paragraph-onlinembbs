@@ -138,15 +138,16 @@ export default function StudentLiveClassRoom() {
         setUserId(user.id);
 
         // Try to get user profile for display name
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('user_name')
-          .eq('user_id', user.id)
-          .maybeSingle();
+     const { data: profile, error } = await supabase
+  .from('users')
+  .select('name')
+  .eq('id', user.id)
+  .maybeSingle();
 
-        if (profile?.user_name) {
-          setUserName(profile.user_name);
-        }
+if (!error && profile?.name) {
+  setUserName(profile.name);
+}
+
       }
     };
 
