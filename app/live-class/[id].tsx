@@ -104,6 +104,10 @@ export default function StudentLiveClassRoom() {
   const [userId, setUserId] = useState('');
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
+  // 🎧 Live audio state
+  const [liveEmbedUrl, setLiveEmbedUrl] = useState<string | null>(null);
+  const [audioEnabled, setAudioEnabled] = useState(true); // 🔊 DEFAULT ON
+
   // Platform detection (stable on web to prevent unmounting)
   const [isMobile, setIsMobile] = useState(
     Platform.OS !== 'web' ? true : typeof window !== 'undefined' && window.innerWidth < 768
@@ -190,6 +194,50 @@ if (!error && profile?.name) {
 
     loadChatHistory();
   }, [id]);
+
+  // 🎧 STEP 2 — Fetch live_embed_url
+  useEffect(() => {
+    if (!id) return;
+
+    const loadLiveEmbed = async () => {
+      const { data, error } = await supabase
+        .from('battle_schedule')
+        .select('live_embed_url')
+        .eq('battle_id', id)
+        .maybeSingle();
+
+      if (!error && data?.live_embed_url) {
+        setLiveEmbedUrl(data.live_embed_url);
+      }
+    };
+
+    loadLiveEmbed();
+  }, [id]);
+
+  // 🎧 STEP 3 — Autoplay attempt (browser-safe)
+  useEffect(() => {
+    if (!isWeb || !liveEmbedUrl) return;
+
+    // Attempt autoplay on load
+    setAudioEnabled(true);
+  }, [liveEmbedUrl, isWeb]);
+
+  // 🎧 STEP 4 — Control audio (play / pause)
+  useEffect(() => {
+    if (!isWeb) return;
+
+    const iframe = document.getElementById(
+      'yt-audio-player'
+    ) as HTMLIFrameElement | null;
+
+    if (!iframe || !iframe.contentWindow) return;
+
+    const command = audioEnabled
+      ? '{"event":"command","func":"playVideo","args":""}'
+      : '{"event":"command","func":"pauseVideo","args":""}';
+
+    iframe.contentWindow.postMessage(command, '*');
+  }, [audioEnabled, isWeb]);
 
   // 2️⃣ Subscribe to feed updates
   useEffect(() => {
@@ -605,6 +653,36 @@ if (!error && profile?.name) {
       <View style={[styles.mainContent, isWeb && !isMobile && styles.mainContentWithSidebar]}>
         {/* FEED COLUMN */}
         <View style={{ flex: 1, minWidth: 0 }}>
+          {/* 🎧 STEP 5 — Hidden audio iframe (web only) */}
+          {isWeb && liveEmbedUrl && (
+            <View style={{ height: 0, overflow: 'hidden' }}>
+              <iframe
+                id="yt-audio-player"
+                src={`${liveEmbedUrl}?enablejsapi=1&autoplay=1`}
+                allow="autoplay"
+                style={{ width: 0, height: 0, border: 0 }}
+              />
+            </View>
+          )}
+
+          {/* 🎧 STEP 6 — Audio control UI */}
+          {isWeb && liveEmbedUrl && (
+            <View style={styles.audioBar}>
+              <TouchableOpacity
+                onPress={() => setAudioEnabled(v => !v)}
+                style={styles.audioButton}
+              >
+                <Text style={styles.audioButtonText}>
+                  {audioEnabled ? '🔇 Mute Audio' : '🔊 Unmute Audio'}
+                </Text>
+              </TouchableOpacity>
+
+              <Text style={styles.audioHint}>
+                🔈 Live class audio
+              </Text>
+            </View>
+          )}
+
           <ScrollView
             ref={scrollRef}
             style={styles.contentScroll}
@@ -1299,5 +1377,37 @@ topicText: {
 
   sendButtonDisabled: {
     opacity: 0.5,
+  },
+
+  // 🎧 STEP 7 — Audio control styles
+  audioBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
+  },
+
+  audioButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: '#252525',
+  },
+
+  audioButtonText: {
+    color: '#00D9FF',
+    fontWeight: '800',
+    fontSize: 13,
+  },
+
+  audioHint: {
+    fontSize: 12,
+    color: '#9CA3AF',
   },
 });
