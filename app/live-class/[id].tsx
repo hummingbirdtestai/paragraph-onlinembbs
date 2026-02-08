@@ -8,10 +8,28 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  TextInput,
+  Dimensions,
+  Platform,
+  Modal,
+  Animated,
+  Keyboard,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { MessageCircle, Send, X } from 'lucide-react-native';
 
 import { supabase } from '@/lib/supabaseClient';
+
+// Types
+interface ChatMessage {
+  id: string;
+  battle_id: string;
+  user_id: string;
+  user_name: string;
+  message: string;
+  created_at: string;
+}
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -68,12 +86,51 @@ function parseInlineMarkup(text: string): React.ReactNode {
 export default function StudentLiveClassRoom() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const scrollRef = useRef<ScrollView>(null); // ✅ HERE
+  const scrollRef = useRef<ScrollView>(null);
+  const chatScrollRef = useRef<ScrollView>(null);
+  const slideAnim = useRef(new Animated.Value(0)).current;
+
   const [feed, setFeed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [mcqAttempts, setMcqAttempts] = useState<
     Record<number, { selected: 'A' | 'B' | 'C' | 'D' }>
   >({});
+
+  // Chat state
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [userName, setUserName] = useState('Student');
+  const [userId, setUserId] = useState('');
+
+  // Platform detection
+  const screenWidth = Dimensions.get('window').width;
+  const isWeb = Platform.OS === 'web';
+  const isMobile = screenWidth < 768;
+
+  // 0️⃣ Load user profile
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+
+        // Try to get user profile for display name
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('user_name')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profile?.user_name) {
+          setUserName(profile.user_name);
+        }
+      }
+    };
+
+    loadUserProfile();
+  }, []);
 
   // 1️⃣ Load persisted feed (replay)
   useEffect(() => {
@@ -94,37 +151,132 @@ export default function StudentLiveClassRoom() {
     loadFeed();
   }, [id]);
 
-  // 2️⃣ Subscribe to realtime updates
+  // 1️⃣.5️⃣ Load chat history
   useEffect(() => {
     if (!id) return;
 
-    const channel = supabase
+    const loadChatHistory = async () => {
+      const { data, error } = await supabase.rpc(
+        'get_battle_chat_messages',
+        { p_battle_id: id }
+      );
+
+      if (!error && data) {
+        setChatMessages(data);
+      }
+    };
+
+    loadChatHistory();
+  }, [id]);
+
+  // 2️⃣ Subscribe to realtime updates (feed + chat)
+  useEffect(() => {
+    if (!id) return;
+
+    const feedChannel = supabase
       .channel(`battle:${id}`)
       .on(
         'broadcast',
         { event: 'class-feed-push' },
         payload => {
           setFeed(prev => {
-  if (prev.some(p => p.seq === payload.payload.seq)) return prev;
+            if (prev.some(p => p.seq === payload.payload.seq)) return prev;
 
-  const next = [...prev, payload.payload];
+            const next = [...prev, payload.payload];
 
-  // 🔑 Auto-scroll to latest broadcast
-  setTimeout(() => {
-  scrollRef.current?.scrollToEnd({ animated: true });
-}, 50);
+            // Auto-scroll to latest broadcast
+            setTimeout(() => {
+              scrollRef.current?.scrollToEnd({ animated: true });
+            }, 50);
 
-  return next;
-});
+            return next;
+          });
+        }
+      )
+      .subscribe();
 
+    const chatChannel = supabase
+      .channel(`battle-chat:${id}`)
+      .on(
+        'broadcast',
+        { event: 'chat-message' },
+        payload => {
+          setChatMessages(prev => {
+            // Deduplicate by id
+            if (prev.some(m => m.id === payload.payload.id)) return prev;
+            const updated = [...prev, payload.payload];
+
+            // Auto-scroll chat to bottom
+            setTimeout(() => {
+              chatScrollRef.current?.scrollToEnd({ animated: true });
+            }, 50);
+
+            return updated;
+          });
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(feedChannel);
+      supabase.removeChannel(chatChannel);
     };
   }, [id]);
+
+  // 3️⃣ Handle chat drawer animation
+  useEffect(() => {
+    Animated.spring(slideAnim, {
+      toValue: chatDrawerOpen ? 1 : 0,
+      useNativeDriver: true,
+      tension: 65,
+      friction: 11,
+    }).start();
+  }, [chatDrawerOpen]);
+
+  // Send chat message
+  const sendChatMessage = async () => {
+    if (!chatInput.trim() || !id || sendingMessage) return;
+
+    const messageText = chatInput.trim();
+    setChatInput('');
+    setSendingMessage(true);
+    Keyboard.dismiss();
+
+    try {
+      // 1️⃣ Insert to DB first
+      await supabase.rpc('insert_battle_chat_message', {
+        p_battle_id: id,
+        p_user_name: userName,
+        p_message: messageText,
+      });
+
+      // 2️⃣ Then broadcast
+      const chatChannel = supabase.channel(`battle-chat:${id}`);
+
+      await chatChannel.send({
+        type: 'broadcast',
+        event: 'chat-message',
+        payload: {
+          id: crypto.randomUUID(),
+          battle_id: id,
+          user_id: userId,
+          user_name: userName,
+          message: messageText,
+          created_at: new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setChatInput(messageText); // Restore input on error
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  // Toggle chat drawer
+  const toggleChatDrawer = () => {
+    setChatDrawerOpen(!chatDrawerOpen);
+  };
 
   if (loading) {
     return (
@@ -135,15 +287,143 @@ export default function StudentLiveClassRoom() {
     );
   }
 
+  // Render chat UI
+  const renderChatUI = () => {
+    const chatUI = (
+      <View style={[styles.chatContainer, isWeb && !isMobile && styles.chatSidebar]}>
+        <View style={styles.chatHeader}>
+          <MessageCircle size={20} color="#00D9FF" />
+          <Text style={styles.chatHeaderText}>Class Chat</Text>
+          {isMobile && (
+            <TouchableOpacity onPress={toggleChatDrawer} style={styles.closeButton}>
+              <X size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <ScrollView
+          ref={chatScrollRef}
+          style={styles.chatMessages}
+          contentContainerStyle={styles.chatMessagesContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {chatMessages.length === 0 && (
+            <View style={styles.emptyChat}>
+              <Text style={styles.emptyChatText}>No messages yet</Text>
+              <Text style={styles.emptyChatSubtext}>
+                Ask your doubts here
+              </Text>
+            </View>
+          )}
+
+          {chatMessages.map(msg => {
+            const isOwnMessage = msg.user_id === userId;
+
+            return (
+              <View
+                key={msg.id}
+                style={[
+                  styles.chatMessageBubble,
+                  isOwnMessage && styles.chatMessageBubbleOwn,
+                ]}
+              >
+                {!isOwnMessage && (
+                  <Text style={styles.chatMessageSender}>{msg.user_name}</Text>
+                )}
+                <Text
+                  style={[
+                    styles.chatMessageText,
+                    isOwnMessage && styles.chatMessageTextOwn,
+                  ]}
+                >
+                  {msg.message}
+                </Text>
+                <Text
+                  style={[
+                    styles.chatMessageTime,
+                    isOwnMessage && styles.chatMessageTimeOwn,
+                  ]}
+                >
+                  {new Date(msg.created_at).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </Text>
+              </View>
+            );
+          })}
+        </ScrollView>
+
+        <View style={styles.chatInputContainer}>
+          <TextInput
+            style={styles.chatInput}
+            value={chatInput}
+            onChangeText={setChatInput}
+            placeholder="Ask a doubt..."
+            placeholderTextColor="#6B7280"
+            multiline
+            maxLength={500}
+            onSubmitEditing={sendChatMessage}
+            blurOnSubmit={false}
+            editable={!sendingMessage}
+          />
+          <TouchableOpacity
+            onPress={sendChatMessage}
+            disabled={!chatInput.trim() || sendingMessage}
+            style={[
+              styles.sendButton,
+              (!chatInput.trim() || sendingMessage) && styles.sendButtonDisabled,
+            ]}
+          >
+            <Send
+              size={20}
+              color={chatInput.trim() && !sendingMessage ? '#00D9FF' : '#4B5563'}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+
+    // Mobile: Modal drawer
+    if (isMobile) {
+      return (
+        <Modal
+          visible={chatDrawerOpen}
+          transparent
+          animationType="none"
+          onRequestClose={toggleChatDrawer}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={toggleChatDrawer}
+          >
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={styles.drawerContainer}
+            >
+              <TouchableOpacity activeOpacity={1} onPress={() => {}}>
+                {chatUI}
+              </TouchableOpacity>
+            </KeyboardAvoidingView>
+          </TouchableOpacity>
+        </Modal>
+      );
+    }
+
+    // Web: Sidebar
+    return chatUI;
+  };
+
   return (
     <View style={styles.container}>
-      <ScrollView
-  ref={scrollRef}
-  style={styles.contentScroll}
-  contentContainerStyle={styles.contentContainer}
->
-
-        {feed.map((item, idx) => {
+      <View style={[styles.mainContent, isWeb && !isMobile && styles.mainContentWithSidebar]}>
+        <ScrollView
+          ref={scrollRef}
+          style={styles.contentScroll}
+          contentContainerStyle={styles.contentContainer}
+        >
+          {feed.map((item, idx) => {
           switch (item.type) {
 case 'topic':
   return (
@@ -325,10 +605,31 @@ case 'topic':
             default:
               return null;
           }
-        })}
+          })}
 
-        <View style={{ height: 40 }} />
-      </ScrollView>
+          <View style={{ height: 40 }} />
+        </ScrollView>
+
+        {/* Mobile: Floating chat button */}
+        {isMobile && !chatDrawerOpen && (
+          <TouchableOpacity
+            style={styles.floatingChatButton}
+            onPress={toggleChatDrawer}
+          >
+            <MessageCircle size={24} color="#FFF" />
+            {chatMessages.length > 0 && (
+              <View style={styles.chatBadge}>
+                <Text style={styles.chatBadgeText}>
+                  {chatMessages.length > 99 ? '99+' : chatMessages.length}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* Web: Sidebar or Mobile: Drawer */}
+      {(isWeb && !isMobile) || chatDrawerOpen ? renderChatUI() : null}
     </View>
   );
 }
@@ -611,5 +912,208 @@ topicText: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+
+  // Chat styles
+  mainContent: {
+    flex: 1,
+  },
+
+  mainContentWithSidebar: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+
+  floatingChatButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#00D9FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+
+  chatBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#EF4444',
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+  },
+
+  chatBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+
+  drawerContainer: {
+    maxHeight: '50%',
+  },
+
+  chatContainer: {
+    backgroundColor: '#1A1A1A',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: 'hidden',
+    height: '100%',
+  },
+
+  chatSidebar: {
+    width: 350,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderLeftWidth: 1,
+    borderLeftColor: '#2D2D2D',
+  },
+
+  chatHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2D2D2D',
+    backgroundColor: '#252525',
+  },
+
+  chatHeaderText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+
+  closeButton: {
+    padding: 4,
+  },
+
+  chatMessages: {
+    flex: 1,
+  },
+
+  chatMessagesContent: {
+    padding: 12,
+    gap: 12,
+  },
+
+  emptyChat: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+
+  emptyChatText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 6,
+  },
+
+  emptyChatSubtext: {
+    fontSize: 13,
+    color: '#4B5563',
+  },
+
+  chatMessageBubble: {
+    backgroundColor: '#252525',
+    borderRadius: 12,
+    padding: 12,
+    maxWidth: '85%',
+    alignSelf: 'flex-start',
+    gap: 4,
+  },
+
+  chatMessageBubbleOwn: {
+    backgroundColor: '#00D9FF20',
+    alignSelf: 'flex-end',
+    borderWidth: 1,
+    borderColor: '#00D9FF40',
+  },
+
+  chatMessageSender: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#00D9FF',
+    marginBottom: 2,
+  },
+
+  chatMessageText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#E5E7EB',
+    lineHeight: 20,
+  },
+
+  chatMessageTextOwn: {
+    color: '#FFF',
+  },
+
+  chatMessageTime: {
+    fontSize: 11,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+
+  chatMessageTimeOwn: {
+    color: '#9CA3AF',
+  },
+
+  chatInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 10,
+    padding: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#2D2D2D',
+    backgroundColor: '#1F1F1F',
+  },
+
+  chatInput: {
+    flex: 1,
+    backgroundColor: '#252525',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#FFF',
+    maxHeight: 100,
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
+  },
+
+  sendButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#252525',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#2D2D2D',
+  },
+
+  sendButtonDisabled: {
+    opacity: 0.5,
   },
 });
