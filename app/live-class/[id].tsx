@@ -831,12 +831,13 @@ if (!error && profile?.name) {
 
       {/* 🎧 Floating Audio Panel */}
       {Platform.OS === 'web' && (
-        <View
-          style={[
-            styles.audioOverlay,
-            { display: audioOpen ? 'flex' : 'none' }
-          ]}
-        >
+       <View
+  style={[
+    styles.audioOverlay,
+    audioOpen ? styles.audioVisible : styles.audioHidden
+  ]}
+>
+
           <TouchableOpacity
             style={styles.audioBackdrop}
             activeOpacity={1}
@@ -1094,6 +1095,17 @@ topicText: {
     fontWeight: '800',
     color: '#F59E0B',
   },
+audioVisible: {
+  opacity: 1,
+  pointerEvents: 'auto',
+  transform: [{ translateY: 0 }],
+},
+
+audioHidden: {
+  opacity: 0,
+  pointerEvents: 'none',
+  transform: [{ translateY: 300 }], // slide off screen
+},
 
   feedbackText: {
     fontSize: 14,
