@@ -106,7 +106,9 @@ export default function StudentLiveClassRoom() {
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
   // 🎧 Live audio state (Mixlr)
-  const [liveEmbedUrl, setLiveEmbedUrl] = useState<string | null>(null);
+const [liveEmbedUrlWeb, setLiveEmbedUrlWeb] = useState<string | null>(null);
+const [liveEventUrlMobile, setLiveEventUrlMobile] = useState<string | null>(null);
+
   const [audioMuted, setAudioMuted] = useState(false); // UI-only state
 
   // Platform detection (stable on web to prevent unmounting)
@@ -196,24 +198,25 @@ if (!error && profile?.name) {
     loadChatHistory();
   }, [id]);
 
-  // 🎧 Fetch Mixlr live audio URL
-  useEffect(() => {
-    if (!id) return;
+ // 🎧 Fetch Mixlr live audio URLs (WEB + MOBILE)
+useEffect(() => {
+  if (!id) return;
 
-    const loadLiveEmbed = async () => {
-      const { data, error } = await supabase
-        .from('battle_schedule')
-        .select('live_embed_url')
-        .eq('battle_id', id)
-        .maybeSingle();
+  const loadLiveAudioUrls = async () => {
+    const { data, error } = await supabase
+      .from('battle_schedule')
+      .select('live_embed_url_web, live_event_url_mobile')
+      .eq('battle_id', id)
+      .maybeSingle();
 
-      if (!error && data?.live_embed_url) {
-        setLiveEmbedUrl(data.live_embed_url);
-      }
-    };
+    if (!error && data) {
+      setLiveEmbedUrlWeb(data.live_embed_url_web ?? null);
+      setLiveEventUrlMobile(data.live_event_url_mobile ?? null);
+    }
+  };
 
-    loadLiveEmbed();
-  }, [id]);
+  loadLiveAudioUrls();
+}, [id]);
 
   // 2️⃣ Subscribe to feed updates
   useEffect(() => {
@@ -630,13 +633,15 @@ if (!error && profile?.name) {
         {/* FEED COLUMN */}
         <View style={{ flex: 1, minWidth: 0 }}>
           {/* 🎧 Mixlr live audio — WEB ONLY */}
-          {isWeb && liveEmbedUrl && (
+{isWeb && liveEmbedUrlWeb && (
+
             <>
               {/* Hidden audio player */}
               <View style={{ height: 0, overflow: 'hidden' }}>
                 <iframe
                   id="live-audio-player"
-                  src={`${liveEmbedUrl}?autoplay=1`}
+src={liveEmbedUrlWeb}
+
                   allow="autoplay"
                   style={{ width: 0, height: 0, border: 0 }}
                 />
@@ -661,12 +666,23 @@ if (!error && profile?.name) {
           )}
 
           {/* 🎧 Mixlr live audio — MOBILE: External link */}
-          {!isWeb && liveEmbedUrl && (
-            <View style={styles.audioBar}>
-              <TouchableOpacity
-                onPress={() => Linking.openURL(liveEmbedUrl)}
-                style={styles.audioButtonMobile}
-              >
+          {!isWeb && liveEventUrlMobile && (
+  <View style={styles.audioBar}>
+    <TouchableOpacity
+      onPress={() => Linking.openURL(liveEventUrlMobile)}
+      style={styles.audioButtonMobile}
+    >
+      <Text style={styles.audioButtonText}>
+        🎧 Join Live Audio
+      </Text>
+    </TouchableOpacity>
+
+    <Text style={styles.audioHintMobile}>
+      Opens in browser
+    </Text>
+  </View>
+)}
+
                 <Text style={styles.audioButtonText}>
                   🎧 Join Live Audio
                 </Text>
