@@ -12,7 +12,6 @@ import {
   Dimensions,
   Platform,
   Modal,
-  Animated,
   Keyboard,
   KeyboardAvoidingView,
 } from 'react-native';
@@ -88,7 +87,7 @@ export default function StudentLiveClassRoom() {
 
   const scrollRef = useRef<ScrollView>(null);
   const chatScrollRef = useRef<ScrollView>(null);
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const chatChannelRef = useRef<any>(null);
 
   const [feed, setFeed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,6 +102,7 @@ export default function StudentLiveClassRoom() {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [userName, setUserName] = useState('Student');
   const [userId, setUserId] = useState('');
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
   // Platform detection
   const screenWidth = Dimensions.get('window').width;
@@ -206,6 +206,11 @@ export default function StudentLiveClassRoom() {
             if (prev.some(m => m.id === payload.payload.id)) return prev;
             const updated = [...prev, payload.payload];
 
+            // Mark as unread if drawer is closed
+            if (!chatDrawerOpen) {
+              setHasUnreadMessages(true);
+            }
+
             // Auto-scroll chat to bottom
             setTimeout(() => {
               chatScrollRef.current?.scrollToEnd({ animated: true });
@@ -217,25 +222,18 @@ export default function StudentLiveClassRoom() {
       )
       .subscribe();
 
+    chatChannelRef.current = chatChannel;
+
     return () => {
       supabase.removeChannel(feedChannel);
       supabase.removeChannel(chatChannel);
+      chatChannelRef.current = null;
     };
-  }, [id]);
-
-  // 3️⃣ Handle chat drawer animation
-  useEffect(() => {
-    Animated.spring(slideAnim, {
-      toValue: chatDrawerOpen ? 1 : 0,
-      useNativeDriver: true,
-      tension: 65,
-      friction: 11,
-    }).start();
-  }, [chatDrawerOpen]);
+  }, [id, chatDrawerOpen]);
 
   // Send chat message
   const sendChatMessage = async () => {
-    if (!chatInput.trim() || !id || sendingMessage) return;
+    if (!chatInput.trim() || !id || sendingMessage || !chatChannelRef.current) return;
 
     const messageText = chatInput.trim();
     setChatInput('');
@@ -250,21 +248,26 @@ export default function StudentLiveClassRoom() {
         p_message: messageText,
       });
 
-      // 2️⃣ Then broadcast
-      const chatChannel = supabase.channel(`battle-chat:${id}`);
+      // 2️⃣ Fetch the inserted message to get real DB data
+      const { data: insertedMessages, error: fetchError } = await supabase
+        .from('battle_group_messages')
+        .select('*')
+        .eq('battle_id', id)
+        .eq('user_id', userId)
+        .eq('message', messageText)
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-      await chatChannel.send({
-        type: 'broadcast',
-        event: 'chat-message',
-        payload: {
-          id: crypto.randomUUID(),
-          battle_id: id,
-          user_id: userId,
-          user_name: userName,
-          message: messageText,
-          created_at: new Date().toISOString(),
-        },
-      });
+      if (fetchError) throw fetchError;
+
+      // 3️⃣ Broadcast using real DB row
+      if (insertedMessages && insertedMessages.length > 0) {
+        await chatChannelRef.current.send({
+          type: 'broadcast',
+          event: 'chat-message',
+          payload: insertedMessages[0],
+        });
+      }
     } catch (error) {
       console.error('Failed to send message:', error);
       setChatInput(messageText); // Restore input on error
@@ -276,6 +279,10 @@ export default function StudentLiveClassRoom() {
   // Toggle chat drawer
   const toggleChatDrawer = () => {
     setChatDrawerOpen(!chatDrawerOpen);
+    if (!chatDrawerOpen) {
+      // Clear unread when opening
+      setHasUnreadMessages(false);
+    }
   };
 
   if (loading) {
@@ -617,13 +624,7 @@ case 'topic':
             onPress={toggleChatDrawer}
           >
             <MessageCircle size={24} color="#FFF" />
-            {chatMessages.length > 0 && (
-              <View style={styles.chatBadge}>
-                <Text style={styles.chatBadgeText}>
-                  {chatMessages.length > 99 ? '99+' : chatMessages.length}
-                </Text>
-              </View>
-            )}
+            {hasUnreadMessages && <View style={styles.chatBadgeDot} />}
           </TouchableOpacity>
         )}
       </View>
@@ -941,23 +942,16 @@ topicText: {
     shadowRadius: 4,
   },
 
-  chatBadge: {
+  chatBadgeDot: {
     position: 'absolute',
-    top: -5,
-    right: -5,
+    top: 4,
+    right: 4,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     backgroundColor: '#EF4444',
-    borderRadius: 12,
-    minWidth: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 6,
-  },
-
-  chatBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#FFF',
+    borderWidth: 2,
+    borderColor: '#00D9FF',
   },
 
   modalOverlay: {
