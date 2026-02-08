@@ -332,11 +332,16 @@ export default function StudentLiveClassRoom() {
         );
 
         // 5️⃣ Broadcast to others
-        await chatChannelRef.current.send({
-          type: 'broadcast',
-          event: 'chat-message',
-          payload: realMessage,
-        });
+       try {
+  await chatChannelRef.current?.send({
+    type: 'broadcast',
+    event: 'chat-message',
+    payload: realMessage,
+  });
+} catch {
+  // no-op: DB persistence already guarantees eventual consistency
+}
+
       }
     } catch (error) {
       console.error('Failed to send message:', error);
