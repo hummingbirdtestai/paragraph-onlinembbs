@@ -683,17 +683,6 @@ src={liveEmbedUrlWeb}
   </View>
 )}
 
-                <Text style={styles.audioButtonText}>
-                  🎧 Join Live Audio
-                </Text>
-              </TouchableOpacity>
-
-              <Text style={styles.audioHintMobile}>
-                Opens in browser
-              </Text>
-            </View>
-          )}
-
           {/* No audio available yet */}
           {!liveEmbedUrl && (
             <View style={styles.audioPlaceholder}>
