@@ -265,7 +265,7 @@ export default function StudentLiveClassRoom() {
 
     // 1️⃣ Create optimistic message (show immediately)
     const optimisticMessage: ChatMessage = {
-      id: `local-${Date.now()}`,
+      id: `local-${Date.now()}-${Math.random()}`,
       battle_id: id,
       user_id: userId,
       user_name: userName || 'You',
@@ -416,19 +416,18 @@ export default function StudentLiveClassRoom() {
         </ScrollView>
 
         <View style={styles.chatInputContainer}>
-          <TextInput
-            style={styles.chatInput}
-            value={chatInput}
-            onChangeText={setChatInput}
-            placeholder={!userId ? 'Loading profile…' : 'Ask a doubt...'}
-            placeholderTextColor="#6B7280"
-            multiline
-            maxLength={500}
-            onSubmitEditing={sendChatMessage}
-            blurOnSubmit={false}
-            editable={!sendingMessage && !!userId}
-            editable={!sendingMessage}
-          />
+<TextInput
+  style={styles.chatInput}
+  value={chatInput}
+  onChangeText={setChatInput}
+  placeholder={!userId ? 'Loading profile…' : 'Ask a doubt...'}
+  placeholderTextColor="#6B7280"
+  multiline
+  maxLength={500}
+  onSubmitEditing={sendChatMessage}
+  blurOnSubmit={false}
+  editable={!sendingMessage && !!userId}
+/>
           <TouchableOpacity
             onPress={sendChatMessage}
             disabled={!chatInput.trim() || sendingMessage}
