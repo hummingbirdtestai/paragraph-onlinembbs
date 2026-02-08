@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { MessageCircle, Send, X } from 'lucide-react-native';
-import * as Linking from 'expo-linking';
 
 import { supabase } from '@/lib/supabaseClient';
 
@@ -105,12 +104,6 @@ export default function StudentLiveClassRoom() {
   const [userId, setUserId] = useState('');
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
-  // 🎧 Live audio state (Mixlr)
-const [liveEmbedUrlWeb, setLiveEmbedUrlWeb] = useState<string | null>(null);
-const [liveEventUrlMobile, setLiveEventUrlMobile] = useState<string | null>(null);
-
-  const [audioMuted, setAudioMuted] = useState(false); // UI-only state
-
   // Platform detection (stable on web to prevent unmounting)
   const [isMobile, setIsMobile] = useState(
     Platform.OS !== 'web' ? true : typeof window !== 'undefined' && window.innerWidth < 768
@@ -197,26 +190,6 @@ if (!error && profile?.name) {
 
     loadChatHistory();
   }, [id]);
-
- // 🎧 Fetch Mixlr live audio URLs (WEB + MOBILE)
-useEffect(() => {
-  if (!id) return;
-
-  const loadLiveAudioUrls = async () => {
-    const { data, error } = await supabase
-      .from('battle_schedule')
-      .select('live_embed_url_web, live_event_url_mobile')
-      .eq('battle_id', id)
-      .maybeSingle();
-
-    if (!error && data) {
-      setLiveEmbedUrlWeb(data.live_embed_url_web ?? null);
-      setLiveEventUrlMobile(data.live_event_url_mobile ?? null);
-    }
-  };
-
-  loadLiveAudioUrls();
-}, [id]);
 
   // 2️⃣ Subscribe to feed updates
   useEffect(() => {
@@ -632,64 +605,23 @@ useEffect(() => {
       <View style={[styles.mainContent, isWeb && !isMobile && styles.mainContentWithSidebar]}>
         {/* FEED COLUMN */}
         <View style={{ flex: 1, minWidth: 0 }}>
-          {/* 🎧 Mixlr live audio — WEB ONLY */}
-{isWeb && liveEmbedUrlWeb && (
-
-            <>
-              {/* Hidden audio player */}
-              <View style={{ height: 0, overflow: 'hidden' }}>
-                <iframe
-                  id="live-audio-player"
-                  src={liveEmbedUrlWeb}
-                  allow="autoplay"
-                  style={{ width: 0, height: 0, border: 0 }}
-                />
-              </View>
-
-              {/* Audio status bar (UI-only control) */}
-              <View style={styles.audioBar}>
-                <TouchableOpacity
-                  onPress={() => setAudioMuted(v => !v)}
-                  style={styles.audioButton}
-                >
-                  <Text style={styles.audioButtonText}>
-                    {audioMuted ? '🔇 Audio Muted' : '🔊 Live Audio Playing'}
-                  </Text>
-                </TouchableOpacity>
-
-                <Text style={styles.audioHint}>
-                  🔈 Mixlr audio
-                </Text>
-              </View>
-            </>
+          {/* 🎧 Live Audio — Mixlr Embed (Web + Mobile Web) */}
+          {Platform.OS === 'web' && (
+            <View style={styles.mixlrContainer}>
+              <iframe
+                src="https://dreamzhr.mixlr.com/embed"
+                frameBorder="0"
+                scrolling="no"
+                allow="autoplay"
+                style={{
+                  width: '100%',
+                  height: 200,
+                  borderRadius: 12,
+                  backgroundColor: '#000',
+                }}
+              />
+            </View>
           )}
-
-          {/* 🎧 Mixlr live audio — MOBILE: External link */}
-          {!isWeb && liveEventUrlMobile && (
-  <View style={styles.audioBar}>
-    <TouchableOpacity
-      onPress={() => Linking.openURL(liveEventUrlMobile)}
-      style={styles.audioButtonMobile}
-    >
-      <Text style={styles.audioButtonText}>
-        🎧 Join Live Audio
-      </Text>
-    </TouchableOpacity>
-
-    <Text style={styles.audioHintMobile}>
-      Opens in browser
-    </Text>
-  </View>
-)}
-
-          {/* No audio available yet */}
-{!liveEmbedUrlWeb && !liveEventUrlMobile && (
-  <View style={styles.audioPlaceholder}>
-    <Text style={styles.audioPlaceholderText}>
-      Live audio not started yet
-    </Text>
-  </View>
-)}
 
           <ScrollView
             ref={scrollRef}
@@ -1387,63 +1319,13 @@ topicText: {
     opacity: 0.5,
   },
 
-  // 🎧 Mixlr audio control styles
-  audioBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#1A1A1A',
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+  // 🎧 Mixlr embed container
+  mixlrContainer: {
     marginBottom: 12,
+    borderRadius: 12,
+    overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#2D2D2D',
-  },
-
-  audioButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: '#252525',
-  },
-
-  audioButtonMobile: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#00D9FF',
-  },
-
-  audioButtonText: {
-    color: '#00D9FF',
-    fontWeight: '800',
-    fontSize: 13,
-  },
-
-  audioHint: {
-    fontSize: 12,
-    color: '#9CA3AF',
-  },
-
-  audioHintMobile: {
-    fontSize: 11,
-    color: '#6B7280',
-  },
-
-  audioPlaceholder: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#2D2D2D',
-    alignItems: 'center',
-  },
-
-  audioPlaceholderText: {
-    fontSize: 12,
-    color: '#9CA3AF',
+    backgroundColor: '#000',
   },
 });
