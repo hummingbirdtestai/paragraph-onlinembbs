@@ -234,15 +234,43 @@ export default function StudentLiveClassRoom() {
 
   // Send chat message
   const sendChatMessage = async () => {
-    if (!chatInput.trim() || !id || sendingMessage || !chatChannelRef.current) return;
+    if (
+      !chatInput.trim() ||
+      !id ||
+      sendingMessage ||
+      !chatChannelRef.current ||
+      !userId
+    ) {
+      if (!userId) {
+        console.warn('User profile not loaded yet');
+      }
+      return;
+    }
 
     const messageText = chatInput.trim();
     setChatInput('');
     setSendingMessage(true);
     Keyboard.dismiss();
 
+    // 1️⃣ Create optimistic message (show immediately)
+    const optimisticMessage: ChatMessage = {
+      id: `local-${Date.now()}`,
+      battle_id: id,
+      user_id: userId,
+      user_name: userName || 'You',
+      message: messageText,
+      created_at: new Date().toISOString(),
+    };
+
+    // 2️⃣ Add to UI immediately (WhatsApp behavior)
+    setChatMessages(prev => [...prev, optimisticMessage]);
+
+    setTimeout(() => {
+      chatScrollRef.current?.scrollToEnd({ animated: true });
+    }, 50);
+
     try {
-      // 1️⃣ Insert to DB and get returned row
+      // 3️⃣ Insert to DB and get returned row
       const { data, error } = await supabase.rpc('insert_battle_chat_message', {
         p_battle_id: id,
         p_user_name: userName,
@@ -251,16 +279,31 @@ export default function StudentLiveClassRoom() {
 
       if (error) throw error;
 
-      // 2️⃣ Broadcast using real DB row
+      // 4️⃣ Replace optimistic message with real DB row
       if (data && data.length > 0) {
+        const realMessage = data[0];
+
+        setChatMessages(prev =>
+          prev.map(m =>
+            m.id === optimisticMessage.id ? realMessage : m
+          )
+        );
+
+        // 5️⃣ Broadcast to others
         await chatChannelRef.current.send({
           type: 'broadcast',
           event: 'chat-message',
-          payload: data[0],
+          payload: realMessage,
         });
       }
     } catch (error) {
       console.error('Failed to send message:', error);
+
+      // Rollback optimistic message on error
+      setChatMessages(prev =>
+        prev.filter(m => m.id !== optimisticMessage.id)
+      );
+
       setChatInput(messageText); // Restore input on error
     } finally {
       setSendingMessage(false);
@@ -1024,7 +1067,7 @@ topicText: {
   },
 
   chatMessageBubble: {
-    backgroundColor: '#252525',
+    backgroundColor: '#2A2A2A',
     borderRadius: 12,
     padding: 12,
     maxWidth: '85%',
@@ -1033,28 +1076,27 @@ topicText: {
   },
 
   chatMessageBubbleOwn: {
-    backgroundColor: '#00D9FF20',
+    backgroundColor: '#DCF8C6',
     alignSelf: 'flex-end',
-    borderWidth: 1,
-    borderColor: '#00D9FF40',
+    borderWidth: 0,
   },
 
   chatMessageSender: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#00D9FF',
+    color: '#34B7F1',
     marginBottom: 2,
   },
 
   chatMessageText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#E5E7EB',
+    color: '#EDEDED',
     lineHeight: 20,
   },
 
   chatMessageTextOwn: {
-    color: '#FFF',
+    color: '#000',
   },
 
   chatMessageTime: {
@@ -1064,7 +1106,7 @@ topicText: {
   },
 
   chatMessageTimeOwn: {
-    color: '#9CA3AF',
+    color: '#666',
   },
 
   chatInputContainer: {
