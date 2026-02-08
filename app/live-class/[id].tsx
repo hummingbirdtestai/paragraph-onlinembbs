@@ -279,17 +279,19 @@ if (!error && profile?.name) {
   // Send chat message
   const sendChatMessage = async () => {
     if (
-      !chatInput.trim() ||
-      !id ||
-      sendingMessage ||
-      !chatChannelRef.current ||
-      !userId
-    ) {
-      if (!userId) {
-        console.warn('User profile not loaded yet');
-      }
-      return;
-    }
+  !chatInput.trim() ||
+  !id ||
+  sendingMessage ||
+  !chatChannelRef.current ||
+  !userId ||
+  !userName ||
+  userName === 'Student'
+) {
+  if (!userName || userName === 'Student') {
+    console.warn('User name not loaded yet');
+  }
+  return;
+}
 
     const messageText = chatInput.trim();
     setChatInput('');
