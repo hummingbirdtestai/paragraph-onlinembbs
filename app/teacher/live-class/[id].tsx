@@ -530,7 +530,35 @@ export default function TeacherLiveClassContent() {
         (a, b) => a.topic_order - b.topic_order
       );
 
-      setData(sorted);
+      const adapted = sorted.map(item => {
+        const newClassJson: Record<string, ConceptBlock> = {};
+
+        Object.entries(item.class_json).forEach(([key, bucket]: any) => {
+          const hyfArray = bucket.hyfs
+            ? Object.entries(bucket.hyfs)
+                .sort(([a], [b]) => Number(a) - Number(b))
+                .map(([, value]) => value)
+            : bucket.concept || [];
+
+          const mcqObject = Array.isArray(bucket.mcq)
+            ? bucket.mcq[0]
+            : bucket.mcq;
+
+          newClassJson[key] = {
+            title: bucket.title,
+            concept: hyfArray,
+            mcq: mcqObject,
+            student_doubts: bucket.student_doubts || [],
+          };
+        });
+
+        return {
+          ...item,
+          class_json: newClassJson,
+        };
+      });
+
+      setData(adapted);
       setLoading(false);
     };
 
